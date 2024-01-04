@@ -46,23 +46,19 @@ fun ProcessRun(
     val displayAction by processRunViewModel.displayAction.observeAsState()
     val numberOfSteps by processRunViewModel.numberOfSteps.observeAsState()
     val currentStepNumber by processRunViewModel.currentStepNumber.observeAsState()
-    val keepScreenOn by processRunViewModel.keepScreenOn.observeAsState()
     val hasLoop by processRunViewModel.hasLoop.observeAsState()
     val hasHours by processRunViewModel.hasHours.observeAsState()
 
-    val numberOfPreBeeps by settingsViewModel.numberOfPreBeeps.observeAsState()
-    val intervalTimeIsCentral by settingsViewModel.interValTimeIsCentral.observeAsState()
     val vibrateEnabled by settingsViewModel.vibrateEnabled.observeAsState()
 
-    processRunViewModel.initialiseRun(processId, numberOfPreBeeps ?: 0, vibrateEnabled ?: false)
+    processRunViewModel.initialiseRun(processId, vibrateEnabled ?: false)
 
     processRunViewModel.setDoneEventHandler {
         navigator.navigateUp()
     }
 
-    if (keepScreenOn == true) {
-        KeepScreenOn()
-    }
+    // Always!
+    KeepScreenOn()
 
     Scaffold(
         content = { innerPadding ->
@@ -108,14 +104,14 @@ fun ProcessRun(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 BigTimerText(
-                                    duration = if (intervalTimeIsCentral == true) pdAction.currentIntervalTime.seconds else pdAction.currentProcessTime.seconds,
+                                    duration = pdAction.currentIntervalTime.seconds,
                                     withHours = hasHours == true,
                                     modifier = Modifier
                                         .fillMaxWidth(0.5f)
                                         .alignByBaseline()
                                 )
                                 MediumTimerAndIntervalText(
-                                    duration = if (intervalTimeIsCentral == true) pdAction.currentProcessTime.seconds else pdAction.currentIntervalTime.seconds,
+                                    duration = pdAction.currentProcessTime.seconds,
                                     withHours = hasHours == true,
                                     intervalText = "${pdAction.currentRound} of ${pdAction.totalRounds}",
                                     modifier = Modifier.alignByBaseline()
@@ -123,11 +119,11 @@ fun ProcessRun(
                             }
                         } else {
                             BigTimerText(
-                                duration = if (intervalTimeIsCentral == true) pdAction.currentIntervalTime.seconds else pdAction.currentProcessTime.seconds,
+                                duration = pdAction.currentIntervalTime.seconds,
                                 withHours = hasHours == true
                             )
                             MediumTimerAndIntervalText(
-                                duration = if (intervalTimeIsCentral == true) pdAction.currentProcessTime.seconds else pdAction.currentIntervalTime.seconds,
+                                duration = pdAction.currentProcessTime.seconds,
                                 withHours = hasHours == true,
                                 intervalText = "${pdAction.currentRound} of ${pdAction.totalRounds}"
                             )

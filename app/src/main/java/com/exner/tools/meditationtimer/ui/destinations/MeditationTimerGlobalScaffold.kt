@@ -24,7 +24,7 @@ import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.rememberNavHostEngine
 
 @Composable
-fun FotoTimerGlobalScaffold() {
+fun MeditationTimerGlobalScaffold() {
     val engine = rememberNavHostEngine()
     val navController = engine.rememberNavController()
     val destination = navController.appCurrentDestinationAsState().value

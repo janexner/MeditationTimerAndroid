@@ -3,18 +3,16 @@ package com.exner.tools.meditationtimer.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.exner.tools.meditationtimer.data.persistence.FotoTimerChainingDependencies
-import com.exner.tools.meditationtimer.data.persistence.FotoTimerProcessIdAndName
-import com.exner.tools.meditationtimer.data.persistence.FotoTimerProcessRepository
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerChainingDependencies
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ProcessDeleteViewModel @Inject constructor(
-    private val repository: FotoTimerProcessRepository
+    private val repository: MeditationTimerProcessRepository
 ): ViewModel() {
 
     private val _processName: MutableLiveData<String> = MutableLiveData("")
@@ -23,8 +21,8 @@ class ProcessDeleteViewModel @Inject constructor(
     private val _processIsTarget: MutableLiveData<Boolean> = MutableLiveData(false)
     val processIsTarget: LiveData<Boolean> = _processIsTarget
 
-    private val _processChainingDependencies: MutableLiveData<FotoTimerChainingDependencies> = MutableLiveData(null)
-    val processChainingDependencies: LiveData<FotoTimerChainingDependencies> = _processChainingDependencies
+    private val _processChainingDependencies: MutableLiveData<MeditationTimerChainingDependencies> = MutableLiveData(null)
+    val processChainingDependencies: LiveData<MeditationTimerChainingDependencies> = _processChainingDependencies
 
     fun checkProcess(processId: Long) {
         if (processId != -1L) {
@@ -33,7 +31,7 @@ class ProcessDeleteViewModel @Inject constructor(
                 if (process != null) {
                     _processName.value = process.name
                     val newDependentProcesses = repository.getIdsAndNamesOfDependentProcesses(process)
-                    val chainingDependencies = FotoTimerChainingDependencies(true, newDependentProcesses)
+                    val chainingDependencies = MeditationTimerChainingDependencies(true, newDependentProcesses)
                     _processChainingDependencies.value = chainingDependencies
                     _processIsTarget.value = true
                 }

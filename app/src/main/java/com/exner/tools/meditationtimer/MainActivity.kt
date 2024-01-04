@@ -7,10 +7,9 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.preference.PreferenceManager
 import com.exner.tools.meditationtimer.audio.SoundPoolHolder
 import com.exner.tools.meditationtimer.audio.VibratorHolder
-import com.exner.tools.meditationtimer.ui.destinations.FotoTimerGlobalScaffold
+import com.exner.tools.meditationtimer.ui.destinations.MeditationTimerGlobalScaffold
 import com.exner.tools.meditationtimer.ui.theme.MeditationTimerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -20,14 +19,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val sharedSettings = PreferenceManager.getDefaultSharedPreferences(this)
-        val forceNightMode = sharedSettings.getBoolean("preference_night_mode", false)
-
         setContent {
-            MeditationTimerTheme(
-                darkTheme = forceNightMode
-            ) {
-                FotoTimerGlobalScaffold()
+            MeditationTimerTheme {
+                MeditationTimerGlobalScaffold()
             }
         }
 

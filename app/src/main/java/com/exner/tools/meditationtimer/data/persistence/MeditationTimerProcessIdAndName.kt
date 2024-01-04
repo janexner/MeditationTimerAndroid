@@ -1,6 +1,6 @@
 package com.exner.tools.meditationtimer.data.persistence
 
-class FotoTimerProcessIdAndName(
+class MeditationTimerProcessIdAndName(
     var uid: Long,
     var name: String
 )

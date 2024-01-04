@@ -31,7 +31,6 @@ import com.exner.tools.meditationtimer.R
 import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.ProcessDetailsViewModel
-import com.exner.tools.meditationtimer.ui.SettingsViewModel
 import com.exner.tools.meditationtimer.ui.SmallBodyText
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessDeleteDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessEditDestination
@@ -44,32 +43,18 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun ProcessDetails(
     processId: Long,
     processDetailsViewModel: ProcessDetailsViewModel = hiltViewModel(),
-    settingsViewModel: SettingsViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
 ) {
 
     val name by processDetailsViewModel.name.observeAsState()
     val processTime by processDetailsViewModel.processTime.observeAsState()
     val intervalTime by processDetailsViewModel.intervalTime.observeAsState()
-    val keepsScreenOn by processDetailsViewModel.keepsScreenOn.observeAsState()
-    val hasSoundStart by processDetailsViewModel.hasSoundStart.observeAsState()
-    val hasSoundEnd by processDetailsViewModel.hasSoundEnd.observeAsState()
-    val hasSoundInterval by processDetailsViewModel.hasSoundInterval.observeAsState()
-    val hasSoundMetronome by processDetailsViewModel.hasSoundMetronome.observeAsState()
-    val hasPreBeeps by processDetailsViewModel.hasPreBeeps.observeAsState()
-    val hasLeadIn by processDetailsViewModel.hasLeadIn.observeAsState()
-    val leadInSeconds by processDetailsViewModel.leadInSeconds.observeAsState()
-    val hasLeadInSound by processDetailsViewModel.hasLeadInSound.observeAsState()
     val hasAutoChain by processDetailsViewModel.hasAutoChain.observeAsState()
-    val hasPauseBeforeChain by processDetailsViewModel.hasPauseBeforeChain.observeAsState()
-    val pauseTime by processDetailsViewModel.pauseTime.observeAsState()
     val gotoId by processDetailsViewModel.gotoId.observeAsState()
     // this one is the odd one out
     val nextProcessesName by processDetailsViewModel.nextProcessesName.observeAsState()
 
     processDetailsViewModel.getProcess(processId)
-
-    val expertMode by settingsViewModel.expertMode.observeAsState()
 
     Scaffold(
         content = { innerPadding ->
@@ -86,37 +71,41 @@ fun ProcessDetails(
                     processTime,
                     intervalTime,
                 )
-                if (keepsScreenOn == true && expertMode == true) {
-                    ListItem(
-                        headlineContent = { SmallBodyText(text = "UI") },
-                        supportingContent = { BodyText(text = "Screen will stay on") },
-                        leadingContent = {
-                            Icon(
-                                painterResource(id = R.drawable.baseline_light_mode_24),
-                                contentDescription = "UI",
-                            )
-                        }
-                    )
+                ListItem(
+                    headlineContent = { SmallBodyText(text = "Sounds") },
+                    supportingContent = { BodyText(text = "Sound is on") },
+                    leadingContent = {
+                        Icon(
+                            painterResource(id = R.drawable.ic_baseline_music_note_24),
+                            contentDescription = "Process Sounds",
+                        )
+                    }
+                )
+                if (hasAutoChain == true && (null != gotoId) && (-1L < gotoId!!)) {
+                    if (null != nextProcessesName) {
+                        ListItem(
+                            headlineContent = { SmallBodyText(text = "After") },
+                            supportingContent = { BodyText(text = "Afterwards, '$nextProcessesName' will be started.") },
+                            leadingContent = {
+                                Icon(
+                                    painterResource(id = R.drawable.ic_baseline_navigate_next_24),
+                                    contentDescription = "Process End",
+                                )
+                            }
+                        )
+                    } else {
+                        ListItem(
+                            headlineContent = { SmallBodyText(text = "After") },
+                            supportingContent = { BodyText(text = "This process chains into a process that does not exist!") },
+                            leadingContent = {
+                                Icon(
+                                    painterResource(id = R.drawable.baseline_error_24),
+                                    contentDescription = "Problem"
+                                )
+                            }
+                        )
+                    }
                 }
-                ProcessAudioData(
-                    hasSoundStart,
-                    hasSoundEnd,
-                    hasSoundInterval,
-                    hasSoundMetronome,
-                    hasPreBeeps,
-                    hasLeadInSound,
-                    expertMode
-                )
-                ProcessLeadInAndChainData(
-                    hasLeadIn,
-                    leadInSeconds,
-                    hasAutoChain,
-                    hasPauseBeforeChain,
-                    pauseTime,
-                    gotoId,
-                    nextProcessesName,
-                    expertMode
-                )
                 // middle - spacer
                 Spacer(modifier = Modifier)
             }
@@ -188,69 +177,6 @@ fun ProcessName(name: String?, modifier: Modifier) {
 }
 
 @Composable
-fun ProcessAudioData(
-    hasSoundStart: Boolean?,
-    hasSoundEnd: Boolean?,
-    hasSoundInterval: Boolean?,
-    hasSoundMetronome: Boolean?,
-    hasPreBeeps: Boolean?,
-    hasLeadInSound: Boolean?,
-    expertMode: Boolean?
-) {
-    if (expertMode == true) {
-        if (hasSoundStart == true || hasSoundEnd == true || hasPreBeeps == true || hasSoundInterval == true || hasSoundMetronome == true || hasLeadInSound == true) {
-            var soundStatement = "Sounds: "
-            var space = ""
-            if (hasLeadInSound == true) {
-                soundStatement += space + "lead-in"
-                space = ", "
-            }
-            if (hasSoundStart == true) {
-                soundStatement += space + "start"
-                space = ", "
-            }
-            if (hasSoundInterval == true) {
-                soundStatement += space + "interval"
-                if (hasPreBeeps == true) {
-                    soundStatement += " (with 'pre-beeps')"
-                }
-                space = ", "
-            }
-            if (hasSoundEnd == true) {
-                soundStatement += space + "end"
-                space = ", "
-            }
-            if (hasSoundMetronome == true) {
-                soundStatement += space + "every second ('metronome')"
-            }
-            ListItem(
-                headlineContent = { SmallBodyText(text = "Sounds") },
-                supportingContent = { BodyText(text = soundStatement) },
-                leadingContent = {
-                    Icon(
-                        painterResource(id = R.drawable.ic_baseline_music_note_24),
-                        contentDescription = "Process Sounds",
-                    )
-                }
-            )
-        }
-    } else { // not expert mode
-        if (hasSoundStart == true || hasSoundEnd == true || hasPreBeeps == true || hasSoundInterval == true || hasSoundMetronome == true || hasLeadInSound == true) {
-            ListItem(
-                headlineContent = { SmallBodyText(text = "Sounds") },
-                supportingContent = { BodyText(text = "Sound is on") },
-                leadingContent = {
-                    Icon(
-                        painterResource(id = R.drawable.ic_baseline_music_note_24),
-                        contentDescription = "Process Sounds",
-                    )
-                }
-            )
-        }
-    }
-}
-
-@Composable
 fun ProcessTimerData(
     processTime: String?,
     intervalTime: String?
@@ -267,85 +193,3 @@ fun ProcessTimerData(
     )
 }
 
-@Composable
-fun ProcessLeadInAndChainData(
-    hasLeadIn: Boolean?,
-    leadInSeconds: String?,
-    hasAutoChain: Boolean?,
-    hasPauseBeforeChain: Boolean?,
-    pauseTime: String?,
-    gotoId: Long?,
-    nextName: String?,
-    expertMode: Boolean?
-) {
-    if (expertMode == true) {
-        if (hasLeadIn == true && (null != leadInSeconds)) {
-            ListItem(
-                headlineContent = { SmallBodyText(text = "Before") },
-                supportingContent = { BodyText(text = "There will be a $leadInSeconds second count down") },
-                leadingContent = {
-                    Icon(
-                        painterResource(id = R.drawable.ic_baseline_start_24),
-                        contentDescription = "Process Start",
-                    )
-                }
-            )
-        }
-        if (hasAutoChain == true && (null != gotoId) && (-1L < gotoId)) {
-            if (null != nextName) {
-                var doneText =
-                    "Afterwards, '$nextName' will be started."
-                if (true == hasPauseBeforeChain && (null != pauseTime) && ("0" != pauseTime)) {
-                    doneText += " There will be a pause of $pauseTime seconds before that."
-                }
-                ListItem(
-                    headlineContent = { SmallBodyText(text = "After") },
-                    supportingContent = { BodyText(text = doneText) },
-                    leadingContent = {
-                        Icon(
-                            painterResource(id = R.drawable.ic_baseline_navigate_next_24),
-                            contentDescription = "Process End",
-                        )
-                    }
-                )
-            } else {
-                ListItem(
-                    headlineContent = { SmallBodyText(text = "After") },
-                    supportingContent = { BodyText(text = "This process chains into a process that does not exist!") },
-                    leadingContent = {
-                        Icon(
-                            painterResource(id = R.drawable.baseline_error_24),
-                            contentDescription = "Problem"
-                        )
-                    }
-                )
-            }
-        }
-    } else {
-        if (hasAutoChain == true && (null != gotoId) && (-1L < gotoId)) {
-            if (null != nextName) {
-                ListItem(
-                    headlineContent = { SmallBodyText(text = "After") },
-                    supportingContent = { BodyText(text = "'$nextName' will be started next") },
-                    leadingContent = {
-                        Icon(
-                            painterResource(id = R.drawable.ic_baseline_navigate_next_24),
-                            contentDescription = "Process End",
-                        )
-                    }
-                )
-            } else {
-                ListItem(
-                    headlineContent = { SmallBodyText(text = "After") },
-                    supportingContent = { BodyText(text = "This process chains into a process that does not exist!") },
-                    leadingContent = {
-                        Icon(
-                            painterResource(id = R.drawable.baseline_error_24),
-                            contentDescription = "Problem"
-                        )
-                    }
-                )
-            }
-        }
-    }
-}

@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.ProcessEditViewModel
-import com.exner.tools.meditationtimer.ui.SettingsViewModel
 import com.exner.tools.meditationtimer.ui.TextAndSwitch
 import com.exner.tools.meditationtimer.ui.TextFieldForTimes
 import com.ramcosta.composedestinations.annotation.Destination
@@ -45,41 +44,21 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun ProcessEdit(
     processId: Long,
     processEditViewModel: ProcessEditViewModel = hiltViewModel(),
-    settingsViewModel: SettingsViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
 ) {
 
     val name by processEditViewModel.name.observeAsState()
     val processTime by processEditViewModel.processTime.observeAsState()
     val intervalTime by processEditViewModel.intervalTime.observeAsState()
-    val keepsScreenOn by processEditViewModel.keepsScreenOn.observeAsState()
-    val hasSoundStart by processEditViewModel.hasSoundStart.observeAsState()
-    val hasSoundEnd by processEditViewModel.hasSoundEnd.observeAsState()
-    val hasSoundInterval by processEditViewModel.hasSoundInterval.observeAsState()
-    val hasSoundMetronome by processEditViewModel.hasSoundMetronome.observeAsState()
-    val hasPreBeeps by processEditViewModel.hasPreBeeps.observeAsState()
-    val hasLeadIn by processEditViewModel.hasLeadIn.observeAsState()
-    val leadInSeconds by processEditViewModel.leadInSeconds.observeAsState()
-    val hasLeadInSound by processEditViewModel.hasLeadInSound.observeAsState()
     val hasAutoChain by processEditViewModel.hasAutoChain.observeAsState()
-    val hasPauseBeforeChain by processEditViewModel.hasPauseBeforeChain.observeAsState()
-    val pauseTime by processEditViewModel.pauseTime.observeAsState()
     // some odd ones out
     val nextProcessesName by processEditViewModel.nextProcessesName.observeAsState()
     val processIdsAndNames by processEditViewModel.processIdsAndNames.observeAsState()
 
     processEditViewModel.getProcess(processId)
-    // if this is a new process, the keepScreenOn property has to be set
-    // this is necessary because there is a setting for that
-    if (processId == -1L) {
-        val defaultKeepsScreenOn by settingsViewModel.defaultKeepScreenOn.observeAsState()
-        processEditViewModel.updateKeepsScreenOn(defaultKeepsScreenOn == true)
-    }
     processEditViewModel.getProcessIdsAndNames()
 
     var modified by remember { mutableStateOf(false) }
-
-    val expertMode by settingsViewModel.expertMode.observeAsState()
 
     Scaffold(
         content = { innerPadding ->
@@ -121,96 +100,6 @@ fun ProcessEdit(
                         modified = true
                     },
                 )
-                HeaderText(text = "During the process")
-                if (expertMode == true) {
-                    TextAndSwitch(
-                        text = "Keep the screen on",
-                        checked = keepsScreenOn == true,
-                    ) {
-                        processEditViewModel.updateKeepsScreenOn(it)
-                        modified = true
-                    }
-                    Text(
-                        text = "Play sounds:",
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    TextAndSwitch(
-                        text = "At start",
-                        checked = hasSoundStart == true
-                    ) {
-                        processEditViewModel.updateHasSoundStart(it)
-                        modified = true
-                    }
-                    TextAndSwitch(
-                        text = "Before each interval ('pre-beeps')",
-                        checked = hasPreBeeps == true,
-                    ) {
-                        processEditViewModel.updateHasPreBeeps(it)
-                        modified = true
-                    }
-                    TextAndSwitch(
-                        text = "At each interval",
-                        checked = hasSoundInterval == true,
-                    ) {
-                        processEditViewModel.updateHasSoundInterval(it)
-                        modified = true
-                    }
-                    TextAndSwitch(
-                        text = "Every second ('metronome')",
-                        checked = hasSoundMetronome == true,
-                    ) {
-                        processEditViewModel.updateHasSoundMetronome(it)
-                        modified = true
-                    }
-                    TextAndSwitch(
-                        text = "At the end",
-                        checked = hasSoundEnd == true,
-                    ) {
-                        processEditViewModel.updateHasSoundEnd(it)
-                        modified = true
-                    }
-                } else {
-                    TextAndSwitch(
-                        text = "Play sounds at start, intervals, and end",
-                        checked = hasSoundStart == true && hasSoundInterval == true && hasSoundEnd == true
-                    ) {
-                        processEditViewModel.updateHasSoundStart(it)
-                        processEditViewModel.updateHasSoundInterval(it)
-                        processEditViewModel.updateHasSoundEnd(it)
-                        modified = true
-                    }
-                }
-                AnimatedVisibility(visible = expertMode == true) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        HeaderText(text = "Before the process")
-                        TextAndSwitch(
-                            text = "Lead-in before process",
-                            checked = hasLeadIn == true,
-                        ) {
-                            processEditViewModel.updateHasLeadIn(it)
-                            modified = true
-                        }
-                        AnimatedVisibility(visible = hasLeadIn == true) {
-                            TextFieldForTimes(
-                                value = leadInSeconds ?: 5,
-                                label = { Text(text = "Lead-in (seconds)") },
-                                onValueChange = {
-                                    processEditViewModel.updateLeadInSeconds(it)
-                                    modified = true
-                                }
-                            )
-                            TextAndSwitch(
-                                text = "Play a sound during lead-in",
-                                checked = hasLeadInSound == true
-                            ) {
-                                processEditViewModel.updateHasLeadInSound(it)
-                                modified = true
-                            }
-                        }
-                    }
-                }
                 HeaderText(text = "After the process")
                 TextAndSwitch(
                     text = "Automatically start another process",
@@ -255,23 +144,6 @@ fun ProcessEdit(
                                     )
                                 }
                             }
-                        }
-                        TextAndSwitch(
-                            text = "Pause before going to the next process",
-                            checked = hasPauseBeforeChain ?: false,
-                        ) {
-                            processEditViewModel.updateHasPauseBeforeChain(it)
-                            modified = true
-                        }
-                        AnimatedVisibility(visible = true == hasPauseBeforeChain) {
-                            TextFieldForTimes(
-                                value = pauseTime ?: 5,
-                                label = { Text(text = "Pause (seconds)") },
-                                onValueChange = {
-                                    processEditViewModel.updatePauseTime(it)
-                                    modified = true
-                                },
-                            )
                         }
                     }
                 }
