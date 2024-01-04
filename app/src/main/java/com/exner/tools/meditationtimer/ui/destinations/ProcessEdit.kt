@@ -150,7 +150,7 @@ fun ProcessEdit(
             }
         },
         bottomBar = {
-            FotoTimerEditBottomBar(navigator = navigator, commitProcess = {
+            MeditationTimerEditBottomBar(navigator = navigator, commitProcess = {
                 processEditViewModel.commitProcess()
             })
         }
@@ -158,7 +158,7 @@ fun ProcessEdit(
 }
 
 @Composable
-fun FotoTimerEditBottomBar(navigator: DestinationsNavigator, commitProcess: () -> Unit) {
+fun MeditationTimerEditBottomBar(navigator: DestinationsNavigator, commitProcess: () -> Unit) {
     BottomAppBar(
         actions = {},
         floatingActionButton = {

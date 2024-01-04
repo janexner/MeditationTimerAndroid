@@ -55,7 +55,7 @@ class ProcessRunViewModel @Inject constructor(
     private var doneEventHandler: () -> Unit = {}
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun initialiseRun(processId: Long, vibrateEnabled: Boolean) {
+    fun initialiseRun(processId: Long, noSounds: Boolean, vibrateEnabled: Boolean) {
         val result = mutableListOf<List<ProcessStepAction>>()
 
         if (!isRunning) {
@@ -155,7 +155,9 @@ class ProcessRunViewModel @Inject constructor(
                                     }
 
                                     is ProcessSoundAction -> {
-                                        SoundPoolHolder.playSound(action.soundId)
+                                        if (!noSounds) {
+                                            SoundPoolHolder.playSound(action.soundId)
+                                        }
                                         if (vibrateEnabled) {
                                             VibratorHolder.vibrate(action.soundId)
                                         }

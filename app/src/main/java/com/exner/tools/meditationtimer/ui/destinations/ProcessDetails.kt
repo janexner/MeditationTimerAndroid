@@ -71,16 +71,6 @@ fun ProcessDetails(
                     processTime,
                     intervalTime,
                 )
-                ListItem(
-                    headlineContent = { SmallBodyText(text = "Sounds") },
-                    supportingContent = { BodyText(text = "Sound is on") },
-                    leadingContent = {
-                        Icon(
-                            painterResource(id = R.drawable.ic_baseline_music_note_24),
-                            contentDescription = "Process Sounds",
-                        )
-                    }
-                )
                 if (hasAutoChain == true && (null != gotoId) && (-1L < gotoId!!)) {
                     if (null != nextProcessesName) {
                         ListItem(
@@ -111,13 +101,13 @@ fun ProcessDetails(
             }
         },
         bottomBar = {
-            FotoTimerDetailsBottomBar(processId = processId, navigator = navigator)
+            MeditationTimerDetailsBottomBar(processId = processId, navigator = navigator)
         }
     )
 }
 
 @Composable
-fun FotoTimerDetailsBottomBar(
+fun MeditationTimerDetailsBottomBar(
     processId: Long,
     navigator: DestinationsNavigator
 ) {
@@ -183,7 +173,7 @@ fun ProcessTimerData(
 ) {
     ListItem(
         headlineContent = { SmallBodyText(text = "Times") },
-        supportingContent = { BodyText(text = "The process runs for $processTime seconds, with an interval every $intervalTime seconds") },
+        supportingContent = { BodyText(text = "The process runs for $processTime minutes, with an interval every $intervalTime minutes") },
         leadingContent = {
             Icon(
                 painterResource(id = R.drawable.ic_baseline_timer_24),

@@ -8,20 +8,20 @@ const val STEP_LENGTH_IN_MILLISECONDS = 1000
 
 fun getProcessStepListForOneProcess(
     process: MeditationTimerProcess,
-    considerLeadIn: Boolean = false,
+    hasLeadIn: Boolean = false,
     leadInTime: Int = 5,
     useSounds: Boolean = true,
 ): MutableList<List<ProcessStepAction>> {
     val result = mutableListOf<List<ProcessStepAction>>()
 
     var processParameters = ""
-    if (considerLeadIn && leadInTime > 0) {
+    if (hasLeadIn && leadInTime > 0) {
         processParameters += "$leadInTime > "
     }
     processParameters += "${process.processTime} / ${process.intervalTime}"
 
     // do we need steps for lead-in, and how many?
-    if (considerLeadIn && leadInTime > 0) {
+    if (hasLeadIn && leadInTime > 0) {
         val howManySteps = leadInTime * 1000 / STEP_LENGTH_IN_MILLISECONDS
         for (i in 1..howManySteps) {
             val actionsList = mutableListOf<ProcessStepAction>()
@@ -38,7 +38,7 @@ fun getProcessStepListForOneProcess(
     }
 
     // how many steps do we need for the regular interval?
-    val howManySteps = process.processTime * 1000 / STEP_LENGTH_IN_MILLISECONDS
+    val howManySteps = process.processTime * 60 * 1000 / STEP_LENGTH_IN_MILLISECONDS
     for (i in 1..howManySteps) {
         val actionsList = mutableListOf<ProcessStepAction>()
         // add actions as needed
@@ -52,11 +52,11 @@ fun getProcessStepListForOneProcess(
         }
         // calculate round and times and create the display action
         val currentProcessTime = i * STEP_LENGTH_IN_MILLISECONDS / 1000
-        val currentIntervalTime = currentProcessTime % process.intervalTime
+        val currentIntervalTime = currentProcessTime % (process.intervalTime * 60)
         val ftpdAction = ProcessDisplayStepAction(
             process.name,
             processParameters,
-            1 + currentProcessTime / process.intervalTime,
+            1 + currentProcessTime / (process.intervalTime * 60),
             ceil(process.processTime.toDouble() / process.intervalTime).toInt(),
             currentProcessTime,
             currentIntervalTime
@@ -76,7 +76,7 @@ fun getProcessStepListForOneProcess(
             )
             actionsList.add(ftpseAction)
         } else if (isFullSecond(i)) {
-            if ((i * STEP_LENGTH_IN_MILLISECONDS / 1000.0 % process.intervalTime == 0.0) && useSounds) {
+            if ((i * STEP_LENGTH_IN_MILLISECONDS / 1000.0 % (process.intervalTime * 60) == 0.0) && useSounds) {
                 val ftpsiAction = ProcessSoundAction(
                     process.name,
                     SoundIDs.SOUND_ID_INTERVAL

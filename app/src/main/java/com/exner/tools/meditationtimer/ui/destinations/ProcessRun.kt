@@ -49,9 +49,10 @@ fun ProcessRun(
     val hasLoop by processRunViewModel.hasLoop.observeAsState()
     val hasHours by processRunViewModel.hasHours.observeAsState()
 
+    val noSounds by settingsViewModel.noSounds.observeAsState()
     val vibrateEnabled by settingsViewModel.vibrateEnabled.observeAsState()
 
-    processRunViewModel.initialiseRun(processId, vibrateEnabled ?: false)
+    processRunViewModel.initialiseRun(processId, noSounds ?: false, vibrateEnabled ?: false)
 
     processRunViewModel.setDoneEventHandler {
         navigator.navigateUp()
