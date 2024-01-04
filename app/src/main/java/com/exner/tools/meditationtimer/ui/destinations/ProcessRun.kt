@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.exner.tools.meditationtimer.steps.ProcessDisplayStepAction
 import com.exner.tools.meditationtimer.steps.ProcessLeadInDisplayStepAction
-import com.exner.tools.meditationtimer.steps.ProcessPauseDisplayStepAction
 import com.exner.tools.meditationtimer.ui.BigTimerText
 import com.exner.tools.meditationtimer.ui.KeepScreenOn
 import com.exner.tools.meditationtimer.ui.MediumTimerAndIntervalText
@@ -89,7 +88,6 @@ fun ProcessRun(
                     is ProcessLeadInDisplayStepAction -> {
                         // TODO
                         val plAction = (displayAction as ProcessLeadInDisplayStepAction)
-                        Text(text = plAction.processName + " | " + plAction.processParameters + " | lead-in")
                         BigTimerText(
                             duration = plAction.currentLeadInTime.seconds,
                             hasHours == true
@@ -99,7 +97,6 @@ fun ProcessRun(
                     is ProcessDisplayStepAction -> {
                         // TODO
                         val pdAction = (displayAction as ProcessDisplayStepAction)
-                        Text(text = pdAction.processName + " | " + pdAction.processParameters + " | running")
                         if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                             Row(
                                 modifier = Modifier.fillMaxWidth()
@@ -129,16 +126,6 @@ fun ProcessRun(
                                 intervalText = "${pdAction.currentRound} of ${pdAction.totalRounds}"
                             )
                         }
-                    }
-
-                    is ProcessPauseDisplayStepAction -> {
-                        // TODO
-                        val ppAction = (displayAction as ProcessPauseDisplayStepAction)
-                        Text(text = ppAction.processName + " | " + ppAction.processParameters + " | pausing")
-                        BigTimerText(
-                            duration = ppAction.currentPauseTime.seconds,
-                            withHours = hasHours == true
-                        )
                     }
 
                     else -> {

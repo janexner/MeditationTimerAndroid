@@ -29,12 +29,6 @@ class ProcessSoundAction(
     val soundId: Long
 ) : ProcessStepAction(processName)
 
-class ProcessPauseDisplayStepAction(
-    processName: String,
-    val processParameters: String,
-    val currentPauseTime: Int
-) : ProcessStepAction(processName)
-
 class ProcessGotoAction(
     processName: String,
     val gotoId: Long
