@@ -1,47 +1,59 @@
 package com.exner.tools.meditationtimer
 
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.exner.tools.fototimer.ui.theme.MeditationTimerTheme
+import androidx.preference.PreferenceManager
+import com.exner.tools.meditationtimer.audio.SoundPoolHolder
+import com.exner.tools.meditationtimer.audio.VibratorHolder
+import com.exner.tools.meditationtimer.ui.destinations.FotoTimerGlobalScaffold
+import com.exner.tools.meditationtimer.ui.theme.MeditationTimerTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        val sharedSettings = PreferenceManager.getDefaultSharedPreferences(this)
+        val forceNightMode = sharedSettings.getBoolean("preference_night_mode", false)
+
         setContent {
-            MeditationTimerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+            MeditationTimerTheme(
+                darkTheme = forceNightMode
+            ) {
+                FotoTimerGlobalScaffold()
             }
         }
+
+        // experiment: vibrate
+        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val vibratorManager =
+                getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            vibratorManager.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        }
+        VibratorHolder.initialise(vibrator)
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    override fun onResume() {
+        super.onResume()
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MeditationTimerTheme {
-        Greeting("Android")
+        // load all sounds
+        SoundPoolHolder.loadSounds(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        // release the kraken
+        SoundPoolHolder.release()
     }
 }

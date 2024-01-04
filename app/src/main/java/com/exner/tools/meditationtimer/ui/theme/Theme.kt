@@ -1,4 +1,4 @@
-package com.exner.tools.fototimer.ui.theme
+package com.exner.tools.meditationtimer.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
