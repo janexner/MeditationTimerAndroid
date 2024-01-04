@@ -12,7 +12,6 @@ import com.exner.tools.meditationtimer.steps.ProcessDisplayStepAction
 import com.exner.tools.meditationtimer.steps.ProcessGotoAction
 import com.exner.tools.meditationtimer.steps.ProcessJumpbackAction
 import com.exner.tools.meditationtimer.steps.ProcessLeadInDisplayStepAction
-import com.exner.tools.meditationtimer.steps.ProcessPauseDisplayStepAction
 import com.exner.tools.meditationtimer.steps.ProcessSoundAction
 import com.exner.tools.meditationtimer.steps.ProcessStartAction
 import com.exner.tools.meditationtimer.steps.ProcessStepAction
@@ -145,7 +144,7 @@ class ProcessRunViewModel @Inject constructor(
                             val actionsList = result[step]
                             actionsList.forEach { action ->
                                 when (action) {
-                                    is ProcessLeadInDisplayStepAction, is ProcessDisplayStepAction, is ProcessPauseDisplayStepAction -> {
+                                    is ProcessLeadInDisplayStepAction, is ProcessDisplayStepAction -> {
                                         _displayAction.value = action
                                     }
 
