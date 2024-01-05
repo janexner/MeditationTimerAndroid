@@ -51,11 +51,11 @@ fun ProcessEdit(
     val processTime by processEditViewModel.processTime.observeAsState()
     val intervalTime by processEditViewModel.intervalTime.observeAsState()
     val hasAutoChain by processEditViewModel.hasAutoChain.observeAsState()
-    val categoryId by processEditViewModel.categoryId.observeAsState()
     // some odd ones out
     val nextProcessesName by processEditViewModel.nextProcessesName.observeAsState()
     val processIdsAndNames by processEditViewModel.processIdsAndNames.observeAsState()
     val categoryName by processEditViewModel.categoryName.observeAsState()
+    val categoryIdsAndNames by processEditViewModel.categoryIdsAndNames.observeAsState()
 
     processEditViewModel.getProcess(processId)
     processEditViewModel.getProcessIdsAndNames()
@@ -118,7 +118,7 @@ fun ProcessEdit(
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         )
-                        processIdsAndNames?.forEach { idAndName ->
+                        categoryIdsAndNames?.forEach { idAndName ->
                             DropdownMenuItem(
                                 text = { Text(text = idAndName.name) },
                                 onClick = {

@@ -34,7 +34,6 @@ fun Settings(
     val chainToSameCategoryOnly by settingsViewModel.chainToSameCategoryOnly.observeAsState()
     val noSounds by settingsViewModel.noSounds.observeAsState()
     val vibrateEnabled by settingsViewModel.vibrateEnabled.observeAsState()
-    val sortProcessesAlphabetically by settingsViewModel.sortProcessesAlphabetically.observeAsState()
 
     // unlock screen rotation
     LockScreenOrientation(orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR)
@@ -78,12 +77,6 @@ fun Settings(
             checked = vibrateEnabled == true
         ) {
             settingsViewModel.updateVibrateEnabled(it)
-        }
-        TextAndSwitch(
-            text = "Sort processes alphabetically",
-            checked = sortProcessesAlphabetically == true
-        ) {
-            settingsViewModel.updateSortProcessesAlphabetically(it)
         }
         TextAndSwitch(
             text = "Chain to same category only",

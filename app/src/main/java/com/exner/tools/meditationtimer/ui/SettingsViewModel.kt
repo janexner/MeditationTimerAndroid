@@ -34,9 +34,6 @@ class SettingsViewModel @Inject constructor(
     private val _vibrateEnabled: MutableLiveData<Boolean> = MutableLiveData(false)
     val vibrateEnabled: LiveData<Boolean> = _vibrateEnabled
 
-    private val _sortProcessesAlphabetically: MutableLiveData<Boolean> = MutableLiveData(false)
-    val sortProcessesAlphabetically: LiveData<Boolean> = _sortProcessesAlphabetically
-
     init {
         _beforeCountingWait.value = sharedPreferences.getBoolean("preference_before_counting_wait", false)
         _howLongToWaitBeforeCounting.value = sharedPreferences.getInt("preference_how_long_to_wait_before_counting", 5)
@@ -44,7 +41,6 @@ class SettingsViewModel @Inject constructor(
         _chainToSameCategoryOnly.value = sharedPreferences.getBoolean("preference_chain_to_same_category_only", false)
         _noSounds.value = sharedPreferences.getBoolean("preference_no_sounds", false)
         _vibrateEnabled.value = sharedPreferences.getBoolean("preference_vibrate_enabled", false)
-        _sortProcessesAlphabetically.value = sharedPreferences.getBoolean("preference_sort_processes_alphabetically", false)
     }
 
     fun updateBeforeCountingWait(newBeforeCountingWait: Boolean) {
@@ -75,10 +71,5 @@ class SettingsViewModel @Inject constructor(
     fun updateVibrateEnabled(newVibrateEnabled: Boolean) {
         sharedPreferences.edit().putBoolean("preference_vibrate_enabled", newVibrateEnabled).apply()
         _vibrateEnabled.value = newVibrateEnabled
-    }
-
-    fun updateSortProcessesAlphabetically(newSortAlpha: Boolean) {
-        sharedPreferences.edit().putBoolean("preference_sort_processes_alphabetically", newSortAlpha).apply()
-        _sortProcessesAlphabetically.value = newSortAlpha
     }
 }

@@ -11,6 +11,9 @@ interface MeditationTimerDataDAO {
     @Query("SELECT * FROM meditationtimerprocess ORDER BY name ASC")
     fun getAllAlphabeticallyOrdered(): Flow<List<MeditationTimerProcess>>
 
+    @Query("SELECT * FROM meditationtimerprocess WHERE category_id IN (:categoryId) ORDER BY name ASC")
+    fun getAllForCategoryAlphabeticallyOrdered(categoryId: Long): Flow<List<MeditationTimerProcess>>
+
     @Query("SELECT uid, name FROM meditationtimerprocess ORDER BY name ASC")
     suspend fun getIdsAndNamesOfAllProcesses(): List<MeditationTimerDataIdAndName>
 

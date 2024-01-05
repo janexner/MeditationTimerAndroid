@@ -14,6 +14,14 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
         meditationTimerProcessDAO.getAllAlphabeticallyOrdered()
 
     @WorkerThread
+    fun getAllProcessesForCategory(categoryId: Long): Flow<List<MeditationTimerProcess>> =
+        if (categoryId == -1L) {
+            meditationTimerProcessDAO.getAllAlphabeticallyOrdered()
+        } else {
+            meditationTimerProcessDAO.getAllForCategoryAlphabeticallyOrdered(categoryId)
+        }
+
+    @WorkerThread
     suspend fun loadProcessById(id: Long): MeditationTimerProcess? {
         return meditationTimerProcessDAO.getMeditationTimerProcess(id)
     }
