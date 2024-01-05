@@ -86,15 +86,15 @@ fun ProcessEdit(
                 HeaderText(text = "Times")
                 TextFieldForTimes(
                     value = processTime ?: 30,
-                    label = { Text(text = "Process time (total)") },
+                    label = { Text(text = "Process time (total) in minutes") },
                     onValueChange = {
                         processEditViewModel.updateProcessTime(it)
                         modified = true
                     },
                 )
                 TextFieldForTimes(
-                    value = intervalTime ?: 10,
-                    label = { Text(text = "Interval time") },
+                    value = intervalTime ?: 5,
+                    label = { Text(text = "Interval time in minutes") },
                     onValueChange = {
                         processEditViewModel.updateIntervalTime(it)
                         modified = true

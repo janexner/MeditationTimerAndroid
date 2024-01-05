@@ -25,7 +25,7 @@ class ProcessEditViewModel @Inject constructor(
     private val _processTime: MutableLiveData<Int> = MutableLiveData(30)
     val processTime: LiveData<Int> = _processTime
 
-    private val _intervalTime: MutableLiveData<Int> = MutableLiveData(10)
+    private val _intervalTime: MutableLiveData<Int> = MutableLiveData(5)
     val intervalTime: LiveData<Int> = _intervalTime
 
     private val _hasAutoChain: MutableLiveData<Boolean> = MutableLiveData(false)

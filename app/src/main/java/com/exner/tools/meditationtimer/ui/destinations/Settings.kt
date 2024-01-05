@@ -54,7 +54,7 @@ fun Settings(
             ) {
                 TextFieldForTimes(
                     value = howLongToWaitBeforeCounting ?: 5,
-                    label = { Text(text = "How long to wait before counting") },
+                    label = { Text(text = "How long to wait before counting (seconds)") },
                     onValueChange = {
                         settingsViewModel.updateHowLongToWaitBeforeCounting(it)
                     }
