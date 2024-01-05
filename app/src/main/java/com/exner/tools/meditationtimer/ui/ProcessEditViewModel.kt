@@ -3,6 +3,7 @@ package com.exner.tools.meditationtimer.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataIdAndName
@@ -38,20 +39,16 @@ class ProcessEditViewModel @Inject constructor(
     val nextProcessesName: LiveData<String?> = _nextProcessesName
 
     private val _categoryId: MutableLiveData<Long?> = MutableLiveData(-1L)
-    val categoryId: LiveData<Long?> = _categoryId
+    private val categoryId: LiveData<Long?> = _categoryId
 
     private val _categoryName: MutableLiveData<String?> = MutableLiveData("None")
     val categoryName: LiveData<String?> = _categoryName
 
-    private val _processIdsAndNames: MutableLiveData<List<MeditationTimerDataIdAndName>> = MutableLiveData(
-        emptyList()
-    )
-    val processIdsAndNames: LiveData<List<MeditationTimerDataIdAndName>> = _processIdsAndNames
+    val processIdsAndNames: LiveData<List<MeditationTimerDataIdAndName>> =
+        repository.loadIdsAndNamesForAllProcesses().asLiveData()
 
-    private val _categoryIdsAndNames: MutableLiveData<List<MeditationTimerDataIdAndName>> = MutableLiveData(
-        emptyList()
-    )
-    val categoryIdsAndNames: LiveData<List<MeditationTimerDataIdAndName>> = _categoryIdsAndNames
+    val categoryIdsAndNames: LiveData<List<MeditationTimerDataIdAndName>> =
+        repository.loadIdsAndNamesForAllCategories().asLiveData()
 
     fun getProcess(processId: Long) {
         if (processId != -1L) {
@@ -76,20 +73,6 @@ class ProcessEditViewModel @Inject constructor(
         }
     }
 
-    fun getProcessIdsAndNames() {
-        viewModelScope.launch {
-            val temp = repository.loadIdsAndNamesForAllProcesses()
-            _processIdsAndNames.value = temp
-        }
-    }
-
-    fun getCategoryIdsAndNames() {
-        viewModelScope.launch {
-            val temp = repository.loadIdsAndNamesForAllCategories()
-            _categoryIdsAndNames.value = temp
-        }
-    }
-
     fun commitProcess() {
         if (uid.value != null) {
             viewModelScope.launch {
@@ -111,6 +94,10 @@ class ProcessEditViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun updateUid(newUid: Long) {
+        _uid.value = newUid
     }
 
     fun updateName(name: String) {

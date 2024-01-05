@@ -1,6 +1,7 @@
 package com.exner.tools.meditationtimer.ui.destinations
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,11 +13,13 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -38,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.exner.tools.meditationtimer.ui.HeaderText
@@ -67,8 +71,6 @@ fun ProcessEdit(
     val categoryIdsAndNames by processEditViewModel.categoryIdsAndNames.observeAsState()
 
     processEditViewModel.getProcess(processId)
-    processEditViewModel.getProcessIdsAndNames()
-    processEditViewModel.getCategoryIdsAndNames()
 
     var modified by remember { mutableStateOf(false) }
 
@@ -101,18 +103,29 @@ fun ProcessEdit(
                     expanded = categoryExpanded,
                     onExpandedChange = { categoryExpanded = !categoryExpanded }
                 ) {
-                    OutlinedTextField(
-                        // The `menuAnchor` modifier must be passed to the text field for correctness.
+                    Row(
                         modifier = Modifier
-                            .menuAnchor()
                             .fillMaxWidth(),
-                        readOnly = true,
-                        value = categoryName ?: "None",
-                        placeholder = { Text("Select a Category") },
-                        onValueChange = {},
-                        label = { Text("Process category") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded) },
-                    )
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        OutlinedTextField(
+                            // The `menuAnchor` modifier must be passed to the text field for correctness.
+                            modifier = Modifier
+                                .menuAnchor(),
+                            readOnly = true,
+                            value = categoryName ?: "None",
+                            onValueChange = {},
+                            label = { Text("Process category") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded) },
+                        )
+                        Button(
+                            shape = RectangleShape,
+                            onClick = { openDialog.value = true }
+                        ) {
+                            Text(text = "+")
+                        }
+                    }
                     ExposedDropdownMenu(
                         expanded = categoryExpanded,
                         onDismissRequest = { categoryExpanded = false }) {
@@ -122,14 +135,6 @@ fun ProcessEdit(
                                 processEditViewModel.updateCategoryId(-1L)
                                 processEditViewModel.updateCategoryName("None")
                                 modified = true
-                                categoryExpanded = false
-                            },
-                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                        )
-                        DropdownMenuItem(
-                            text = { Text(text = "Create new category") },
-                            onClick = {
-                                openDialog.value = true
                                 categoryExpanded = false
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,

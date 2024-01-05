@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.MutableLiveData
 import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.ProcessListViewModel
@@ -56,8 +57,6 @@ fun ProcessList(
     val categoryName by processListViewModel.categoryName.observeAsState()
     val categoryIdsAndNames by processListViewModel.categoryIdsAndNames.observeAsState()
 
-    processListViewModel.getCategoryIdsAndNames()
-
     var modified by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -79,7 +78,6 @@ fun ProcessList(
                             .fillMaxWidth(),
                         readOnly = true,
                         value = categoryName ?: "All",
-                        placeholder = { Text("Select a Category") },
                         onValueChange = {},
                         label = { Text("Process category") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded) },

@@ -14,6 +14,7 @@ import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -53,7 +54,7 @@ fun ProcessDelete(
                     .verticalScroll(rememberScrollState())
             ) {
                 HeaderText(text = "Delete Process")
-                Divider(modifier = Modifier.padding(8.dp))
+                HorizontalDivider(modifier = Modifier.padding(8.dp))
                 Text(
                     text = "You are about to delete processID $processId,"
                 )

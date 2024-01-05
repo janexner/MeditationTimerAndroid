@@ -27,12 +27,12 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
     }
 
     @WorkerThread
-    suspend fun loadIdsAndNamesForAllProcesses(): List<MeditationTimerDataIdAndName> {
+    fun loadIdsAndNamesForAllProcesses(): Flow<List<MeditationTimerDataIdAndName>> {
         return meditationTimerProcessDAO.getIdsAndNamesOfAllProcesses()
     }
 
     @WorkerThread
-    suspend fun loadIdsAndNamesForAllCategories(): List<MeditationTimerDataIdAndName> {
+    fun loadIdsAndNamesForAllCategories(): Flow<List<MeditationTimerDataIdAndName>> {
         return meditationTimerProcessDAO.getIdsAndNamesOfAllCategories()
     }
 
