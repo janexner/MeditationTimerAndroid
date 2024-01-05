@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -48,10 +48,20 @@ fun ProcessRun(
     val hasLoop by processRunViewModel.hasLoop.observeAsState()
     val hasHours by processRunViewModel.hasHours.observeAsState()
 
+    val beforeCountingWait by settingsViewModel.beforeCountingWait.observeAsState()
+    val howLongToWaitBeforeCounting by settingsViewModel.howLongToWaitBeforeCounting.observeAsState()
     val noSounds by settingsViewModel.noSounds.observeAsState()
     val vibrateEnabled by settingsViewModel.vibrateEnabled.observeAsState()
+    val countBackwards by settingsViewModel.countBackwards.observeAsState()
 
-    processRunViewModel.initialiseRun(processId, noSounds ?: false, vibrateEnabled ?: false)
+    processRunViewModel.initialiseRun(
+        processId = processId,
+        hasLeadIn = beforeCountingWait ?: false,
+        leadInTime = howLongToWaitBeforeCounting ?: 5,
+        noSounds = noSounds ?: false,
+        vibrateEnabled = vibrateEnabled ?: false,
+        countBackwards = countBackwards ?: false
+    )
 
     processRunViewModel.setDoneEventHandler {
         navigator.navigateUp()
@@ -74,7 +84,7 @@ fun ProcessRun(
                     val currentProgress =
                         if (numberOfSteps != null && numberOfSteps != 0) currentStepNumber!!.toFloat() / numberOfSteps!! else 0.0f
                     LinearProgressIndicator(
-                        progress = currentProgress,
+                        progress = { currentProgress },
                         modifier = Modifier.fillMaxWidth(),
                     )
                 } else {
@@ -149,7 +159,7 @@ fun FotoTimerRunBottomBar(navigator: DestinationsNavigator, cancelAction: () -> 
                 text = { Text(text = "Stop") },
                 icon = {
                     Icon(
-                        imageVector = Icons.Filled.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Stop"
                     )
                 },

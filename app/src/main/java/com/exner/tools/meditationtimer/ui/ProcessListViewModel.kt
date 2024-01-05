@@ -16,7 +16,7 @@ class ProcessListViewModel @Inject constructor(
 ): ViewModel() {
 
     private val _categoryId: MutableLiveData<Long?> = MutableLiveData(-1L)
-    private val categoryId: LiveData<Long?> = _categoryId
+    val categoryId: LiveData<Long?> = _categoryId
 
     private val _categoryName: MutableLiveData<String?> = MutableLiveData("All")
     val categoryName: LiveData<String?> = _categoryName

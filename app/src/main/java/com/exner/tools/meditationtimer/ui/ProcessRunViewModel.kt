@@ -54,7 +54,14 @@ class ProcessRunViewModel @Inject constructor(
     private var doneEventHandler: () -> Unit = {}
 
     @OptIn(DelicateCoroutinesApi::class)
-    fun initialiseRun(processId: Long, noSounds: Boolean, vibrateEnabled: Boolean) {
+    fun initialiseRun(
+        processId: Long,
+        hasLeadIn: Boolean,
+        leadInTime: Int,
+        noSounds: Boolean,
+        vibrateEnabled: Boolean,
+        countBackwards: Boolean
+    ) {
         val result = mutableListOf<List<ProcessStepAction>>()
 
         if (!isRunning) {
@@ -73,7 +80,12 @@ class ProcessRunViewModel @Inject constructor(
                     val process = repository.loadProcessById(currentID)
                     if (process != null) {
                         val partialResult =
-                            getProcessStepListForOneProcess(process, firstRound)
+                            getProcessStepListForOneProcess(
+                                process = process,
+                                hasLeadIn = firstRound && hasLeadIn,
+                                leadInTime = leadInTime,
+                                countBackwards = countBackwards,
+                            )
                         partialResult.forEach { actionList ->
                             result.add(actionList)
                         }

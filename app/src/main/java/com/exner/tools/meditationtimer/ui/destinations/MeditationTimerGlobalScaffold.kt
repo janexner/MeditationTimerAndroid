@@ -3,8 +3,9 @@ package com.exner.tools.meditationtimer.ui.destinations
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -12,9 +13,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.exner.tools.meditationtimer.ui.destinations.destinations.AboutDestination
+import com.exner.tools.meditationtimer.ui.destinations.destinations.CategoryListDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.Destination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessListDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessRunDestination
@@ -48,8 +54,10 @@ fun MeditationTimerGlobalScaffold() {
 @Composable
 private fun MeditationTimerTopBar(
     destination: Destination?,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
+    var displayMainMenu by remember { mutableStateOf(false) }
+
     TopAppBar(
         title = { Text(text = "Meditation Timer") },
         navigationIcon = {
@@ -73,41 +81,44 @@ private fun MeditationTimerTopBar(
             }
         },
         actions = {
-            when (destination) {
-                SettingsDestination -> {
-                    AboutActionIconButton(navController)
+            IconButton(
+                onClick = {
+                    displayMainMenu = !displayMainMenu
                 }
-
-                AboutDestination -> {
-                    // no icons
-                }
-
-                else -> {
-                    SettingsActionIconButton(navController)
-                    AboutActionIconButton(navController)
-                }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = "Menu"
+                )
+            }
+            DropdownMenu(
+                expanded = displayMainMenu,
+                onDismissRequest = { displayMainMenu = false }
+            ) {
+                DropdownMenuItem(
+                    enabled = destination != CategoryListDestination,
+                    text = { Text(text = "Manage categories") },
+                    onClick = {
+                        displayMainMenu = false
+                        navController.navigate(CategoryListDestination())
+                    }
+                )
+                DropdownMenuItem(
+                    enabled = destination != SettingsDestination,
+                    text = { Text(text = "Settings") },
+                    onClick = {
+                        displayMainMenu = false
+                        navController.navigate(SettingsDestination())
+                    }
+                )
+                DropdownMenuItem(
+                    enabled = destination != AboutDestination,
+                    text = { Text(text = "About Meditation Timer") },
+                    onClick = {
+                        navController.navigate(AboutDestination())
+                    }
+                )
             }
         }
     )
-}
-
-@Composable
-private fun AboutActionIconButton(navController: NavHostController) {
-    IconButton(onClick = {
-        navController.navigate(AboutDestination())
-    }) {
-        Icon(imageVector = Icons.Filled.Info, contentDescription = "About Meditation Timer")
-    }
-}
-
-@Composable
-private fun SettingsActionIconButton(navController: NavHostController) {
-    IconButton(onClick = {
-        navController.navigate(SettingsDestination())
-    }) {
-        Icon(
-            imageVector = Icons.Filled.Settings,
-            contentDescription = "Settings"
-        )
-    }
 }

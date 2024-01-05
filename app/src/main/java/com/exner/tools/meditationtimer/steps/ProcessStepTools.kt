@@ -11,7 +11,9 @@ fun getProcessStepListForOneProcess(
     hasLeadIn: Boolean = false,
     leadInTime: Int = 5,
     useSounds: Boolean = true,
+    countBackwards: Boolean = false,
 ): MutableList<List<ProcessStepAction>> {
+
     val result = mutableListOf<List<ProcessStepAction>>()
 
     var processParameters = ""
@@ -25,11 +27,13 @@ fun getProcessStepListForOneProcess(
         val howManySteps = leadInTime * 1000 / STEP_LENGTH_IN_MILLISECONDS
         for (i in 1..howManySteps) {
             val actionsList = mutableListOf<ProcessStepAction>()
+            val timeToShow =
+                if (countBackwards) (howManySteps + 1) - i * STEP_LENGTH_IN_MILLISECONDS / 1000 else i * STEP_LENGTH_IN_MILLISECONDS / 1000
             // add actions as needed
             val ftpliAction = ProcessLeadInDisplayStepAction(
-                process.name,
-                processParameters,
-                i * STEP_LENGTH_IN_MILLISECONDS / 1000
+                processName = process.name,
+                processParameters = processParameters,
+                currentLeadInTime = timeToShow
             )
             actionsList.add(ftpliAction)
             // add the chain of actions to the overall list
@@ -51,7 +55,7 @@ fun getProcessStepListForOneProcess(
             actionsList.add(ftpstartAction)
         }
         // calculate round and times and create the display action
-        val currentProcessTime = i * STEP_LENGTH_IN_MILLISECONDS / 1000
+        val currentProcessTime = if (countBackwards) (howManySteps + 1) - i * STEP_LENGTH_IN_MILLISECONDS / 1000 else i * STEP_LENGTH_IN_MILLISECONDS / 1000
         val currentIntervalTime = currentProcessTime % (process.intervalTime * 60)
         val ftpdAction = ProcessDisplayStepAction(
             process.name,
