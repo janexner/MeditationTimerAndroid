@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataIdAndName
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -142,5 +143,12 @@ class ProcessEditViewModel @Inject constructor(
 
     fun updateCategoryName(newCategoryName: String?) {
         _categoryName.value = newCategoryName
+    }
+
+    fun createNewCategory(newCategoryName: String) {
+        viewModelScope.launch {
+            val newCategory = MeditationTimerProcessCategory(newCategoryName, 0)
+            repository.insertCategory(newCategory)
+        }
     }
 }

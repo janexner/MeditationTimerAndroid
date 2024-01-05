@@ -2,7 +2,7 @@ package com.exner.tools.meditationtimer.ui.destinations
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,7 +31,7 @@ fun MeditationTimerGlobalScaffold() {
 
     Scaffold(
         topBar = {
-            FotoTimerTopBar(destination, navController)
+            MeditationTimerTopBar(destination, navController)
         },
         content = { innerPadding ->
             DestinationsNavHost(
@@ -46,7 +46,7 @@ fun MeditationTimerGlobalScaffold() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun FotoTimerTopBar(
+private fun MeditationTimerTopBar(
     destination: Destination?,
     navController: NavHostController
 ) {
@@ -65,7 +65,7 @@ private fun FotoTimerTopBar(
                 else -> {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
                         )
                     }

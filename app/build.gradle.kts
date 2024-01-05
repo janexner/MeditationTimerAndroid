@@ -92,6 +92,7 @@ dependencies {
 
     // others
     implementation(libs.material)
+    implementation(libs.androidx.material3.android)
 
     // compose destinations
     implementation(libs.compose.destinations.core)

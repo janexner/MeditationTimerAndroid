@@ -40,6 +40,9 @@ interface MeditationTimerDataDAO {
 
     @Delete
     suspend fun delete(fotoTimerProcess: MeditationTimerProcess)
+
+    @Insert
+    suspend fun insertCategory(category: MeditationTimerProcessCategory)
 }
 
 // see https://developer.android.com/training/data-storage/room#kts

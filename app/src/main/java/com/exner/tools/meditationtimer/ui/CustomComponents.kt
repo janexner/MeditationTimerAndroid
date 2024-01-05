@@ -6,7 +6,6 @@ import android.content.ContextWrapper
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ListItem
@@ -233,9 +232,9 @@ private fun AutoSizeText(
     style: TextStyle = LocalTextStyle.current
 ) {
     val tm = TextMeasurer(
-        fallbackFontFamilyResolver = LocalFontFamilyResolver.current,
-        fallbackDensity = LocalDensity.current,
-        fallbackLayoutDirection = LayoutDirection.Ltr
+        defaultFontFamilyResolver = LocalFontFamilyResolver.current,
+        defaultDensity = LocalDensity.current,
+        defaultLayoutDirection = LayoutDirection.Ltr
     )
     var shrunkFontSize = fontSize
     // measure

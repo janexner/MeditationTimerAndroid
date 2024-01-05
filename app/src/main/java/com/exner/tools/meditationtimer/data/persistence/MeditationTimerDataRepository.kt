@@ -55,4 +55,9 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
     suspend fun delete(fotoTimerProcess: MeditationTimerProcess) {
         meditationTimerProcessDAO.delete(fotoTimerProcess)
     }
+
+    @WorkerThread
+    suspend fun insertCategory(category: MeditationTimerProcessCategory) {
+        meditationTimerProcessDAO.insertCategory(category)
+    }
 }
