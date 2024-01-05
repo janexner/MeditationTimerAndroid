@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 // Declares the DAO as a private property in the constructor. Pass in the DAO
 // instead of the whole database, because you only need access to the DAO
-class MeditationTimerProcessRepository @Inject constructor(private val meditationTimerProcessDAO: MeditationTimerProcessDAO) {
+class MeditationTimerDataRepository @Inject constructor(private val meditationTimerProcessDAO: MeditationTimerDataDAO) {
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
@@ -15,16 +15,21 @@ class MeditationTimerProcessRepository @Inject constructor(private val meditatio
 
     @WorkerThread
     suspend fun loadProcessById(id: Long): MeditationTimerProcess? {
-        return meditationTimerProcessDAO.getFotoTimerProcess(id)
+        return meditationTimerProcessDAO.getMeditationTimerProcess(id)
     }
 
     @WorkerThread
-    suspend fun loadIdsAndNamesForAllProcesses(): List<MeditationTimerProcessIdAndName> {
+    suspend fun loadIdsAndNamesForAllProcesses(): List<MeditationTimerDataIdAndName> {
         return meditationTimerProcessDAO.getIdsAndNamesOfAllProcesses()
     }
 
     @WorkerThread
-    suspend fun getIdsAndNamesOfDependentProcesses(fotoTimerProcess: MeditationTimerProcess): List<MeditationTimerProcessIdAndName> {
+    suspend fun loadIdsAndNamesForAllCategories(): List<MeditationTimerDataIdAndName> {
+        return meditationTimerProcessDAO.getIdsAndNamesOfAllCategories()
+    }
+
+    @WorkerThread
+    suspend fun getIdsAndNamesOfDependentProcesses(fotoTimerProcess: MeditationTimerProcess): List<MeditationTimerDataIdAndName> {
         return meditationTimerProcessDAO.getIdsAndNamesOfDependantProcesses(fotoTimerProcess.uid)
     }
 

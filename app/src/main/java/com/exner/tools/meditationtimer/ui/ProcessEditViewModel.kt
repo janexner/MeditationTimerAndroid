@@ -5,15 +5,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
-import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessIdAndName
-import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessRepository
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataIdAndName
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ProcessEditViewModel @Inject constructor(
-    private val repository: MeditationTimerProcessRepository,
+    private val repository: MeditationTimerDataRepository,
 ): ViewModel() {
 
     private val _uid: MutableLiveData<Long> = MutableLiveData(-1L)
@@ -36,10 +36,21 @@ class ProcessEditViewModel @Inject constructor(
     private val _nextProcessesName: MutableLiveData<String?> = MutableLiveData("")
     val nextProcessesName: LiveData<String?> = _nextProcessesName
 
-    private val _processIdsAndNames: MutableLiveData<List<MeditationTimerProcessIdAndName>> = MutableLiveData(
+    private val _categoryId: MutableLiveData<Long?> = MutableLiveData(-1L)
+    val categoryId: LiveData<Long?> = _categoryId
+
+    private val _categoryName: MutableLiveData<String?> = MutableLiveData("None")
+    val categoryName: LiveData<String?> = _categoryName
+
+    private val _processIdsAndNames: MutableLiveData<List<MeditationTimerDataIdAndName>> = MutableLiveData(
         emptyList()
     )
-    val processIdsAndNames: LiveData<List<MeditationTimerProcessIdAndName>> = _processIdsAndNames
+    val processIdsAndNames: LiveData<List<MeditationTimerDataIdAndName>> = _processIdsAndNames
+
+    private val _categoryIdsAndNames: MutableLiveData<List<MeditationTimerDataIdAndName>> = MutableLiveData(
+        emptyList()
+    )
+    val categoryIdsAndNames: LiveData<List<MeditationTimerDataIdAndName>> = _categoryIdsAndNames
 
     fun getProcess(processId: Long) {
         if (processId != -1L) {
@@ -58,6 +69,7 @@ class ProcessEditViewModel @Inject constructor(
                             _nextProcessesName.value = nextProcess.name
                         }
                     }
+                    _categoryId.value = process.categoryId ?: -1L
                 }
             }
         }
@@ -70,18 +82,26 @@ class ProcessEditViewModel @Inject constructor(
         }
     }
 
+    fun getCategoryIdsAndNames() {
+        viewModelScope.launch {
+            val temp = repository.loadIdsAndNamesForAllCategories()
+            _categoryIdsAndNames.value = temp
+        }
+    }
+
     fun commitProcess() {
-        if (_uid.value != null) {
+        if (uid.value != null) {
             viewModelScope.launch {
                 val process = MeditationTimerProcess(
-                    uid = _uid.value!!.toLong(),
-                    name = _name.value.toString(),
-                    processTime = if (_processTime.value != null) _processTime.value!!.toInt() else 30,
-                    intervalTime = if (_intervalTime.value != null) _intervalTime.value!!.toInt() else 10,
-                    hasAutoChain =  _hasAutoChain.value == true,
+                    uid = uid.value!!.toLong(),
+                    name = name.value.toString(),
+                    processTime = if (processTime.value != null) processTime.value!!.toInt() else 30,
+                    intervalTime = if (intervalTime.value != null) intervalTime.value!!.toInt() else 10,
+                    hasAutoChain =  hasAutoChain.value == true,
                     gotoId = if (_gotoId.value != null) _gotoId.value!!.toLong() else null,
+                    categoryId = if (categoryId.value != null) categoryId.value!!.toLong() else null
                 )
-                if (_uid.value == -1L) {
+                if (uid.value == -1L) {
                     repository.insert(process.copy(
                         uid = 0
                     ))
@@ -114,5 +134,13 @@ class ProcessEditViewModel @Inject constructor(
 
     fun updateNextProcessesName(nextProcessesName: String?) {
         _nextProcessesName.value = nextProcessesName
+    }
+
+    fun updateCategoryId(newCategoryId: Long?) {
+        _categoryId.value = newCategoryId
+    }
+
+    fun updateCategoryName(newCategoryName: String?) {
+        _categoryName.value = newCategoryName
     }
 }

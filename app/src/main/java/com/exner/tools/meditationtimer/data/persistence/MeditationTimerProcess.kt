@@ -13,5 +13,7 @@ data class MeditationTimerProcess (
     @ColumnInfo(name = "has_auto_chain") val hasAutoChain: Boolean = false,
     @ColumnInfo(name = "goto_id") val gotoId: Long?,
 
+    @ColumnInfo(name = "category_id") val categoryId: Long?,
+
     @PrimaryKey(autoGenerate = true) val uid: Long = 0
 )

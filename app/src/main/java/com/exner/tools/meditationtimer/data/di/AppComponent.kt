@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataDAO
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
-import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessDAO
-import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessRoomDatabase
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerRoomDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,23 +25,23 @@ object AppComponent {
 
     @Singleton
     @Provides
-    fun provideDao(ftDatabase: MeditationTimerProcessRoomDatabase): MeditationTimerProcessDAO =
+    fun provideDao(ftDatabase: MeditationTimerRoomDatabase): MeditationTimerDataDAO =
         ftDatabase.processDAO()
 
     @Singleton
     @Provides
     fun provideAppDatabase(
         @ApplicationContext context: Context,
-        provider: Provider<MeditationTimerProcessDAO>
-    ): MeditationTimerProcessRoomDatabase =
+        provider: Provider<MeditationTimerDataDAO>
+    ): MeditationTimerRoomDatabase =
         Room.databaseBuilder(
             context.applicationContext,
-            MeditationTimerProcessRoomDatabase::class.java,
+            MeditationTimerRoomDatabase::class.java,
             "meditation_timer_process_database"
-        ).addCallback(ProcessDatabaseCallback(provider)).build()
+        ).fallbackToDestructiveMigration().addCallback(ProcessDatabaseCallback(provider)).build()
 
     class ProcessDatabaseCallback(
-        private val provider: Provider<MeditationTimerProcessDAO>
+        private val provider: Provider<MeditationTimerDataDAO>
     ) : RoomDatabase.Callback() {
 
         private val applicationScope = CoroutineScope(SupervisorJob())
@@ -62,6 +62,7 @@ object AppComponent {
                     10,
                     true,
                     2L,
+                    -1L
                 )
             provider.get().insert(meditationTimerProcess)
             meditationTimerProcess =
@@ -71,6 +72,7 @@ object AppComponent {
                     5,
                     false,
                     0,
+                    -1L
                 )
             provider.get().insert(meditationTimerProcess)
         }

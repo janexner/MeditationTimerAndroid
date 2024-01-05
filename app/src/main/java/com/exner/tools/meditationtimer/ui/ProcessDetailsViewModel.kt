@@ -4,14 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessRepository
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ProcessDetailsViewModel @Inject constructor(
-    private val repository: MeditationTimerProcessRepository
+    private val repository: MeditationTimerDataRepository
 ): ViewModel() {
 
     private val _uid: MutableLiveData<Long> = MutableLiveData(-1L)

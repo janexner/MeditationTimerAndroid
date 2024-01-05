@@ -4,13 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
-import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessRepository
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class ProcessListViewModel @Inject constructor(
-    repository: MeditationTimerProcessRepository
+    repository: MeditationTimerDataRepository
 ): ViewModel() {
 
     // Using LiveData and caching what allWords returns has several benefits:

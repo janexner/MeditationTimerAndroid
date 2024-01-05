@@ -51,12 +51,15 @@ fun ProcessEdit(
     val processTime by processEditViewModel.processTime.observeAsState()
     val intervalTime by processEditViewModel.intervalTime.observeAsState()
     val hasAutoChain by processEditViewModel.hasAutoChain.observeAsState()
+    val categoryId by processEditViewModel.categoryId.observeAsState()
     // some odd ones out
     val nextProcessesName by processEditViewModel.nextProcessesName.observeAsState()
     val processIdsAndNames by processEditViewModel.processIdsAndNames.observeAsState()
+    val categoryName by processEditViewModel.categoryName.observeAsState()
 
     processEditViewModel.getProcess(processId)
     processEditViewModel.getProcessIdsAndNames()
+    processEditViewModel.getCategoryIdsAndNames()
 
     var modified by remember { mutableStateOf(false) }
 
@@ -82,6 +85,52 @@ fun ProcessEdit(
                         singleLine = true,
                         modifier = Modifier.weight(0.75f)
                     )
+                }
+                var categoryExpanded by remember {
+                    mutableStateOf(false)
+                }
+                ExposedDropdownMenuBox(
+                    expanded = categoryExpanded,
+                    onExpandedChange = { categoryExpanded = !categoryExpanded }
+                ) {
+                    OutlinedTextField(
+                        // The `menuAnchor` modifier must be passed to the text field for correctness.
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth(),
+                        readOnly = true,
+                        value = categoryName ?: "None",
+                        placeholder = { Text("Select a Category") },
+                        onValueChange = {},
+                        label = { Text("Process category") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded) },
+                    )
+                    ExposedDropdownMenu(
+                        expanded = categoryExpanded,
+                        onDismissRequest = { categoryExpanded = false }) {
+                        DropdownMenuItem(
+                            text = { Text(text = "None") },
+                            onClick = {
+                                processEditViewModel.updateCategoryId(-1L)
+                                processEditViewModel.updateCategoryName("None")
+                                modified = true
+                                categoryExpanded = false
+                            },
+                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                        )
+                        processIdsAndNames?.forEach { idAndName ->
+                            DropdownMenuItem(
+                                text = { Text(text = idAndName.name) },
+                                onClick = {
+                                    processEditViewModel.updateCategoryId(idAndName.uid)
+                                    processEditViewModel.updateCategoryName(idAndName.name)
+                                    modified = true
+                                    categoryExpanded = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                            )
+                        }
+                    }
                 }
                 HeaderText(text = "Times")
                 TextFieldForTimes(

@@ -4,7 +4,7 @@ import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface MeditationTimerProcessDAO {
+interface MeditationTimerDataDAO {
     @Query("SELECT * FROM meditationtimerprocess")
     fun getAll(): Flow<List<MeditationTimerProcess>>
 
@@ -12,13 +12,16 @@ interface MeditationTimerProcessDAO {
     fun getAllAlphabeticallyOrdered(): Flow<List<MeditationTimerProcess>>
 
     @Query("SELECT uid, name FROM meditationtimerprocess ORDER BY name ASC")
-    suspend fun getIdsAndNamesOfAllProcesses(): List<MeditationTimerProcessIdAndName>
+    suspend fun getIdsAndNamesOfAllProcesses(): List<MeditationTimerDataIdAndName>
+
+    @Query("SELECT uid, name FROM meditationtimerprocesscategory ORDER BY name ASC")
+    suspend fun getIdsAndNamesOfAllCategories(): List<MeditationTimerDataIdAndName>
 
     @Query("SELECT uid, name FROM meditationtimerprocess WHERE goto_id=:id ORDER BY name ASC")
-    suspend fun getIdsAndNamesOfDependantProcesses(id: Long): List<MeditationTimerProcessIdAndName>
+    suspend fun getIdsAndNamesOfDependantProcesses(id: Long): List<MeditationTimerDataIdAndName>
 
     @Query("SELECT * FROM meditationtimerprocess WHERE uid=:id")
-    suspend fun getFotoTimerProcess(id : Long): MeditationTimerProcess?
+    suspend fun getMeditationTimerProcess(id : Long): MeditationTimerProcess?
 
     @Query("SELECT name FROM meditationtimerprocess WHERE uid=:id")
     suspend fun getProcessNameById(id: Long): String

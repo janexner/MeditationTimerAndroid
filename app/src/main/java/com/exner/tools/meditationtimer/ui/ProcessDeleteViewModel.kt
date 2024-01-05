@@ -5,14 +5,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerChainingDependencies
-import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessRepository
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ProcessDeleteViewModel @Inject constructor(
-    private val repository: MeditationTimerProcessRepository
+    private val repository: MeditationTimerDataRepository
 ): ViewModel() {
 
     private val _processName: MutableLiveData<String> = MutableLiveData("")

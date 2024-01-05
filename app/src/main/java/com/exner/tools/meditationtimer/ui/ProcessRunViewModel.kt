@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.audio.SoundPoolHolder
 import com.exner.tools.meditationtimer.audio.VibratorHolder
-import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessRepository
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
 import com.exner.tools.meditationtimer.steps.ProcessDisplayStepAction
 import com.exner.tools.meditationtimer.steps.ProcessGotoAction
 import com.exner.tools.meditationtimer.steps.ProcessJumpbackAction
@@ -29,7 +29,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProcessRunViewModel @Inject constructor(
-    private val repository: MeditationTimerProcessRepository
+    private val repository: MeditationTimerDataRepository
 ) : ViewModel() {
 
     private val _displayAction: MutableLiveData<ProcessStepAction> = MutableLiveData(null)
