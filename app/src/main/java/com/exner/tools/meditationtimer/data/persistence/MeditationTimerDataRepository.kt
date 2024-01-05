@@ -22,6 +22,10 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
         }
 
     @WorkerThread
+    fun processById(id: Long): Flow<MeditationTimerProcess> =
+        meditationTimerProcessDAO.processById(id)
+
+    @WorkerThread
     suspend fun loadProcessById(id: Long): MeditationTimerProcess? {
         return meditationTimerProcessDAO.getMeditationTimerProcess(id)
     }

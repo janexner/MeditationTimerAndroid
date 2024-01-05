@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
@@ -60,17 +59,14 @@ fun ProcessEdit(
     navigator: DestinationsNavigator
 ) {
 
-    val name by processEditViewModel.name.observeAsState()
-    val processTime by processEditViewModel.processTime.observeAsState()
-    val intervalTime by processEditViewModel.intervalTime.observeAsState()
-    val hasAutoChain by processEditViewModel.hasAutoChain.observeAsState()
+    processEditViewModel.updateUid(processId)
+
+    val process by processEditViewModel.process.observeAsState()
     // some odd ones out
     val nextProcessesName by processEditViewModel.nextProcessesName.observeAsState()
     val processIdsAndNames by processEditViewModel.processIdsAndNames.observeAsState()
     val categoryName by processEditViewModel.categoryName.observeAsState()
     val categoryIdsAndNames by processEditViewModel.categoryIdsAndNames.observeAsState()
-
-    processEditViewModel.getProcess(processId)
 
     var modified by remember { mutableStateOf(false) }
 
@@ -87,7 +83,7 @@ fun ProcessEdit(
                 // top - fields
                 Row(modifier = Modifier.fillMaxWidth()) {
                     OutlinedTextField(
-                        value = name ?: "Name",
+                        value = process?.name ?: "Name",
                         onValueChange = {
                             processEditViewModel.updateName(it)
                             modified = true
@@ -198,7 +194,7 @@ fun ProcessEdit(
                 }
                 HeaderText(text = "Times")
                 TextFieldForTimes(
-                    value = processTime ?: 30,
+                    value = process?.processTime ?: 30,
                     label = { Text(text = "Process time (total) in minutes") },
                     onValueChange = {
                         processEditViewModel.updateProcessTime(it)
@@ -206,7 +202,7 @@ fun ProcessEdit(
                     },
                 )
                 TextFieldForTimes(
-                    value = intervalTime ?: 5,
+                    value = process?.intervalTime ?: 5,
                     label = { Text(text = "Interval time in minutes") },
                     onValueChange = {
                         processEditViewModel.updateIntervalTime(it)
@@ -216,12 +212,12 @@ fun ProcessEdit(
                 HeaderText(text = "After the process")
                 TextAndSwitch(
                     text = "Automatically start another process",
-                    checked = hasAutoChain == true,
+                    checked = process?.hasAutoChain == true,
                 ) {
                     processEditViewModel.updateHasAutoChain(it)
                     modified = true
                 }
-                AnimatedVisibility(visible = hasAutoChain == true) {
+                AnimatedVisibility(visible = process?.hasAutoChain == true) {
                     var expanded by remember { mutableStateOf(false) }
                     Column(
                         modifier = Modifier.fillMaxWidth()

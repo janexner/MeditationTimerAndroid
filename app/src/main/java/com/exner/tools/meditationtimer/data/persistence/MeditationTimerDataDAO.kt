@@ -29,6 +29,9 @@ interface MeditationTimerDataDAO {
     @Query("SELECT name FROM meditationtimerprocess WHERE uid=:id")
     suspend fun getProcessNameById(id: Long): String
 
+    @Query("SELECT * FROM meditationtimerprocess WHERE uid=:id")
+    fun processById(id: Long): Flow<MeditationTimerProcess>
+
     @Query("SELECT count(uid) FROM meditationtimerprocess")
     suspend fun getNumberOfProcesses(): Int
 
