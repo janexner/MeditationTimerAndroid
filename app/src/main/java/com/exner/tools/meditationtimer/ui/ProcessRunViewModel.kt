@@ -86,14 +86,15 @@ class ProcessRunViewModel @Inject constructor(
                                 leadInTime = leadInTime,
                                 countBackwards = countBackwards,
                             )
-                        partialResult.forEach { actionList ->
-                            result.add(actionList)
-                        }
+                        result.addAll(partialResult)
                         // do we need hours in the display?
-                        _hasHours.value = hasHours.value == true || process.processTime > 3600
+                        _hasHours.value = hasHours.value == true || process.processTime > 60
                         // prepare for the next iteration
                         firstRound = false
-                        if (process.gotoId != null && process.gotoId != -1L) {
+                        if (process.gotoId != null && process.gotoId != -1L && repository.doesProcessWithIdExist(
+                                process.gotoId
+                            )
+                        ) {
                             currentID = process.gotoId
                             if (processIdList.contains(currentID)) {
                                 noLoopDetectedSoFar = false // LOOP!
@@ -114,7 +115,8 @@ class ProcessRunViewModel @Inject constructor(
                                 if (earliestStepNumberForLoop >= 0) {
                                     // this has to replace the latest GotoAction
                                     val latestActionList = result[result.lastIndex]
-                                    val lastAction = latestActionList[latestActionList.lastIndex]
+                                    val lastAction =
+                                        latestActionList[latestActionList.lastIndex]
                                     if (lastAction is ProcessGotoAction) { // it should be!
                                         // remove the action list, it is not mutable
                                         result.removeLast() // remove the action list, bcs we need a new one
@@ -151,7 +153,10 @@ class ProcessRunViewModel @Inject constructor(
                         if (step >= result.size) {
                             break
                         } else {
-                            Log.d("ProcessRunVM", "${System.currentTimeMillis() - startTime}: step $step")
+                            Log.d(
+                                "ProcessRunVM",
+                                "${System.currentTimeMillis() - startTime}: step $step"
+                            )
                             // update display action and do sounds
                             val actionsList = result[step]
                             actionsList.forEach { action ->

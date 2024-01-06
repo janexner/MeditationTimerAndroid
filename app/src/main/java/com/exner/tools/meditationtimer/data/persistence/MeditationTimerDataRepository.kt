@@ -42,6 +42,11 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
     }
 
     @WorkerThread
+    suspend fun doesProcessWithIdExist(id: Long): Boolean {
+        return (meditationTimerProcessDAO.getMeditationTimerProcess(id) !== null)
+    }
+
+    @WorkerThread
     suspend fun insert(fotoTimerProcess: MeditationTimerProcess) {
         meditationTimerProcessDAO.insert(fotoTimerProcess)
     }
