@@ -35,6 +35,12 @@ class ProcessDetailsViewModel @Inject constructor(
     private val _nextProcessesName: MutableLiveData<String> = MutableLiveData("")
     val nextProcessesName: LiveData<String> = _nextProcessesName
 
+    private val _categoryId: MutableLiveData<Long> = MutableLiveData(-1L)
+    val categoryId: LiveData<Long> = _categoryId
+
+    private val _categoryName: MutableLiveData<String> = MutableLiveData("None")
+    val categoryName: LiveData<String> = _categoryName
+
     fun getProcess(processId: Long) {
         if (processId != -1L) {
             _uid.value = processId
@@ -51,6 +57,10 @@ class ProcessDetailsViewModel @Inject constructor(
                         if (nextProcess != null) {
                             _nextProcessesName.value = nextProcess.name
                         }
+                    }
+                    _categoryId.value = process.categoryId ?: -1L
+                    if (categoryId.value!! > 0) {
+                        _categoryName.value = repository.getCategoryNameForId(categoryId.value!!)
                     }
                 }
             }

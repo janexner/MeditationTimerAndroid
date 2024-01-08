@@ -12,9 +12,9 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -51,8 +51,10 @@ fun ProcessDetails(
     val intervalTime by processDetailsViewModel.intervalTime.observeAsState()
     val hasAutoChain by processDetailsViewModel.hasAutoChain.observeAsState()
     val gotoId by processDetailsViewModel.gotoId.observeAsState()
+    val categoryId by processDetailsViewModel.categoryId.observeAsState()
     // this one is the odd one out
     val nextProcessesName by processDetailsViewModel.nextProcessesName.observeAsState()
+    val categoryName by processDetailsViewModel.categoryName.observeAsState()
 
     processDetailsViewModel.getProcess(processId)
 
@@ -65,8 +67,12 @@ fun ProcessDetails(
                     .verticalScroll(rememberScrollState())
             ) {
                 // top - process information
-                ProcessName(name, modifier = Modifier.padding(8.dp))
-                Divider(modifier = Modifier.padding(8.dp))
+                ProcessNameAndCategory(
+                    name,
+                    categoryName,
+                    modifier = Modifier.padding(8.dp)
+                )
+                HorizontalDivider(modifier = Modifier.padding(8.dp))
                 ProcessTimerData(
                     processTime,
                     intervalTime,
@@ -159,9 +165,13 @@ fun MeditationTimerDetailsBottomBar(
 }
 
 @Composable
-fun ProcessName(name: String?, modifier: Modifier) {
+fun ProcessNameAndCategory(name: String?, category: String?, modifier: Modifier) {
     HeaderText(
         text = name ?: "Name",
+        modifier = modifier
+    )
+    Text(
+        text = "Category: " + (category ?: "None"),
         modifier = modifier
     )
 }

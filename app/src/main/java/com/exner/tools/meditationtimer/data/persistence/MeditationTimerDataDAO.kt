@@ -32,6 +32,9 @@ interface MeditationTimerDataDAO {
     @Query("SELECT count(uid) FROM meditationtimerprocess")
     suspend fun getNumberOfProcesses(): Int
 
+    @Query("SELECT name FROM meditationtimerprocesscategory WHERE uid=:id")
+    suspend fun getCategoryNameById(id: Long): String?
+
     @Insert
     suspend fun insert(fotoTimerProcess: MeditationTimerProcess)
 

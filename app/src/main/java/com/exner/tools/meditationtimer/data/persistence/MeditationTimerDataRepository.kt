@@ -46,6 +46,10 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
         return (meditationTimerProcessDAO.getMeditationTimerProcess(id) !== null)
     }
 
+    suspend fun getCategoryNameForId(id: Long): String? {
+        return meditationTimerProcessDAO.getCategoryNameById(id)
+    }
+
     @WorkerThread
     suspend fun insert(fotoTimerProcess: MeditationTimerProcess) {
         meditationTimerProcessDAO.insert(fotoTimerProcess)

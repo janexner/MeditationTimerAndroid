@@ -31,6 +31,8 @@ class ProcessListViewModel @Inject constructor(
     val allProcesses: LiveData<List<MeditationTimerProcess>> =
         repository.getAllProcessesForCategory(categoryId.value ?: -1L).asLiveData()
 
+    // TODO should probably use init {}
+
     fun updateCategoryId(newCategoryId: Long?) {
         _categoryId.value = newCategoryId
     }
