@@ -48,6 +48,7 @@ import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCategory
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.ProcessEditViewModel
+import com.exner.tools.meditationtimer.ui.SettingsViewModel
 import com.exner.tools.meditationtimer.ui.TextAndSwitch
 import com.exner.tools.meditationtimer.ui.TextFieldForTimes
 import com.ramcosta.composedestinations.annotation.Destination
@@ -59,6 +60,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun ProcessEdit(
     processId: Long,
     processEditViewModel: ProcessEditViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
 ) {
 
@@ -78,7 +80,9 @@ fun ProcessEdit(
         initialValue = emptyList()
     )
 
-    processEditViewModel.getProcess(processId)
+    val chainToSameCategoryOnly by settingsViewModel.chainToSameCategoryOnly.observeAsState()
+
+    processEditViewModel.getProcess(processId, chainToSameCategoryOnly == true)
 
     var modified by remember { mutableStateOf(false) }
 
@@ -140,7 +144,10 @@ fun ProcessEdit(
                         DropdownMenuItem(
                             text = { Text(text = "None") },
                             onClick = {
-                                processEditViewModel.updateCategoryId(-1L)
+                                processEditViewModel.updateCategoryId(
+                                    -1L,
+                                    chainToSameCategoryOnly == true
+                                )
                                 modified = true
                                 categoryExpanded = false
                             },
@@ -150,7 +157,10 @@ fun ProcessEdit(
                             DropdownMenuItem(
                                 text = { Text(text = category.name) },
                                 onClick = {
-                                    processEditViewModel.updateCategoryId(category.uid)
+                                    processEditViewModel.updateCategoryId(
+                                        category.uid,
+                                        chainToSameCategoryOnly == true
+                                    )
                                     modified = true
                                     categoryExpanded = false
                                 },
@@ -251,16 +261,18 @@ fun ProcessEdit(
                                 expanded = expanded,
                                 onDismissRequest = { expanded = false }) {
                                 processes.forEach { process ->
-                                    DropdownMenuItem(
-                                        text = { Text(text = process.name) },
-                                        onClick = {
-                                            processEditViewModel.updateGotoId(process.uid)
-                                            processEditViewModel.updateNextProcessesName(process.name)
-                                            modified = true
-                                            expanded = false
-                                        },
-                                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                                    )
+                                    if (chainToSameCategoryOnly != true || process.categoryId == -1L || process.categoryId == currentCategory.uid) {
+                                        DropdownMenuItem(
+                                            text = { Text(text = process.name) },
+                                            onClick = {
+                                                processEditViewModel.updateGotoId(process.uid)
+                                                processEditViewModel.updateNextProcessesName(process.name)
+                                                modified = true
+                                                expanded = false
+                                            },
+                                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                                        )
+                                    }
                                 }
                             }
                         }

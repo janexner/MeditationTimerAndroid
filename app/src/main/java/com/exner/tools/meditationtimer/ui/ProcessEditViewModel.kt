@@ -61,7 +61,7 @@ class ProcessEditViewModel @Inject constructor(
         }
     }
 
-    fun updateCategoryId(id: Long) {
+    fun updateCategoryId(id: Long, filterProcessesForCurrentCategory: Boolean) {
         if (id == -1L) {
             _currentCategory.value = MeditationTimerProcessCategory("All", -1L)
         } else {
@@ -72,7 +72,7 @@ class ProcessEditViewModel @Inject constructor(
         viewModelScope.launch {
             observeProcessesRaw.collect {itemsList ->
                 val filteredItemsList: List<MeditationTimerProcess> = itemsList.filter { item ->
-                    if (currentCategory.value.uid == -1L) {
+                    if (currentCategory.value.uid == -1L || !filterProcessesForCurrentCategory) {
                         true
                     } else {
                         item.categoryId == currentCategory.value.uid
@@ -83,7 +83,7 @@ class ProcessEditViewModel @Inject constructor(
         }
     }
 
-    fun getProcess(processId: Long) {
+    fun getProcess(processId: Long, filterProcessesForCurrentCategory: Boolean) {
         if (processId != -1L) {
             _uid.value = processId
             viewModelScope.launch {
@@ -100,7 +100,7 @@ class ProcessEditViewModel @Inject constructor(
                             _nextProcessesName.value = nextProcess.name
                         }
                     }
-                    updateCategoryId(process.categoryId ?: -1L)
+                    updateCategoryId(process.categoryId ?: -1L, filterProcessesForCurrentCategory)
                 }
             }
         }
