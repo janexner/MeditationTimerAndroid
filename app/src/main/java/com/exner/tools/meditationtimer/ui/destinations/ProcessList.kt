@@ -25,15 +25,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataIdAndName
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
 import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.HeaderText
+import com.exner.tools.meditationtimer.ui.ProcessListUiState
 import com.exner.tools.meditationtimer.ui.ProcessListViewModel
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessDetailsDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessEditDestination
@@ -41,6 +43,15 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+@Composable
+fun rememberProcessListUiState(
+    categoryId: Long,
+    categoryName: String,
+    processList: List<MeditationTimerProcess>,
+    idsAndNamesList: List<MeditationTimerDataIdAndName>
+): ProcessListUiState = remember(categoryId, categoryName, processList, idsAndNamesList) {
+    ProcessListUiState(categoryId, categoryName, processList, idsAndNamesList)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RootNavGraph(start = true)
@@ -48,13 +59,14 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun ProcessList(
     processListViewModel: ProcessListViewModel = hiltViewModel(),
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    uiState: ProcessListUiState = rememberProcessListUiState(
+        categoryId = -1L,
+        categoryName = "All",
+        processList = processListViewModel.uiState.value.getProcessList(),
+        idsAndNamesList = processListViewModel.uiState.value.getListOfCategoryIdsAndNames()
+    )
 ) {
-
-    val processes by processListViewModel.allProcesses.observeAsState()
-    // odd ones
-    val categoryName by processListViewModel.categoryName.observeAsState()
-    val categoryIdsAndNames by processListViewModel.categoryIdsAndNames.observeAsState()
 
     var modified by remember { mutableStateOf(false) }
 
@@ -76,7 +88,7 @@ fun ProcessList(
                             .menuAnchor()
                             .fillMaxWidth(),
                         readOnly = true,
-                        value = categoryName ?: "All",
+                        value = uiState.getCategoryName(),
                         onValueChange = {},
                         label = { Text("Process category") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded) },
@@ -87,20 +99,17 @@ fun ProcessList(
                         DropdownMenuItem(
                             text = { Text(text = "All") },
                             onClick = {
-                                processListViewModel.updateCategoryId(-1L)
-                                processListViewModel.updateCategoryName("All")
+                                processListViewModel.selectNewCategoryId(-1L)
                                 modified = true
                                 categoryExpanded = false
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         )
-                        categoryIdsAndNames?.forEach { idAndName ->
+                        uiState.getListOfCategoryIdsAndNames().forEach { idAndName ->
                             DropdownMenuItem(
                                 text = { Text(text = idAndName.name) },
                                 onClick = {
-                                    processListViewModel.updateCategoryId(idAndName.uid)
-                                    processListViewModel.updateCategoryName(idAndName.name)
-                                    modified = true
+                                    processListViewModel.selectNewCategoryId(idAndName.uid)
                                     categoryExpanded = false
                                 },
                                 contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
@@ -115,28 +124,26 @@ fun ProcessList(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(innerPadding)
                 ) {
-                    processes?.let {
-                        items(count = it.size) { meditationTimerProcess ->
-                            val mtProcess = processes!![meditationTimerProcess]
-                            Surface(
-                                modifier = Modifier
-                                    .clickable {
-                                        navigator.navigate(
-                                            ProcessDetailsDestination(
-                                                processId = mtProcess.uid,
-                                            )
+                    items(count = uiState.getProcessList().size) { processIndex ->
+                        val mtProcess = uiState.getProcessByIndex(processIndex)
+                        Surface(
+                            modifier = Modifier
+                                .clickable {
+                                    navigator.navigate(
+                                        ProcessDetailsDestination(
+                                            processId = mtProcess.uid,
                                         )
-                                    },
-                            ) {
-                                var supText = "${mtProcess.processTime}/${mtProcess.intervalTime}"
-                                if (mtProcess.hasAutoChain && null != mtProcess.gotoId && mtProcess.gotoId >= 0) {
-                                    supText += ". Next: ${mtProcess.gotoId}"
-                                }
-                                ListItem(
-                                    headlineContent = { HeaderText(text = mtProcess.name) },
-                                    supportingContent = { BodyText(text = supText) }
-                                )
+                                    )
+                                },
+                        ) {
+                            var supText = "${mtProcess.processTime}/${mtProcess.intervalTime}"
+                            if (mtProcess.hasAutoChain && null != mtProcess.gotoId && mtProcess.gotoId >= 0) {
+                                supText += ". Next: ${mtProcess.gotoId}"
                             }
+                            ListItem(
+                                headlineContent = { HeaderText(text = mtProcess.name) },
+                                supportingContent = { BodyText(text = supText) }
+                            )
                         }
                     }
                 }
