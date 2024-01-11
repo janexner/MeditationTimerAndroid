@@ -5,7 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,11 +38,19 @@ class ProcessDetailsViewModel @Inject constructor(
     private val _nextProcessesName: MutableLiveData<String> = MutableLiveData("")
     val nextProcessesName: LiveData<String> = _nextProcessesName
 
-    private val _categoryId: MutableLiveData<Long> = MutableLiveData(-1L)
-    val categoryId: LiveData<Long> = _categoryId
+    private val _currentCategory = MutableStateFlow(MeditationTimerProcessCategory("All", -1L))
+    val currentCategory: StateFlow<MeditationTimerProcessCategory>
+        get() = _currentCategory
 
-    private val _categoryName: MutableLiveData<String> = MutableLiveData("None")
-    val categoryName: LiveData<String> = _categoryName
+    private fun updateCategoryId(id: Long) {
+        if (id == -1L) {
+            _currentCategory.value = MeditationTimerProcessCategory("All", -1L)
+        } else {
+            viewModelScope.launch {
+                _currentCategory.value = repository.getCategoryById(id)
+            }
+        }
+    }
 
     fun getProcess(processId: Long) {
         if (processId != -1L) {
@@ -58,10 +69,7 @@ class ProcessDetailsViewModel @Inject constructor(
                             _nextProcessesName.value = nextProcess.name
                         }
                     }
-                    _categoryId.value = process.categoryId ?: -1L
-                    if (categoryId.value!! > 0) {
-                        _categoryName.value = repository.getCategoryById(categoryId.value!!).name
-                    }
+                    updateCategoryId(process.categoryId ?: -1L)
                 }
             }
         }

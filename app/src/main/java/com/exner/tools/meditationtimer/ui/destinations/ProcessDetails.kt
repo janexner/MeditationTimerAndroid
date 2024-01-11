@@ -27,7 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.exner.tools.meditationtimer.R
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCategory
 import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.ProcessDetailsViewModel
@@ -51,10 +53,11 @@ fun ProcessDetails(
     val intervalTime by processDetailsViewModel.intervalTime.observeAsState()
     val hasAutoChain by processDetailsViewModel.hasAutoChain.observeAsState()
     val gotoId by processDetailsViewModel.gotoId.observeAsState()
-    val categoryId by processDetailsViewModel.categoryId.observeAsState()
+    val currentCategory: MeditationTimerProcessCategory by processDetailsViewModel.currentCategory.collectAsStateWithLifecycle(
+        initialValue = MeditationTimerProcessCategory("All", -1L)
+    )
     // this one is the odd one out
     val nextProcessesName by processDetailsViewModel.nextProcessesName.observeAsState()
-    val categoryName by processDetailsViewModel.categoryName.observeAsState()
 
     processDetailsViewModel.getProcess(processId)
 
@@ -69,7 +72,7 @@ fun ProcessDetails(
                 // top - process information
                 ProcessNameAndCategory(
                     name,
-                    categoryName,
+                    currentCategory.name,
                     modifier = Modifier.padding(8.dp)
                 )
                 HorizontalDivider(modifier = Modifier.padding(8.dp))
