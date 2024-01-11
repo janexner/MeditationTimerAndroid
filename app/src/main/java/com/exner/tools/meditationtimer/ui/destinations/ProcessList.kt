@@ -25,13 +25,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCategory
 import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.ProcessListViewModel
@@ -51,10 +53,15 @@ fun ProcessList(
     navigator: DestinationsNavigator
 ) {
 
-    val processes by processListViewModel.allProcesses.observeAsState()
-    // odd ones
-    val categoryName by processListViewModel.categoryName.observeAsState()
-    val categoryIdsAndNames by processListViewModel.categoryIdsAndNames.observeAsState()
+    val processes: List<MeditationTimerProcess> by processListViewModel.observeProcessesForCurrentCategory.collectAsStateWithLifecycle(
+        initialValue = emptyList()
+    )
+    val currentCategory: MeditationTimerProcessCategory by processListViewModel.currentCategory.collectAsStateWithLifecycle(
+        initialValue = MeditationTimerProcessCategory("All", -1L)
+    )
+    val categories: List<MeditationTimerProcessCategory> by processListViewModel.observeCategoriesRaw.collectAsStateWithLifecycle(
+        initialValue = emptyList()
+    )
 
     var modified by remember { mutableStateOf(false) }
 
@@ -76,7 +83,7 @@ fun ProcessList(
                             .menuAnchor()
                             .fillMaxWidth(),
                         readOnly = true,
-                        value = categoryName ?: "All",
+                        value = currentCategory.name,
                         onValueChange = {},
                         label = { Text("Process category") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded) },
@@ -88,18 +95,16 @@ fun ProcessList(
                             text = { Text(text = "All") },
                             onClick = {
                                 processListViewModel.updateCategoryId(-1L)
-                                processListViewModel.updateCategoryName("All")
                                 modified = true
                                 categoryExpanded = false
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         )
-                        categoryIdsAndNames?.forEach { idAndName ->
+                        categories.forEach { category ->
                             DropdownMenuItem(
-                                text = { Text(text = idAndName.name) },
+                                text = { Text(text = category.name) },
                                 onClick = {
-                                    processListViewModel.updateCategoryId(idAndName.uid)
-                                    processListViewModel.updateCategoryName(idAndName.name)
+                                    processListViewModel.updateCategoryId(category.uid)
                                     modified = true
                                     categoryExpanded = false
                                 },
@@ -115,9 +120,9 @@ fun ProcessList(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(innerPadding)
                 ) {
-                    processes?.let {
+                    processes.let {
                         items(count = it.size) { meditationTimerProcess ->
-                            val mtProcess = processes!![meditationTimerProcess]
+                            val mtProcess = processes[meditationTimerProcess]
                             Surface(
                                 modifier = Modifier
                                     .clickable {

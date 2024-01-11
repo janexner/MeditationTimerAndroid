@@ -10,30 +10,15 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
 
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
-    val allProcesses: Flow<List<MeditationTimerProcess>> =
-        meditationTimerProcessDAO.getAllAlphabeticallyOrdered()
+    val observeProcesses: Flow<List<MeditationTimerProcess>> =
+        meditationTimerProcessDAO.observeProcessesAlphabeticallyOrdered()
 
-    @WorkerThread
-    fun getAllProcessesForCategory(categoryId: Long): Flow<List<MeditationTimerProcess>> =
-        if (categoryId == -1L) {
-            meditationTimerProcessDAO.getAllAlphabeticallyOrdered()
-        } else {
-            meditationTimerProcessDAO.getAllForCategoryAlphabeticallyOrdered(categoryId)
-        }
+    val observeCategories: Flow<List<MeditationTimerProcessCategory>> =
+        meditationTimerProcessDAO.observeCategoriesAlphabeticallyOrdered()
 
     @WorkerThread
     suspend fun loadProcessById(id: Long): MeditationTimerProcess? {
         return meditationTimerProcessDAO.getMeditationTimerProcess(id)
-    }
-
-    @WorkerThread
-    fun loadIdsAndNamesForAllProcesses(): Flow<List<MeditationTimerDataIdAndName>> {
-        return meditationTimerProcessDAO.getIdsAndNamesOfAllProcesses()
-    }
-
-    @WorkerThread
-    fun loadIdsAndNamesForAllCategories(): Flow<List<MeditationTimerDataIdAndName>> {
-        return meditationTimerProcessDAO.getIdsAndNamesOfAllCategories()
     }
 
     @WorkerThread
@@ -46,8 +31,8 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
         return (meditationTimerProcessDAO.getMeditationTimerProcess(id) !== null)
     }
 
-    suspend fun getCategoryNameForId(id: Long): String? {
-        return meditationTimerProcessDAO.getCategoryNameById(id)
+    suspend fun getCategoryById(id: Long): MeditationTimerProcessCategory {
+        return meditationTimerProcessDAO.getCategoryById(id)
     }
 
     @WorkerThread

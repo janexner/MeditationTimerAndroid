@@ -3,13 +3,13 @@ package com.exner.tools.meditationtimer.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
-import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataIdAndName
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -38,17 +38,50 @@ class ProcessEditViewModel @Inject constructor(
     private val _nextProcessesName: MutableLiveData<String?> = MutableLiveData("")
     val nextProcessesName: LiveData<String?> = _nextProcessesName
 
-    private val _categoryId: MutableLiveData<Long?> = MutableLiveData(-1L)
-    private val categoryId: LiveData<Long?> = _categoryId
+    private val observeProcessesRaw = repository.observeProcesses
 
-    private val _categoryName: MutableLiveData<String?> = MutableLiveData("None")
-    val categoryName: LiveData<String?> = _categoryName
+    private val _observeProcessesForCurrentCategory = MutableStateFlow(emptyList<MeditationTimerProcess>())
+    val observeProcessesForCurrentCategory: StateFlow<List<MeditationTimerProcess>>
+        get() = _observeProcessesForCurrentCategory
 
-    val processIdsAndNames: LiveData<List<MeditationTimerDataIdAndName>> =
-        repository.loadIdsAndNamesForAllProcesses().asLiveData()
+    val observeCategoriesRaw = repository.observeCategories
 
-    val categoryIdsAndNames: LiveData<List<MeditationTimerDataIdAndName>> =
-        repository.loadIdsAndNamesForAllCategories().asLiveData()
+    private val _currentCategory = MutableStateFlow(MeditationTimerProcessCategory("All", -1L))
+    val currentCategory: StateFlow<MeditationTimerProcessCategory>
+        get() = _currentCategory
+
+    init {
+        viewModelScope.launch {
+            observeProcessesRaw.collect {itemsList ->
+                val filteredItemsList: List<MeditationTimerProcess> = itemsList.filter { item ->
+                    item.categoryId == currentCategory.value.uid || currentCategory.value.uid == -1L
+                }
+                _observeProcessesForCurrentCategory.value = filteredItemsList
+            }
+        }
+    }
+
+    fun updateCategoryId(id: Long) {
+        if (id == -1L) {
+            _currentCategory.value = MeditationTimerProcessCategory("All", -1L)
+        } else {
+            viewModelScope.launch {
+                _currentCategory.value = repository.getCategoryById(id)
+            }
+        }
+        viewModelScope.launch {
+            observeProcessesRaw.collect {itemsList ->
+                val filteredItemsList: List<MeditationTimerProcess> = itemsList.filter { item ->
+                    if (currentCategory.value.uid == -1L) {
+                        true
+                    } else {
+                        item.categoryId == currentCategory.value.uid
+                    }
+                }
+                _observeProcessesForCurrentCategory.value = filteredItemsList
+            }
+        }
+    }
 
     fun getProcess(processId: Long) {
         if (processId != -1L) {
@@ -67,7 +100,7 @@ class ProcessEditViewModel @Inject constructor(
                             _nextProcessesName.value = nextProcess.name
                         }
                     }
-                    _categoryId.value = process.categoryId ?: -1L
+                    updateCategoryId(process.categoryId ?: -1L)
                 }
             }
         }
@@ -83,7 +116,7 @@ class ProcessEditViewModel @Inject constructor(
                     intervalTime = if (intervalTime.value != null) intervalTime.value!!.toInt() else 10,
                     hasAutoChain =  hasAutoChain.value == true,
                     gotoId = if (_gotoId.value != null) _gotoId.value!!.toLong() else null,
-                    categoryId = if (categoryId.value != null) categoryId.value!!.toLong() else null
+                    categoryId = currentCategory.value.uid
                 )
                 if (uid.value == -1L) {
                     repository.insert(process.copy(
@@ -94,10 +127,6 @@ class ProcessEditViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    fun updateUid(newUid: Long) {
-        _uid.value = newUid
     }
 
     fun updateName(name: String) {
@@ -122,14 +151,6 @@ class ProcessEditViewModel @Inject constructor(
 
     fun updateNextProcessesName(nextProcessesName: String?) {
         _nextProcessesName.value = nextProcessesName
-    }
-
-    fun updateCategoryId(newCategoryId: Long?) {
-        _categoryId.value = newCategoryId
-    }
-
-    fun updateCategoryName(newCategoryName: String?) {
-        _categoryName.value = newCategoryName
     }
 
     fun createNewCategory(newCategoryName: String) {

@@ -60,7 +60,7 @@ class ProcessDetailsViewModel @Inject constructor(
                     }
                     _categoryId.value = process.categoryId ?: -1L
                     if (categoryId.value!! > 0) {
-                        _categoryName.value = repository.getCategoryNameForId(categoryId.value!!)
+                        _categoryName.value = repository.getCategoryById(categoryId.value!!).name
                     }
                 }
             }

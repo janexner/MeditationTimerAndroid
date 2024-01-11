@@ -5,17 +5,17 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MeditationTimerDataDAO {
-    @Query("SELECT * FROM meditationtimerprocess")
-    fun getAll(): Flow<List<MeditationTimerProcess>>
-
     @Query("SELECT * FROM meditationtimerprocess ORDER BY name ASC")
-    fun getAllAlphabeticallyOrdered(): Flow<List<MeditationTimerProcess>>
+    fun observeProcessesAlphabeticallyOrdered(): Flow<List<MeditationTimerProcess>>
 
     @Query("SELECT * FROM meditationtimerprocess WHERE category_id IN (:categoryId) ORDER BY name ASC")
     fun getAllForCategoryAlphabeticallyOrdered(categoryId: Long): Flow<List<MeditationTimerProcess>>
 
     @Query("SELECT uid, name FROM meditationtimerprocess ORDER BY name ASC")
     fun getIdsAndNamesOfAllProcesses(): Flow<List<MeditationTimerDataIdAndName>>
+
+    @Query("SELECT * FROM meditationtimerprocesscategory ORDER BY name ASC")
+    fun observeCategoriesAlphabeticallyOrdered(): Flow<List<MeditationTimerProcessCategory>>
 
     @Query("SELECT uid, name FROM meditationtimerprocesscategory ORDER BY name ASC")
     fun getIdsAndNamesOfAllCategories(): Flow<List<MeditationTimerDataIdAndName>>
@@ -32,8 +32,8 @@ interface MeditationTimerDataDAO {
     @Query("SELECT count(uid) FROM meditationtimerprocess")
     suspend fun getNumberOfProcesses(): Int
 
-    @Query("SELECT name FROM meditationtimerprocesscategory WHERE uid=:id")
-    suspend fun getCategoryNameById(id: Long): String?
+    @Query("SELECT * FROM meditationtimerprocesscategory WHERE uid=:id")
+    suspend fun getCategoryById(id: Long): MeditationTimerProcessCategory
 
     @Insert
     suspend fun insert(fotoTimerProcess: MeditationTimerProcess)

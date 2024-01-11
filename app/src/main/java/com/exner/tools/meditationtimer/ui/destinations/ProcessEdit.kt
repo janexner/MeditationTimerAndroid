@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
@@ -44,6 +43,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCategory
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.ProcessEditViewModel
 import com.exner.tools.meditationtimer.ui.TextAndSwitch
@@ -66,9 +68,15 @@ fun ProcessEdit(
     val hasAutoChain by processEditViewModel.hasAutoChain.observeAsState()
     // some odd ones out
     val nextProcessesName by processEditViewModel.nextProcessesName.observeAsState()
-    val processIdsAndNames by processEditViewModel.processIdsAndNames.observeAsState()
-    val categoryName by processEditViewModel.categoryName.observeAsState()
-    val categoryIdsAndNames by processEditViewModel.categoryIdsAndNames.observeAsState()
+    val processes: List<MeditationTimerProcess> by processEditViewModel.observeProcessesForCurrentCategory.collectAsStateWithLifecycle(
+        initialValue = emptyList()
+    )
+    val currentCategory: MeditationTimerProcessCategory by processEditViewModel.currentCategory.collectAsStateWithLifecycle(
+        initialValue = MeditationTimerProcessCategory("All", -1L)
+    )
+    val categories: List<MeditationTimerProcessCategory> by processEditViewModel.observeCategoriesRaw.collectAsStateWithLifecycle(
+        initialValue = emptyList()
+    )
 
     processEditViewModel.getProcess(processId)
 
@@ -114,7 +122,7 @@ fun ProcessEdit(
                             modifier = Modifier
                                 .menuAnchor(),
                             readOnly = true,
-                            value = categoryName ?: "None",
+                            value = if (currentCategory.uid == -1L) "None" else currentCategory.name,
                             onValueChange = {},
                             label = { Text("Process category") },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded) },
@@ -133,18 +141,16 @@ fun ProcessEdit(
                             text = { Text(text = "None") },
                             onClick = {
                                 processEditViewModel.updateCategoryId(-1L)
-                                processEditViewModel.updateCategoryName("None")
                                 modified = true
                                 categoryExpanded = false
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         )
-                        categoryIdsAndNames?.forEach { idAndName ->
+                        categories.forEach { category ->
                             DropdownMenuItem(
-                                text = { Text(text = idAndName.name) },
+                                text = { Text(text = category.name) },
                                 onClick = {
-                                    processEditViewModel.updateCategoryId(idAndName.uid)
-                                    processEditViewModel.updateCategoryName(idAndName.name)
+                                    processEditViewModel.updateCategoryId(category.uid)
                                     modified = true
                                     categoryExpanded = false
                                 },
@@ -244,12 +250,12 @@ fun ProcessEdit(
                             ExposedDropdownMenu(
                                 expanded = expanded,
                                 onDismissRequest = { expanded = false }) {
-                                processIdsAndNames?.forEach { idAndName ->
+                                processes.forEach { process ->
                                     DropdownMenuItem(
-                                        text = { Text(text = idAndName.name) },
+                                        text = { Text(text = process.name) },
                                         onClick = {
-                                            processEditViewModel.updateGotoId(idAndName.uid)
-                                            processEditViewModel.updateNextProcessesName(idAndName.name)
+                                            processEditViewModel.updateGotoId(process.uid)
+                                            processEditViewModel.updateNextProcessesName(process.name)
                                             modified = true
                                             expanded = false
                                         },
