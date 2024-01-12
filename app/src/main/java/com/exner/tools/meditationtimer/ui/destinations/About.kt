@@ -67,9 +67,8 @@ fun AboutScreenElements() {
         )
     }
     Spacer(modifier = Modifier.height(8.dp))
-    val url = "https://www.jan-exner.de/software/android/meditationtimer/about.html"
-    // second URL that reflects how kirby maps the above URL (sigh)
-    val url2 = "https://www.jan-exner.de/content/5-software/android/meditationtimer/about.html"
+    val payload = "buildConfigAID=${BuildConfig.APPLICATION_ID}"
+    val url = "https://www.jan-exner.de/software/android/meditationtimer/about/?$payload"
     val uriHandler = LocalUriHandler.current
     AndroidView(factory = { context ->
         WebView(context).apply {
@@ -83,7 +82,7 @@ fun AboutScreenElements() {
                     request: WebResourceRequest?
                 ): Boolean {
                     if (request != null) {
-                        return if (request.url.toString() == url || request.url.toString() == url2) { // load this, and only this, URL in webView
+                        return if (request.url.toString() == url) { // load this, and only this, URL in webView
                             false
                         } else { // load anything else in the Android default browser
                             uriHandler.openUri(request.url.toString())
