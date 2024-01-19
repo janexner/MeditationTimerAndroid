@@ -1,5 +1,7 @@
 package com.exner.tools.meditationtimer.ui
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
@@ -29,6 +31,12 @@ class CategoryListViewModel @Inject constructor(
             val category = repository.getCategoryById(uid)
             category.name = newName
             repository.updateCategory(category)
+        }
+    }
+
+    fun deleteAllCategoriesFromListOfIds(listOfIdsToDelete: List<Long>) {
+        viewModelScope.launch {
+            repository.deleteCategoriesByIdsFromList(listOfIdsToDelete)
         }
     }
 }

@@ -67,4 +67,12 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
     suspend fun updateCategory(category: MeditationTimerProcessCategory) {
         meditationTimerProcessDAO.updateCategory(category)
     }
+
+    @WorkerThread
+    suspend fun deleteCategoriesByIdsFromList(listOfIds: List<Long>) {
+        if (listOfIds.isNotEmpty()) {
+            val listOfIdsForSQL = listOfIds.joinToString()
+            meditationTimerProcessDAO.deleteCategoriesByIdsFromList(listOfIdsForSQL)
+        }
+    }
 }

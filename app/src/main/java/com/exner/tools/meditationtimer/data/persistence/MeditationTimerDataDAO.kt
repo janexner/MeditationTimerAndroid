@@ -41,6 +41,9 @@ interface MeditationTimerDataDAO {
     @Query("SELECT * FROM meditationtimerprocesscategory WHERE uid=:id")
     suspend fun getCategoryById(id: Long): MeditationTimerProcessCategory
 
+    @Query("DELETE FROM meditationtimerprocesscategory WHERE uid IN (:listOfIds)")
+    suspend fun deleteCategoriesByIdsFromList(listOfIds: String)
+
     @Insert
     suspend fun insert(fotoTimerProcess: MeditationTimerProcess)
 
@@ -55,6 +58,9 @@ interface MeditationTimerDataDAO {
 
     @Update
     suspend fun updateCategory(category: MeditationTimerProcessCategory)
+
+    @Delete
+    suspend fun deleteCategory(category: MeditationTimerProcessCategory)
 }
 
 // see https://developer.android.com/training/data-storage/room#kts

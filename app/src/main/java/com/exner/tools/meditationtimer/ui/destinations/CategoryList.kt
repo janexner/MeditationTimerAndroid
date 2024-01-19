@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.BottomAppBar
@@ -21,6 +22,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -43,6 +45,8 @@ import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCa
 import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.CategoryListViewModel
 import com.exner.tools.meditationtimer.ui.HeaderText
+import com.exner.tools.meditationtimer.ui.destinations.destinations.CategoryBulkDeleteDestination
+import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessDeleteDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -124,7 +128,7 @@ fun CategoryList(
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 var newCategoryName by remember {
-                                    mutableStateOf( openDialogCategory.value?.name ?: "New Category" )
+                                    mutableStateOf(openDialogCategory.value?.name ?: "New Category")
                                 }
                                 OutlinedTextField(
                                     value = newCategoryName,
@@ -143,7 +147,10 @@ fun CategoryList(
                                         if (uid < 0) {
                                             categoryListViewModel.createNewCategory(newCategoryName)
                                         } else {
-                                            categoryListViewModel.updateCategoryName(uid, newCategoryName)
+                                            categoryListViewModel.updateCategoryName(
+                                                uid,
+                                                newCategoryName
+                                            )
                                         }
                                         openDialog.value = false
                                     },
@@ -161,6 +168,16 @@ fun CategoryList(
         bottomBar = {
             BottomAppBar(
                 actions = {
+                    IconButton(onClick = {
+                        navigator.navigate(
+                            CategoryBulkDeleteDestination()
+                        )
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = "Delete Categories"
+                        )
+                    }
                 },
                 floatingActionButton = {
                     ExtendedFloatingActionButton(
