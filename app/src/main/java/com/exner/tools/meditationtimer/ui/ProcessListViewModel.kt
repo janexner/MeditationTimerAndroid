@@ -44,7 +44,7 @@ class ProcessListViewModel @Inject constructor(
             _currentCategory.value = MeditationTimerProcessCategory("All", -1L)
         } else {
             viewModelScope.launch {
-                _currentCategory.value = repository.getCategoryById(id)
+                _currentCategory.value = repository.getCategoryById(id) ?: MeditationTimerProcessCategory("All", -1L)
             }
         }
         viewModelScope.launch {

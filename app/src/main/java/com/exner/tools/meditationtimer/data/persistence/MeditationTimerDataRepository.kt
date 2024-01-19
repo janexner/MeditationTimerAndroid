@@ -38,9 +38,14 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
     suspend fun doesProcessWithIdExist(id: Long): Boolean {
         return (meditationTimerProcessDAO.getMeditationTimerProcess(id) !== null)
     }
-
-    suspend fun getCategoryById(id: Long): MeditationTimerProcessCategory {
+    @WorkerThread
+    suspend fun getCategoryById(id: Long): MeditationTimerProcessCategory? {
         return meditationTimerProcessDAO.getCategoryById(id)
+    }
+
+    @WorkerThread
+    suspend fun doesCategoryWithIdExist(categoryId: Long): Boolean {
+        return (meditationTimerProcessDAO.getCategoryById(categoryId) !== null)
     }
 
     @WorkerThread

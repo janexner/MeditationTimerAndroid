@@ -33,13 +33,13 @@ interface MeditationTimerDataDAO {
     suspend fun getMeditationTimerProcess(id : Long): MeditationTimerProcess?
 
     @Query("SELECT name FROM meditationtimerprocess WHERE uid=:id")
-    suspend fun getProcessNameById(id: Long): String
+    suspend fun getProcessNameById(id: Long): String?
 
     @Query("SELECT count(uid) FROM meditationtimerprocess")
     suspend fun getNumberOfProcesses(): Int
 
     @Query("SELECT * FROM meditationtimerprocesscategory WHERE uid=:id")
-    suspend fun getCategoryById(id: Long): MeditationTimerProcessCategory
+    suspend fun getCategoryById(id: Long): MeditationTimerProcessCategory?
 
     @Query("DELETE FROM meditationtimerprocesscategory WHERE uid IN (:listOfIds)")
     suspend fun deleteCategoriesByIdsFromList(listOfIds: String)

@@ -27,8 +27,10 @@ class CategoryListViewModel @Inject constructor(
     fun updateCategoryName(uid: Long, newName: String) {
         viewModelScope.launch {
             val category = repository.getCategoryById(uid)
-            category.name = newName
-            repository.updateCategory(category)
+            if (null != category) {
+                category.name = newName
+                repository.updateCategory(category)
+            }
         }
     }
 
