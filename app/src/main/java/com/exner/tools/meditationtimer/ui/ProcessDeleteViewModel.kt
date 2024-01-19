@@ -31,7 +31,9 @@ class ProcessDeleteViewModel @Inject constructor(
                 if (process != null) {
                     _processName.value = process.name
                     val newDependentProcesses = repository.getIdsAndNamesOfDependentProcesses(process)
-                    val chainingDependencies = MeditationTimerChainingDependencies(true, newDependentProcesses)
+                    val chainingDependencies = MeditationTimerChainingDependencies(
+                        newDependentProcesses
+                    )
                     _processChainingDependencies.value = chainingDependencies
                     _processIsTarget.value = true
                 }

@@ -16,6 +16,9 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
     val observeCategories: Flow<List<MeditationTimerProcessCategory>> =
         meditationTimerProcessDAO.observeCategoriesAlphabeticallyOrdered()
 
+    val observeCategoryUsageCount: Flow<List<MeditationTimerCategoryIdNameCount>> =
+        meditationTimerProcessDAO.observeCategoryUsageCount()
+
     @WorkerThread
     suspend fun loadProcessById(id: Long): MeditationTimerProcess? {
         return meditationTimerProcessDAO.getMeditationTimerProcess(id)
@@ -24,6 +27,11 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
     @WorkerThread
     suspend fun getIdsAndNamesOfDependentProcesses(fotoTimerProcess: MeditationTimerProcess): List<MeditationTimerDataIdAndName> {
         return meditationTimerProcessDAO.getIdsAndNamesOfDependantProcesses(fotoTimerProcess.uid)
+    }
+
+    @WorkerThread
+    suspend fun getIdsAndNamesOfAllCategories(): List<MeditationTimerDataIdAndName> {
+        return meditationTimerProcessDAO.getIdsAndNamesOfAllCategories()
     }
 
     @WorkerThread
