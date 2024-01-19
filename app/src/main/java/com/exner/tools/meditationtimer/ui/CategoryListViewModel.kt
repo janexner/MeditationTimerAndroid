@@ -1,7 +1,5 @@
 package com.exner.tools.meditationtimer.ui
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository

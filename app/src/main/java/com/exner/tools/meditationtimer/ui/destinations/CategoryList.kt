@@ -46,7 +46,6 @@ import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.CategoryListViewModel
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.destinations.destinations.CategoryBulkDeleteDestination
-import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessDeleteDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 

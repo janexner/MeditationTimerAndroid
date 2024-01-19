@@ -83,8 +83,7 @@ fun CategoryBulkDelete(
                         ListItem(
                             leadingContent = {
                                 Checkbox(
-                                    checked = listOfCategoryIdsToDelete.contains(category.uid)
-                                        ?: false,
+                                    checked = listOfCategoryIdsToDelete.contains(category.uid),
                                     onCheckedChange = { checked ->
                                         if (checked) {
                                             listOfCategoryIdsToDelete.add(category.uid)
