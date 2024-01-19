@@ -52,6 +52,9 @@ interface MeditationTimerDataDAO {
 
     @Insert
     suspend fun insertCategory(category: MeditationTimerProcessCategory)
+
+    @Update
+    suspend fun updateCategory(category: MeditationTimerProcessCategory)
 }
 
 // see https://developer.android.com/training/data-storage/room#kts

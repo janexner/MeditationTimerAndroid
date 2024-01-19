@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class MeditationTimerProcessCategory (
-    @ColumnInfo(name = "name") val name : String,
+    @ColumnInfo(name = "name") var name : String,
     @PrimaryKey(autoGenerate = true) val uid: Long = 0
 )

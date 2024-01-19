@@ -63,6 +63,10 @@ fun CategoryList(
 
     val openDialog = remember { mutableStateOf(false) }
 
+    val openDialogCategory = remember {
+        mutableStateOf<MeditationTimerProcessCategory?>(null)
+    }
+
     Scaffold(
         content = { innerPadding ->
             Column(
@@ -81,7 +85,8 @@ fun CategoryList(
                         Surface(
                             modifier = Modifier
                                 .clickable {
-                                           // TODO
+                                    openDialogCategory.value = category
+                                    openDialog.value = true
                                 },
                         ) {
                             var supText = "Unused"
@@ -118,7 +123,9 @@ fun CategoryList(
                             tonalElevation = AlertDialogDefaults.TonalElevation
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                var newCategoryName by remember { mutableStateOf("Category 1") }
+                                var newCategoryName by remember {
+                                    mutableStateOf( openDialogCategory.value?.name ?: "New Category" )
+                                }
                                 OutlinedTextField(
                                     value = newCategoryName,
                                     onValueChange = {
@@ -132,7 +139,12 @@ fun CategoryList(
                                 Spacer(modifier = Modifier.height(24.dp))
                                 TextButton(
                                     onClick = {
-                                        categoryListViewModel.createNewCategory(newCategoryName)
+                                        val uid = openDialogCategory.value?.uid ?: -1
+                                        if (uid < 0) {
+                                            categoryListViewModel.createNewCategory(newCategoryName)
+                                        } else {
+                                            categoryListViewModel.updateCategoryName(uid, newCategoryName)
+                                        }
                                         openDialog.value = false
                                     },
                                     modifier = Modifier.align(Alignment.End)
@@ -157,6 +169,7 @@ fun CategoryList(
                             Icon(Icons.Filled.Add, "Add a category")
                         },
                         onClick = {
+                            openDialogCategory.value = null
                             openDialog.value = true
                         },
                         containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
