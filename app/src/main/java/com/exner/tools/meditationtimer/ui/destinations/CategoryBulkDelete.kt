@@ -115,6 +115,7 @@ fun CategoryBulkDelete(
                             TextButton(onClick = {
                                 categoryListViewModel.deleteAllCategoriesFromListOfIds(listOfCategoryIdsToDelete)
                                 openAlertDialog.value = false
+                                navigator.navigateUp()
                             }) {
                                 Text(text = "Yes, delete")
                             }
