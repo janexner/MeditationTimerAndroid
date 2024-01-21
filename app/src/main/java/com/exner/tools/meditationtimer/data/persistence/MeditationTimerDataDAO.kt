@@ -42,7 +42,7 @@ interface MeditationTimerDataDAO {
     suspend fun getCategoryById(id: Long): MeditationTimerProcessCategory?
 
     @Query("DELETE FROM meditationtimerprocesscategory WHERE uid IN (:listOfIds)")
-    suspend fun deleteCategoriesByIdsFromList(listOfIds: String)
+    suspend fun deleteCategoriesByIdsFromList(listOfIds: List<Long>)
 
     @Insert
     suspend fun insert(fotoTimerProcess: MeditationTimerProcess)
