@@ -38,16 +38,16 @@ class ProcessDetailsViewModel @Inject constructor(
     private val _nextProcessesName: MutableLiveData<String> = MutableLiveData("")
     val nextProcessesName: LiveData<String> = _nextProcessesName
 
-    private val _currentCategory = MutableStateFlow(MeditationTimerProcessCategory("All", -1L))
+    private val _currentCategory = MutableStateFlow(MeditationTimerProcessCategory("None", -1L))
     val currentCategory: StateFlow<MeditationTimerProcessCategory>
         get() = _currentCategory
 
     private fun updateCategoryId(id: Long) {
         if (id == -1L) {
-            _currentCategory.value = MeditationTimerProcessCategory("All", -1L)
+            _currentCategory.value = MeditationTimerProcessCategory("None", -1L)
         } else {
             viewModelScope.launch {
-                _currentCategory.value = repository.getCategoryById(id) ?: MeditationTimerProcessCategory("All", -1L)
+                _currentCategory.value = repository.getCategoryById(id) ?: MeditationTimerProcessCategory("None", -1L)
             }
         }
     }

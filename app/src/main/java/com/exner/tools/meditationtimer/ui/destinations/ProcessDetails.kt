@@ -54,7 +54,7 @@ fun ProcessDetails(
     val hasAutoChain by processDetailsViewModel.hasAutoChain.observeAsState()
     val gotoId by processDetailsViewModel.gotoId.observeAsState()
     val currentCategory: MeditationTimerProcessCategory by processDetailsViewModel.currentCategory.collectAsStateWithLifecycle(
-        initialValue = MeditationTimerProcessCategory("All", -1L)
+        initialValue = MeditationTimerProcessCategory("None", -1L)
     )
     // this one is the odd one out
     val nextProcessesName by processDetailsViewModel.nextProcessesName.observeAsState()

@@ -94,7 +94,7 @@ fun ProcessList(
                         DropdownMenuItem(
                             text = { Text(text = "All") },
                             onClick = {
-                                processListViewModel.updateCategoryId(-1L)
+                                processListViewModel.updateCategoryId(-2L)
                                 modified = true
                                 categoryExpanded = false
                             },
@@ -111,6 +111,15 @@ fun ProcessList(
                                 contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                             )
                         }
+                        DropdownMenuItem(
+                            text = { Text(text = "None") },
+                            onClick = {
+                                processListViewModel.updateCategoryId(-1L)
+                                modified = true
+                                categoryExpanded = false
+                            },
+                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                        )
                     }
                 }
 
@@ -120,28 +129,26 @@ fun ProcessList(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(innerPadding)
                 ) {
-                    processes.let {
-                        items(count = it.size) { meditationTimerProcess ->
-                            val mtProcess = processes[meditationTimerProcess]
-                            Surface(
-                                modifier = Modifier
-                                    .clickable {
-                                        navigator.navigate(
-                                            ProcessDetailsDestination(
-                                                processId = mtProcess.uid,
-                                            )
+                    items(count = processes.size) { meditationTimerProcess ->
+                        val mtProcess = processes[meditationTimerProcess]
+                        Surface(
+                            modifier = Modifier
+                                .clickable {
+                                    navigator.navigate(
+                                        ProcessDetailsDestination(
+                                            processId = mtProcess.uid,
                                         )
-                                    },
-                            ) {
-                                var supText = "${mtProcess.processTime}/${mtProcess.intervalTime}"
-                                if (mtProcess.hasAutoChain && null != mtProcess.gotoId && mtProcess.gotoId >= 0) {
-                                    supText += ". Next: ${mtProcess.gotoId}"
-                                }
-                                ListItem(
-                                    headlineContent = { HeaderText(text = mtProcess.name) },
-                                    supportingContent = { BodyText(text = supText) }
-                                )
+                                    )
+                                },
+                        ) {
+                            var supText = "${mtProcess.processTime}/${mtProcess.intervalTime}"
+                            if (mtProcess.hasAutoChain && null != mtProcess.gotoId && mtProcess.gotoId >= 0) {
+                                supText += ". Next: ${mtProcess.gotoId}"
                             }
+                            ListItem(
+                                headlineContent = { HeaderText(text = mtProcess.name) },
+                                supportingContent = { BodyText(text = supText) }
+                            )
                         }
                     }
                 }

@@ -40,17 +40,17 @@ class ProcessListViewModel @Inject constructor(
     }
 
     fun updateCategoryId(id: Long) {
-        if (id == -1L) {
-            _currentCategory.value = MeditationTimerProcessCategory("All", -1L)
+        if (id == -2L) {
+            _currentCategory.value = MeditationTimerProcessCategory("All", -2L)
         } else {
             viewModelScope.launch {
-                _currentCategory.value = repository.getCategoryById(id) ?: MeditationTimerProcessCategory("All", -1L)
+                _currentCategory.value = repository.getCategoryById(id) ?: MeditationTimerProcessCategory("None", -1L)
             }
         }
         viewModelScope.launch {
             observeProcessesRaw.collect {itemsList ->
                 val filteredItemsList: List<MeditationTimerProcess> = itemsList.filter { item ->
-                    if (currentCategory.value.uid == -1L) {
+                    if (currentCategory.value.uid == -2L) {
                         true
                     } else {
                         item.categoryId == currentCategory.value.uid
