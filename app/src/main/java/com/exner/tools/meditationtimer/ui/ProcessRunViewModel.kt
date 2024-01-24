@@ -4,10 +4,12 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.audio.SoundPoolHolder
 import com.exner.tools.meditationtimer.audio.VibratorHolder
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
+import com.exner.tools.meditationtimer.data.preferences.MeditationTimerUserPreferencesRepository
 import com.exner.tools.meditationtimer.steps.ProcessDisplayStepAction
 import com.exner.tools.meditationtimer.steps.ProcessGotoAction
 import com.exner.tools.meditationtimer.steps.ProcessJumpbackAction
@@ -29,7 +31,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProcessRunViewModel @Inject constructor(
-    private val repository: MeditationTimerDataRepository
+    private val repository: MeditationTimerDataRepository,
+    private val userPreferencesRepository: MeditationTimerUserPreferencesRepository
 ) : ViewModel() {
 
     private val _displayAction: MutableLiveData<ProcessStepAction> = MutableLiveData(null)
@@ -56,11 +59,6 @@ class ProcessRunViewModel @Inject constructor(
     @OptIn(DelicateCoroutinesApi::class)
     fun initialiseRun(
         processId: Long,
-        hasLeadIn: Boolean,
-        leadInTime: Int,
-        noSounds: Boolean,
-        vibrateEnabled: Boolean,
-        countBackwards: Boolean
     ) {
         val result = mutableListOf<List<ProcessStepAction>>()
 
@@ -82,9 +80,9 @@ class ProcessRunViewModel @Inject constructor(
                         val partialResult =
                             getProcessStepListForOneProcess(
                                 process = process,
-                                hasLeadIn = firstRound && hasLeadIn,
-                                leadInTime = leadInTime,
-                                countBackwards = countBackwards,
+                                hasLeadIn = firstRound && userPreferencesRepository.beforeCountingWait.asLiveData().value ?: false,
+                                leadInTime = userPreferencesRepository.howLongToWaitBeforeCounting.asLiveData().value ?: 5,
+                                countBackwards = userPreferencesRepository.countBackwards.asLiveData().value ?: false,
                             )
                         result.addAll(partialResult)
                         // do we need hours in the display?
@@ -171,10 +169,10 @@ class ProcessRunViewModel @Inject constructor(
                                     }
 
                                     is ProcessSoundAction -> {
-                                        if (!noSounds) {
+                                        if (userPreferencesRepository.noSounds.asLiveData().value != true) {
                                             SoundPoolHolder.playSound(action.soundId)
                                         }
-                                        if (vibrateEnabled) {
+                                        if (userPreferencesRepository.vibrateEnabled.asLiveData().value == true) {
                                             VibratorHolder.vibrate(action.soundId)
                                         }
                                     }

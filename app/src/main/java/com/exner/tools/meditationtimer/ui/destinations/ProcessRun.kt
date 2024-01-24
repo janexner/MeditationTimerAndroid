@@ -28,7 +28,6 @@ import com.exner.tools.meditationtimer.ui.BigTimerText
 import com.exner.tools.meditationtimer.ui.KeepScreenOn
 import com.exner.tools.meditationtimer.ui.MediumTimerAndIntervalText
 import com.exner.tools.meditationtimer.ui.ProcessRunViewModel
-import com.exner.tools.meditationtimer.ui.SettingsViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlin.time.Duration.Companion.seconds
@@ -38,7 +37,6 @@ import kotlin.time.Duration.Companion.seconds
 fun ProcessRun(
     processId: Long,
     processRunViewModel: ProcessRunViewModel = hiltViewModel(),
-    settingsViewModel: SettingsViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
 ) {
 
@@ -48,19 +46,8 @@ fun ProcessRun(
     val hasLoop by processRunViewModel.hasLoop.observeAsState()
     val hasHours by processRunViewModel.hasHours.observeAsState()
 
-    val beforeCountingWait by settingsViewModel.beforeCountingWait.observeAsState()
-    val howLongToWaitBeforeCounting by settingsViewModel.howLongToWaitBeforeCounting.observeAsState()
-    val noSounds by settingsViewModel.noSounds.observeAsState()
-    val vibrateEnabled by settingsViewModel.vibrateEnabled.observeAsState()
-    val countBackwards by settingsViewModel.countBackwards.observeAsState()
-
     processRunViewModel.initialiseRun(
         processId = processId,
-        hasLeadIn = beforeCountingWait ?: false,
-        leadInTime = howLongToWaitBeforeCounting ?: 5,
-        noSounds = noSounds ?: false,
-        vibrateEnabled = vibrateEnabled ?: false,
-        countBackwards = countBackwards ?: false
     )
 
     processRunViewModel.setDoneEventHandler {

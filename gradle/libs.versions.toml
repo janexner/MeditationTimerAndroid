@@ -1,5 +1,5 @@
 [versions]
-androidGradlePlugin = "8.4.0-alpha04"
+androidGradlePlugin = "8.4.0-alpha05"
 androidxActivity = "1.8.2"
 androidxAppCompat = "1.6.1"
 androidxComposeBom = "2023.10.01"
@@ -11,14 +11,15 @@ foundation = "1.5.4"
 foundationLayout = "1.5.4"
 hiltCompiler = "2.50"
 kotlin = "1.9.22"
+kotlinxCoroutinesAndroid = "1.7.3"
 ksp = "1.9.22-1.0.17"
 material = "1.11.0"
 room = "2.6.1"
 webkit = "1.9.0"
 composeDestinations = "1.9.62"
-preference = "1.2.1"
 junit = "4.13.2"
 material3Android = "1.2.0-beta02"
+datastorePreferences = "1.0.0"
 
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "androidxActivity" }
@@ -42,9 +43,9 @@ androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
 androidx-window-manager = { module = "androidx.window:window", version.ref = "androidxWindowManager" }
-androidx-preferences = { module = "androidx.preference:preference-ktx", version.ref = "preference" }
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltCompiler" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltCompiler" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
@@ -54,6 +55,7 @@ compose-destinations-ksp = { group = "io.github.raamcosta.compose-destinations",
 junit = { module = "junit:junit", version.ref = "junit" }
 androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastorePreferences" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
