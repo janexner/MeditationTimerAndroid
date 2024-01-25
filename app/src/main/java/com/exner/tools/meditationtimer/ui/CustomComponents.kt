@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.exner.tools.meditationtimer.ui.theme.MeditationTimerTheme
+import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -130,7 +131,7 @@ fun TextFieldForTimes(
 fun durationToAnnotatedString(duration: Duration, withHours: Boolean, postText: String? = null): AnnotatedString {
     // convert seconds to "00:00" style string
     val output = duration.toComponents { hours, minutes, seconds, _ ->
-        String.format("%02d:%02d:%02d", hours, minutes, seconds)
+        String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds)
     }
     val tmp = output.split(":")
     val styledOutput = buildAnnotatedString {
