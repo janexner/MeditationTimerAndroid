@@ -4,12 +4,11 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.audio.SoundPoolHolder
 import com.exner.tools.meditationtimer.audio.VibratorHolder
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
-import com.exner.tools.meditationtimer.data.preferences.MeditationTimerUserPreferencesRepository
+import com.exner.tools.meditationtimer.data.preferences.MeditationTimerUserPreferencesManager
 import com.exner.tools.meditationtimer.steps.ProcessDisplayStepAction
 import com.exner.tools.meditationtimer.steps.ProcessGotoAction
 import com.exner.tools.meditationtimer.steps.ProcessJumpbackAction
@@ -25,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,7 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProcessRunViewModel @Inject constructor(
     private val repository: MeditationTimerDataRepository,
-    private val userPreferencesRepository: MeditationTimerUserPreferencesRepository
+    private val userPreferencesRepository: MeditationTimerUserPreferencesManager
 ) : ViewModel() {
 
     private val _displayAction: MutableLiveData<ProcessStepAction> = MutableLiveData(null)
@@ -80,9 +80,9 @@ class ProcessRunViewModel @Inject constructor(
                         val partialResult =
                             getProcessStepListForOneProcess(
                                 process = process,
-                                hasLeadIn = firstRound && userPreferencesRepository.beforeCountingWait.asLiveData().value ?: false,
-                                leadInTime = userPreferencesRepository.howLongToWaitBeforeCounting.asLiveData().value ?: 5,
-                                countBackwards = userPreferencesRepository.countBackwards.asLiveData().value ?: false,
+                                hasLeadIn = firstRound && userPreferencesRepository.beforeCountingWait().firstOrNull() ?: false,
+                                leadInTime = userPreferencesRepository.howLongToWaitBeforeCounting().firstOrNull() ?: 5,
+                                countBackwards = userPreferencesRepository.countBackwards().firstOrNull() ?: false,
                             )
                         result.addAll(partialResult)
                         // do we need hours in the display?
@@ -169,10 +169,10 @@ class ProcessRunViewModel @Inject constructor(
                                     }
 
                                     is ProcessSoundAction -> {
-                                        if (userPreferencesRepository.noSounds.asLiveData().value != true) {
+                                        if (userPreferencesRepository.noSounds().firstOrNull() != true) {
                                             SoundPoolHolder.playSound(action.soundId)
                                         }
-                                        if (userPreferencesRepository.vibrateEnabled.asLiveData().value == true) {
+                                        if (userPreferencesRepository.vibrateEnabled().firstOrNull() == true) {
                                             VibratorHolder.vibrate(action.soundId)
                                         }
                                     }

@@ -10,11 +10,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.exner.tools.meditationtimer.ui.LockScreenOrientation
 import com.exner.tools.meditationtimer.ui.SettingsViewModel
 import com.exner.tools.meditationtimer.ui.TextAndSwitch
@@ -28,12 +28,12 @@ fun Settings(
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
 
-    val beforeCountingWait by settingsViewModel.beforeCountingWait.observeAsState()
-    val howLongToWaitBeforeCounting by settingsViewModel.howLongToWaitBeforeCounting.observeAsState()
-    val countBackwards by settingsViewModel.countBackwards.observeAsState()
-    val chainToSameCategoryOnly by settingsViewModel.chainToSameCategoryOnly.observeAsState()
-    val noSounds by settingsViewModel.noSounds.observeAsState()
-    val vibrateEnabled by settingsViewModel.vibrateEnabled.observeAsState()
+    val beforeCountingWait by settingsViewModel.beforeCountingWait.collectAsStateWithLifecycle()
+    val howLongToWaitBeforeCounting by settingsViewModel.howLongToWaitBeforeCounting.collectAsStateWithLifecycle()
+    val countBackwards by settingsViewModel.countBackwards.collectAsStateWithLifecycle()
+    val chainToSameCategoryOnly by settingsViewModel.chainToSameCategoryOnly.collectAsStateWithLifecycle()
+    val noSounds by settingsViewModel.noSounds.collectAsStateWithLifecycle()
+    val vibrateEnabled by settingsViewModel.vibrateEnabled.collectAsStateWithLifecycle()
 
     // unlock screen rotation
     LockScreenOrientation(orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR)
@@ -44,15 +44,15 @@ fun Settings(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        TextAndSwitch(text = "Before counting, wait", checked = beforeCountingWait == true) {
+        TextAndSwitch(text = "Before counting, wait", checked = beforeCountingWait) {
             settingsViewModel.updateBeforeCountingWait(it)
         }
-        AnimatedVisibility(visible = beforeCountingWait == true) {
+        AnimatedVisibility(visible = beforeCountingWait) {
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 TextFieldForTimes(
-                    value = howLongToWaitBeforeCounting ?: 5,
+                    value = howLongToWaitBeforeCounting,
                     label = { Text(text = "How long to wait before counting (seconds)") },
                     onValueChange = {
                         settingsViewModel.updateHowLongToWaitBeforeCounting(it)
@@ -62,25 +62,25 @@ fun Settings(
         }
         TextAndSwitch(
             text = "Count backwards (down to 0)",
-            checked = countBackwards == true
+            checked = countBackwards
         ) {
             settingsViewModel.updateCountBackwards(it)
         }
         TextAndSwitch(
             text = "No Sound (count silently)",
-            checked = noSounds == true
+            checked = noSounds
         ) {
             settingsViewModel.updateNoSounds(it)
         }
         TextAndSwitch(
             text = "Vibrate",
-            checked = vibrateEnabled == true
+            checked = vibrateEnabled
         ) {
             settingsViewModel.updateVibrateEnabled(it)
         }
         TextAndSwitch(
             text = "Chain to same category only",
-            checked = chainToSameCategoryOnly == true
+            checked = chainToSameCategoryOnly
         ) {
             settingsViewModel.updateChainToSameCategoryOnly(it)
         }

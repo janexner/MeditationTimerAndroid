@@ -80,9 +80,9 @@ fun ProcessEdit(
         initialValue = emptyList()
     )
 
-    val chainToSameCategoryOnly by settingsViewModel.chainToSameCategoryOnly.observeAsState()
+    val chainToSameCategoryOnly by settingsViewModel.chainToSameCategoryOnly.collectAsStateWithLifecycle()
 
-    processEditViewModel.getProcess(processId, chainToSameCategoryOnly == true)
+    processEditViewModel.getProcess(processId, chainToSameCategoryOnly)
 
     var modified by remember { mutableStateOf(false) }
 
@@ -146,7 +146,7 @@ fun ProcessEdit(
                             onClick = {
                                 processEditViewModel.updateCategoryId(
                                     -1L,
-                                    chainToSameCategoryOnly == true
+                                    chainToSameCategoryOnly
                                 )
                                 modified = true
                                 categoryExpanded = false
@@ -159,7 +159,7 @@ fun ProcessEdit(
                                 onClick = {
                                     processEditViewModel.updateCategoryId(
                                         category.uid,
-                                        chainToSameCategoryOnly == true
+                                        chainToSameCategoryOnly
                                     )
                                     modified = true
                                     categoryExpanded = false
@@ -261,7 +261,7 @@ fun ProcessEdit(
                                 expanded = expanded,
                                 onDismissRequest = { expanded = false }) {
                                 processes.forEach { process ->
-                                    if (chainToSameCategoryOnly != true || process.categoryId == -1L || process.categoryId == currentCategory.uid) {
+                                    if (!chainToSameCategoryOnly || process.categoryId == -1L || process.categoryId == currentCategory.uid) {
                                         DropdownMenuItem(
                                             text = { Text(text = process.name) },
                                             onClick = {

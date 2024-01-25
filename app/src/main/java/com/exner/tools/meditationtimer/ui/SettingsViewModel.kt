@@ -1,58 +1,84 @@
 package com.exner.tools.meditationtimer.ui
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.exner.tools.meditationtimer.data.preferences.MeditationTimerUserPreferencesRepository
+import com.exner.tools.meditationtimer.data.preferences.MeditationTimerUserPreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val userPreferencesRepository: MeditationTimerUserPreferencesRepository
+    private val userPreferencesManager: MeditationTimerUserPreferencesManager
 ) : ViewModel() {
 
-    val beforeCountingWait = userPreferencesRepository.beforeCountingWait.asLiveData()
-    val howLongToWaitBeforeCounting = userPreferencesRepository.howLongToWaitBeforeCounting.asLiveData()
-    val countBackwards = userPreferencesRepository.countBackwards.asLiveData()
-    val chainToSameCategoryOnly = userPreferencesRepository.chainToSameCategoryOnly.asLiveData()
-    val noSounds = userPreferencesRepository.noSounds.asLiveData()
-    val vibrateEnabled = userPreferencesRepository.vibrateEnabled.asLiveData()
+    val beforeCountingWait: StateFlow<Boolean> = userPreferencesManager.beforeCountingWait().stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            false
+        )
+    val howLongToWaitBeforeCounting: StateFlow<Int> = userPreferencesManager.howLongToWaitBeforeCounting().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(),
+        5
+    )
+    val countBackwards: StateFlow<Boolean> = userPreferencesManager.countBackwards().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(),
+        false
+    )
+    val chainToSameCategoryOnly: StateFlow<Boolean> = userPreferencesManager.chainToSameCategoryOnly().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(),
+        false
+    )
+    val noSounds: StateFlow<Boolean> = userPreferencesManager.noSounds().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(),
+        false
+    )
+    val vibrateEnabled: StateFlow<Boolean> = userPreferencesManager.vibrateEnabled().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(),
+        false
+    )
 
     fun updateBeforeCountingWait(newBeforeCountingWait: Boolean) {
         viewModelScope.launch {
-            userPreferencesRepository.setBeforeCountingWait(newBeforeCountingWait)
+            userPreferencesManager.setBeforeCountingWait(newBeforeCountingWait)
         }
     }
 
     fun updateHowLongToWaitBeforeCounting(newHowLongToWaitBeforeCounting: Int) {
         viewModelScope.launch {
-            userPreferencesRepository.setHowLongToWaitBeforeCounting(newHowLongToWaitBeforeCounting)
+            userPreferencesManager.setHowLongToWaitBeforeCounting(newHowLongToWaitBeforeCounting)
         }
     }
 
     fun updateCountBackwards(newCountBackwards: Boolean) {
         viewModelScope.launch {
-            userPreferencesRepository.setCountBackwards(newCountBackwards)
+            userPreferencesManager.setCountBackwards(newCountBackwards)
         }
     }
 
     fun updateChainToSameCategoryOnly(newChainToSameOnly: Boolean) {
         viewModelScope.launch {
-            userPreferencesRepository.setChainToSameCategoryOnly(newChainToSameOnly)
+            userPreferencesManager.setChainToSameCategoryOnly(newChainToSameOnly)
         }
     }
 
     fun updateNoSounds(newNoSounds: Boolean) {
         viewModelScope.launch {
-            userPreferencesRepository.setNoSounds(newNoSounds)
+            userPreferencesManager.setNoSounds(newNoSounds)
         }
     }
 
     fun updateVibrateEnabled(newVibrateEnabled: Boolean) {
         viewModelScope.launch {
-            userPreferencesRepository.setVibrateEnabled(newVibrateEnabled)
+            userPreferencesManager.setVibrateEnabled(newVibrateEnabled)
         }
     }
 }
