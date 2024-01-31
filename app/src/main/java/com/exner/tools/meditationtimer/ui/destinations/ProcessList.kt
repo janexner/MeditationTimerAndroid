@@ -68,6 +68,8 @@ fun ProcessList(
 
     var modified by remember { mutableStateOf(false) }
 
+    processListViewModel.updateOnlyFirstState(onlyShowFirstInChain.value)
+
     Scaffold(
         content = { innerPadding ->
             Column(
@@ -126,8 +128,6 @@ fun ProcessList(
                     }
                 }
 
-                val titleText = if (onlyShowFirstInChain.value) "Start Processes" else "All Processes"
-                Text(text = titleText, modifier = Modifier.padding(8.dp))
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 250.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
