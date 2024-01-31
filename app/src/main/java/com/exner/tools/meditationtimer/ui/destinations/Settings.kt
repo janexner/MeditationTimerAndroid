@@ -34,6 +34,7 @@ fun Settings(
     val chainToSameCategoryOnly by settingsViewModel.chainToSameCategoryOnly.collectAsStateWithLifecycle()
     val noSounds by settingsViewModel.noSounds.collectAsStateWithLifecycle()
     val vibrateEnabled by settingsViewModel.vibrateEnabled.collectAsStateWithLifecycle()
+    val onlyShowFirstInChain by settingsViewModel.onlyShowFirstInChain.collectAsStateWithLifecycle()
 
     // unlock screen rotation
     LockScreenOrientation(orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR)
@@ -83,6 +84,12 @@ fun Settings(
             checked = chainToSameCategoryOnly
         ) {
             settingsViewModel.updateChainToSameCategoryOnly(it)
+        }
+        TextAndSwitch(
+            text = "Only show first process of any chain (hide others)",
+            checked = onlyShowFirstInChain
+        ) {
+            settingsViewModel.updateOnlyShowFirstInChain(it)
         }
     }
 

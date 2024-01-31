@@ -106,6 +106,20 @@ class MeditationTimerUserPreferencesManager @Inject constructor(
         }
     }
 
+    fun onlyShowFirstInChain(): Flow<Boolean> {
+        return userDataStorePreferences.data.catch {
+            emit(emptyPreferences())
+        }.map { preferences ->
+            preferences[KEY_ONLY_SHOW_FIRST_IN_CHAIN] ?: false
+        }
+    }
+
+    suspend fun setOnlyShowFirstInChain(newFirstOnly: Boolean) {
+        userDataStorePreferences.edit { preferences ->
+            preferences[KEY_ONLY_SHOW_FIRST_IN_CHAIN] = newFirstOnly
+        }
+    }
+
     private companion object {
 
         val KEY_BEFORE_COUNTING_WAIT = booleanPreferencesKey(name = "before_counting_wait")
@@ -116,5 +130,6 @@ class MeditationTimerUserPreferencesManager @Inject constructor(
             booleanPreferencesKey(name = "chain_to_same_category_only")
         val KEY_NO_SOUNDS = booleanPreferencesKey(name = "no_sounds")
         val KEY_VIBRATE_ENABLED = booleanPreferencesKey(name = "vibrate_enabled")
+        val KEY_ONLY_SHOW_FIRST_IN_CHAIN = booleanPreferencesKey(name = "only_show_first_in_chain")
     }
 }

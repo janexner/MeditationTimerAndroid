@@ -45,6 +45,11 @@ class SettingsViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(),
         false
     )
+    val onlyShowFirstInChain: StateFlow<Boolean> = userPreferencesManager.onlyShowFirstInChain().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(),
+        false
+    )
 
     fun updateBeforeCountingWait(newBeforeCountingWait: Boolean) {
         viewModelScope.launch {
@@ -79,6 +84,12 @@ class SettingsViewModel @Inject constructor(
     fun updateVibrateEnabled(newVibrateEnabled: Boolean) {
         viewModelScope.launch {
             userPreferencesManager.setVibrateEnabled(newVibrateEnabled)
+        }
+    }
+
+    fun updateOnlyShowFirstInChain(newFirstOnly: Boolean) {
+        viewModelScope.launch {
+            userPreferencesManager.setOnlyShowFirstInChain(newFirstOnly)
         }
     }
 }
