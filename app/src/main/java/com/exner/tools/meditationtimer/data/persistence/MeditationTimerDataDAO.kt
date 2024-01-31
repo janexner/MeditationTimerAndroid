@@ -8,6 +8,9 @@ interface MeditationTimerDataDAO {
     @Query("SELECT * FROM meditationtimerprocess ORDER BY name ASC")
     fun observeProcessesAlphabeticallyOrdered(): Flow<List<MeditationTimerProcess>>
 
+    @Query("SELECT * FROM meditationtimerprocess WHERE uid NOT IN (SELECT goto_id FROM meditationtimerprocess WHERE goto_id > 0) ORDER BY name ASC")
+    fun observeFirstProcessesAlphabeticallyOrdered(): Flow<List<MeditationTimerProcess>>
+
     @Query("SELECT * FROM meditationtimerprocess WHERE category_id IN (:categoryId) ORDER BY name ASC")
     fun observeProcessesForCategoryAlphabeticallyOrdered(categoryId: Long): Flow<List<MeditationTimerProcess>>
 

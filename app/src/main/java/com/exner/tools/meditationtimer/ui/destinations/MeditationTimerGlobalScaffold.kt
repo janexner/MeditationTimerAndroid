@@ -18,12 +18,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.exner.tools.meditationtimer.ui.SettingsViewModel
 import com.exner.tools.meditationtimer.ui.destinations.destinations.AboutDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.CategoryListDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.Destination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessListDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessRunDestination
+import com.exner.tools.meditationtimer.ui.destinations.destinations.RemoteProcessManagementDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.SettingsDestination
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.navigate
@@ -55,8 +59,11 @@ fun MeditationTimerGlobalScaffold() {
 private fun MeditationTimerTopBar(
     destination: Destination?,
     navController: NavHostController,
+    settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     var displayMainMenu by remember { mutableStateOf(false) }
+    
+    val onlyShowFirstInChain by settingsViewModel.onlyShowFirstInChain.collectAsStateWithLifecycle()
 
     TopAppBar(
         title = { Text(text = "Meditation Timer") },
@@ -104,6 +111,26 @@ private fun MeditationTimerTopBar(
                     }
                 )
                 DropdownMenuItem(
+                    enabled = destination != RemoteProcessManagementDestination,
+                    text = { Text(text = "Manage remote processes") },
+                    onClick = {
+                        displayMainMenu = false
+                        navController.navigate(RemoteProcessManagementDestination)
+                    }
+                )
+                DropdownMenuItem(
+                    enabled = destination == ProcessListDestination,
+                    text = { if (onlyShowFirstInChain) { 
+                        Text(text = "Show all processes")
+                    } else { 
+                        Text(text = "Show only first process in chain (hide the others)")
+                    } }, 
+                    onClick = { 
+                        displayMainMenu = false
+                        settingsViewModel.updateOnlyShowFirstInChain(!onlyShowFirstInChain)
+                    }
+                )
+                DropdownMenuItem(
                     enabled = destination != SettingsDestination,
                     text = { Text(text = "Settings") },
                     onClick = {
@@ -115,6 +142,7 @@ private fun MeditationTimerTopBar(
                     enabled = destination != AboutDestination,
                     text = { Text(text = "About Meditation Timer") },
                     onClick = {
+                        displayMainMenu = false
                         navController.navigate(AboutDestination())
                     }
                 )

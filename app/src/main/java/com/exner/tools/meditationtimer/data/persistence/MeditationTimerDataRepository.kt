@@ -13,6 +13,9 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
     val observeProcesses: Flow<List<MeditationTimerProcess>> =
         meditationTimerProcessDAO.observeProcessesAlphabeticallyOrdered()
 
+    val observeFirstProcesses: Flow<List<MeditationTimerProcess>> =
+        meditationTimerProcessDAO.observeFirstProcessesAlphabeticallyOrdered()
+
     val observeCategories: Flow<List<MeditationTimerProcessCategory>> =
         meditationTimerProcessDAO.observeCategoriesAlphabeticallyOrdered()
 
