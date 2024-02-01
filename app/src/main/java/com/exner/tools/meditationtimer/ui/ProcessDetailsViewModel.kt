@@ -23,6 +23,9 @@ class ProcessDetailsViewModel @Inject constructor(
     private val _name: MutableLiveData<String> = MutableLiveData("Name")
     val name: LiveData<String> = _name
 
+    private val _uuid: MutableLiveData<String> = MutableLiveData("")
+    val uuid: LiveData<String> = _uuid
+
     private val _processTime: MutableLiveData<String> = MutableLiveData("30")
     val processTime: LiveData<String> = _processTime
 
@@ -51,29 +54,27 @@ class ProcessDetailsViewModel @Inject constructor(
         }
     }
 
-    fun getProcess(processId: Long) {
-        if (processId != -1L) {
-            _uid.value = processId
-            viewModelScope.launch {
-                val process = repository.loadProcessById(processId)
-                if (process != null) {
-                    _name.value = process.name
-                    _processTime.value = process.processTime.toString()
-                    _intervalTime.value = process.intervalTime.toString()
-                    _hasAutoChain.value = process.hasAutoChain
-                    _gotoUuid.value = process.gotoUuid
-                    _gotoName.value = process.gotoName
-                    if (process.gotoUuid != null && process.gotoUuid != "") {
-                        val nextProcess = repository.loadProcessByUuid(process.gotoUuid)
-                        if (nextProcess != null) {
-                            if (_gotoName.value != nextProcess.name) {
-                                // this is weird!
-                                _gotoName.value = nextProcess.name
-                            }
+    fun getProcess(processUuid: String) {
+        _uuid.value = processUuid
+        viewModelScope.launch {
+            val process = repository.loadProcessByUuid(processUuid)
+            if (process != null) {
+                _name.value = process.name
+                _processTime.value = process.processTime.toString()
+                _intervalTime.value = process.intervalTime.toString()
+                _hasAutoChain.value = process.hasAutoChain
+                _gotoUuid.value = process.gotoUuid
+                _gotoName.value = process.gotoName
+                if (process.gotoUuid != null && process.gotoUuid != "") {
+                    val nextProcess = repository.loadProcessByUuid(process.gotoUuid)
+                    if (nextProcess != null) {
+                        if (_gotoName.value != nextProcess.name) {
+                            // this is weird!
+                            _gotoName.value = nextProcess.name
                         }
                     }
-                    updateCategoryId(process.categoryId ?: -1L)
                 }
+                updateCategoryId(process.categoryId ?: -1L)
             }
         }
     }

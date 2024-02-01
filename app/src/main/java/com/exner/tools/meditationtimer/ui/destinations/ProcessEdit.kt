@@ -58,7 +58,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Destination
 @Composable
 fun ProcessEdit(
-    processId: Long,
+    processUuid: String?,
     processEditViewModel: ProcessEditViewModel = hiltViewModel(),
     settingsViewModel: SettingsViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
@@ -82,7 +82,7 @@ fun ProcessEdit(
 
     val chainToSameCategoryOnly by settingsViewModel.chainToSameCategoryOnly.collectAsStateWithLifecycle()
 
-    processEditViewModel.getProcess(processId, chainToSameCategoryOnly)
+    processEditViewModel.getProcess(processUuid, chainToSameCategoryOnly)
 
     var modified by remember { mutableStateOf(false) }
 

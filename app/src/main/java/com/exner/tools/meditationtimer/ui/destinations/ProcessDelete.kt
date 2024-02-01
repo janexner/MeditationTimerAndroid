@@ -33,7 +33,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Destination
 @Composable
 fun ProcessDelete(
-    processId: Long,
+    processUuid: String,
     processDeleteViewModel: ProcessDeleteViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
 ) {
@@ -42,7 +42,7 @@ fun ProcessDelete(
     val processIsTarget by processDeleteViewModel.processIsTarget.observeAsState()
     val dependantProcesses by processDeleteViewModel.processChainingDependencies.observeAsState()
 
-    processDeleteViewModel.checkProcess(processId)
+    processDeleteViewModel.checkProcess(processUuid)
 
     Scaffold(
         content = { innerPadding ->
@@ -56,7 +56,7 @@ fun ProcessDelete(
                 HeaderText(text = "Delete Process")
                 HorizontalDivider(modifier = Modifier.padding(8.dp))
                 Text(
-                    text = "You are about to delete processID $processId,"
+                    text = "You are about to delete a process,"
                 )
                 Text(text = "'$processName'.")
                 // double-check in case there are chains that contain this
@@ -67,7 +67,7 @@ fun ProcessDelete(
                         Spacer(modifier = Modifier.height(8.dp))
                         if (dependantProcesses!!.dependentProcessIdsAndNames.isNotEmpty()) {
                             dependantProcesses!!.dependentProcessIdsAndNames.forEach {
-                                Text(text = "${it.uid}: ${it.name}")
+                                Text(text = it.name)
                             }
                         }
                         Spacer(modifier = Modifier.height(8.dp))
@@ -78,7 +78,7 @@ fun ProcessDelete(
         },
         bottomBar = {
             FotoTimerDeleteBottomBar(navigator = navigator) {
-                processDeleteViewModel.deleteProcess(processId)
+                processDeleteViewModel.deleteProcess(processUuid)
             }
         }
     )

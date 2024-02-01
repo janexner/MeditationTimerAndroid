@@ -58,7 +58,7 @@ class ProcessRunViewModel @Inject constructor(
 
     @OptIn(DelicateCoroutinesApi::class)
     fun initialiseRun(
-        processId: Long,
+        processUuid: String,
     ) {
         val result = mutableListOf<List<ProcessStepAction>>()
 
@@ -68,15 +68,15 @@ class ProcessRunViewModel @Inject constructor(
             // create list of list of actions and run it
             viewModelScope.launch {
                 // loop detection
-                val processIdList = mutableListOf<Long>()
-                var currentID = processId
+                val processIdList = mutableListOf<String>()
+                var currentID: String? = processUuid
                 var noLoopDetectedSoFar = true
                 var firstRound = true
 
-                while (currentID >= 0 && noLoopDetectedSoFar) {
-                    processIdList.add(currentID)
-                    val process = repository.loadProcessById(currentID)
+                while (currentID != null && noLoopDetectedSoFar) {
+                    val process = repository.loadProcessByUuid(currentID)
                     if (process != null) {
+                        processIdList.add(currentID)
                         val partialResult =
                             getProcessStepListForOneProcess(
                                 process = process,
@@ -93,7 +93,7 @@ class ProcessRunViewModel @Inject constructor(
                                 process.gotoUuid
                             )
                         ) {
-                            currentID = repository.getIdForProcessByUuid(process.gotoUuid)!!
+                            currentID = process.gotoUuid
                             if (processIdList.contains(currentID)) {
                                 noLoopDetectedSoFar = false // LOOP!
                                 _hasLoop.value = true
@@ -103,7 +103,7 @@ class ProcessRunViewModel @Inject constructor(
                                     val checkPoint = result[i]
                                     checkPoint.forEach { action ->
                                         if (action is ProcessStartAction) {
-                                            if (action.processID == currentID) {
+                                            if (action.processUuiD == currentID) {
                                                 earliestStepNumberForLoop = i
                                             }
                                         }
@@ -135,7 +135,7 @@ class ProcessRunViewModel @Inject constructor(
                             }
                         } else {
                             // that's it, no chain
-                            currentID = -1
+                            currentID = null
                         }
                     }
                 }

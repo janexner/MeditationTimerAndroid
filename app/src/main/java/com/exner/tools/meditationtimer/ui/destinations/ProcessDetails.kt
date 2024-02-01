@@ -43,7 +43,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Destination
 @Composable
 fun ProcessDetails(
-    processId: Long,
+    processUuid: String,
     processDetailsViewModel: ProcessDetailsViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
 ) {
@@ -58,7 +58,7 @@ fun ProcessDetails(
         initialValue = MeditationTimerProcessCategory("None", -1L)
     )
 
-    processDetailsViewModel.getProcess(processId)
+    processDetailsViewModel.getProcess(processUuid = processUuid)
 
     Scaffold(
         content = { innerPadding ->
@@ -109,14 +109,14 @@ fun ProcessDetails(
             }
         },
         bottomBar = {
-            MeditationTimerDetailsBottomBar(processId = processId, navigator = navigator)
+            MeditationTimerDetailsBottomBar(processUuid = processUuid, navigator = navigator)
         }
     )
 }
 
 @Composable
 fun MeditationTimerDetailsBottomBar(
-    processId: Long,
+    processUuid: String,
     navigator: DestinationsNavigator
 ) {
     BottomAppBar(
@@ -124,7 +124,7 @@ fun MeditationTimerDetailsBottomBar(
 
             IconButton(onClick = {
                 navigator.navigate(
-                    ProcessEditDestination(processId = processId)
+                    ProcessEditDestination(processUuid = processUuid)
                 )
             }) {
                 Icon(
@@ -135,7 +135,7 @@ fun MeditationTimerDetailsBottomBar(
 
             IconButton(onClick = {
                 navigator.navigate(
-                    ProcessDeleteDestination(processId = processId)
+                    ProcessDeleteDestination(processUuid = processUuid)
                 )
             }) {
                 Icon(
@@ -156,7 +156,7 @@ fun MeditationTimerDetailsBottomBar(
                 },
                 onClick = {
                     navigator.navigate(
-                        ProcessRunDestination(processId = processId)
+                        ProcessRunDestination(processUuid = processUuid)
                     )
                 },
                 containerColor = BottomAppBarDefaults.bottomAppBarFabColor,

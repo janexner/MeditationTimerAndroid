@@ -141,7 +141,7 @@ fun ProcessList(
                                 .clickable {
                                     navigator.navigate(
                                         ProcessDetailsDestination(
-                                            processId = mtProcess.uid,
+                                            processUuid = mtProcess.uuid,
                                         )
                                     )
                                 },
@@ -180,7 +180,7 @@ private fun MeditationTimerListBottomBar(
                 },
                 onClick = {
                     navigator.navigate(
-                        ProcessEditDestination(-1)
+                        ProcessEditDestination(null)
                     )
                 },
                 containerColor = BottomAppBarDefaults.bottomAppBarFabColor,

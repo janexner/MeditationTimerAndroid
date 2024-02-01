@@ -36,7 +36,7 @@ class RemoteProcessManagementViewModel @Inject constructor() : ViewModel() {
 
         call?.enqueue(object : Callback<RemoteProcessData?> {
             override fun onResponse(
-                call: Call<RemoteProcessData?>?,
+                call: Call<RemoteProcessData?>,
                 response: Response<RemoteProcessData?>
             ) {
                 if (response.code() == 200) {
@@ -51,7 +51,7 @@ class RemoteProcessManagementViewModel @Inject constructor() : ViewModel() {
             }
 
             override fun onFailure(
-                call: Call<RemoteProcessData?>?,
+                call: Call<RemoteProcessData?>,
                 t: Throwable
             ) {
                 Log.i("PROCESSES", "Failed! $t")

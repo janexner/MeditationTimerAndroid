@@ -23,32 +23,13 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
         meditationTimerProcessDAO.observeCategoryUsageCount()
 
     @WorkerThread
-    suspend fun loadProcessById(id: Long): MeditationTimerProcess? {
-        return meditationTimerProcessDAO.getMeditationTimerProcess(id)
-    }
-
-    @WorkerThread
     suspend fun loadProcessByUuid(uuid: String): MeditationTimerProcess? {
         return meditationTimerProcessDAO.getMeditationTimerProcessByUuid(uuid)
     }
 
     @WorkerThread
-    suspend fun getIdForProcessByUuid(uuid: String): Long? {
-        val process = meditationTimerProcessDAO.getMeditationTimerProcessByUuid(uuid)
-        if (process != null) {
-            return process.uid
-        }
-        return null
-    }
-
-    @WorkerThread
-    suspend fun getIdsAndNamesOfDependentProcesses(fotoTimerProcess: MeditationTimerProcess): List<MeditationTimerDataIdAndName> {
-        return meditationTimerProcessDAO.getIdsAndNamesOfDependantProcesses(fotoTimerProcess.uuid)
-    }
-
-    @WorkerThread
-    suspend fun getIdsAndNamesOfAllCategories(): List<MeditationTimerDataIdAndName> {
-        return meditationTimerProcessDAO.getIdsAndNamesOfAllCategories()
+    suspend fun getUuidsOfDependentProcesses(fotoTimerProcess: MeditationTimerProcess): List<String> {
+        return meditationTimerProcessDAO.getUuidsOfDependantProcesses(fotoTimerProcess.uuid)
     }
 
     @WorkerThread
@@ -59,11 +40,6 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
     @WorkerThread
     suspend fun getCategoryById(id: Long): MeditationTimerProcessCategory? {
         return meditationTimerProcessDAO.getCategoryById(id)
-    }
-
-    @WorkerThread
-    suspend fun doesCategoryWithIdExist(categoryId: Long): Boolean {
-        return (meditationTimerProcessDAO.getCategoryById(categoryId) !== null)
     }
 
     @WorkerThread

@@ -6,6 +6,7 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataDAO
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCategory
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerRoomDatabase
 import dagger.Module
 import dagger.Provides
@@ -50,36 +51,42 @@ object AppComponent {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
             applicationScope.launch(Dispatchers.IO) {
-                populateDatabaseWithSampleProcesses()
+                populateDatabaseWithSampleData()
             }
         }
 
-        private suspend fun populateDatabaseWithSampleProcesses() {
+        private suspend fun populateDatabaseWithSampleData() {
             // Add sample words.
+            val secondUuid = UUID.randomUUID().toString()
             var meditationTimerProcess =
                 MeditationTimerProcess(
                     "Test Process 1",
+                    uuid = UUID.randomUUID().toString(),
                     30,
                     10,
                     true,
-                    gotoUuid = null,
-                    gotoName = null,
+                    gotoUuid = secondUuid,
+                    gotoName = "Test Process 2",
                     -1L,
-                    uuid = UUID.randomUUID().toString()
                 )
             provider.get().insert(meditationTimerProcess)
             meditationTimerProcess =
                 MeditationTimerProcess(
                     "Test Process 2",
+                    uuid = secondUuid,
                     15,
                     5,
                     false,
                     gotoUuid = null,
                     gotoName = null,
                     -1L,
-                    uuid = UUID.randomUUID().toString()
                 )
             provider.get().insert(meditationTimerProcess)
+            val demoCategory = MeditationTimerProcessCategory(
+                "Category 1",
+                0
+            )
+            provider.get().insertCategory(demoCategory)
         }
     }
 }

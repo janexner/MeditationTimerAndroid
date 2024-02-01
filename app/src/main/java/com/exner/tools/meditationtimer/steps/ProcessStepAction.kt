@@ -6,7 +6,7 @@ open class ProcessStepAction(
 
 class ProcessStartAction(
     processName: String,
-    val processID: Long
+    val processUuiD: String
 ): ProcessStepAction(processName)
 
 class ProcessDisplayStepAction(
@@ -31,7 +31,7 @@ class ProcessSoundAction(
 
 class ProcessGotoAction(
     processName: String,
-    val gotoId: String
+    val gotoUuid: String
 ): ProcessStepAction(processName)
 
 class ProcessJumpbackAction(

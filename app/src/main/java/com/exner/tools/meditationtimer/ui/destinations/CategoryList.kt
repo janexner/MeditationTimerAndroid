@@ -83,8 +83,8 @@ fun CategoryList(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(innerPadding)
                 ) {
-                    items(count = categories.size) { meditationTimerCategory ->
-                        val category = categories[meditationTimerCategory]
+                    items(count = categories.size) { index ->
+                        val category = categories[index]
                         Surface(
                             modifier = Modifier
                                 .clickable {
@@ -160,7 +160,6 @@ fun CategoryList(
                             }
                         }
                     }
-
                 }
             }
         },

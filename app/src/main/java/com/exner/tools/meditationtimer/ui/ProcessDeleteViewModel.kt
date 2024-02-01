@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerChainingDependencies
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataIdAndName
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -24,13 +25,20 @@ class ProcessDeleteViewModel @Inject constructor(
     private val _processChainingDependencies: MutableLiveData<MeditationTimerChainingDependencies> = MutableLiveData(null)
     val processChainingDependencies: LiveData<MeditationTimerChainingDependencies> = _processChainingDependencies
 
-    fun checkProcess(processId: Long) {
-        if (processId != -1L) {
+    fun checkProcess(processUuid: String?) {
+        if (processUuid != null) {
             viewModelScope.launch {
-                val process = repository.loadProcessById(processId)
+                val process = repository.loadProcessByUuid(processUuid)
                 if (process != null) {
                     _processName.value = process.name
-                    val newDependentProcesses = repository.getIdsAndNamesOfDependentProcesses(process)
+                    val newDependentProcessUuids = repository.getUuidsOfDependentProcesses(process)
+                    val newDependentProcesses = mutableListOf<MeditationTimerDataIdAndName>()
+                    newDependentProcessUuids.forEach {
+                        val tmpProcess = repository.loadProcessByUuid(it)
+                        if (tmpProcess != null) {
+                            newDependentProcesses.add(MeditationTimerDataIdAndName(it, tmpProcess.name))
+                        }
+                    }
                     val chainingDependencies = MeditationTimerChainingDependencies(
                         newDependentProcesses
                     )
@@ -41,13 +49,12 @@ class ProcessDeleteViewModel @Inject constructor(
         }
     }
 
-    fun deleteProcess(processId: Long) {
+    fun deleteProcess(processUuid: String) {
         viewModelScope.launch {
-            val ftp = repository.loadProcessById(processId)
+            val ftp = repository.loadProcessByUuid(processUuid)
             if (ftp != null) {
                 repository.delete(ftp)
             }
         }
     }
-
 }

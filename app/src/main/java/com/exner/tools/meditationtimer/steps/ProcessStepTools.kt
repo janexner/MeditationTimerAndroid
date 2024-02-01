@@ -50,7 +50,7 @@ fun getProcessStepListForOneProcess(
             // first things first
             val ftpstartAction = ProcessStartAction(
                 process.name,
-                process.uid
+                process.uuid
             )
             actionsList.add(ftpstartAction)
         }

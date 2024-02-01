@@ -37,7 +37,7 @@ class ProcessEditViewModel @Inject constructor(
     private val _gotoUuid: MutableLiveData<String?> = MutableLiveData(null)
     private val _gotoName: MutableLiveData<String?> = MutableLiveData(null)
 
-    private val _uuid: MutableLiveData<String?> = MutableLiveData(UUID.randomUUID().toString())
+    private val _uuid: MutableLiveData<String?> = MutableLiveData(null)
 
     private val _nextProcessesName: MutableLiveData<String?> = MutableLiveData("")
     val nextProcessesName: LiveData<String?> = _nextProcessesName
@@ -87,11 +87,11 @@ class ProcessEditViewModel @Inject constructor(
         }
     }
 
-    fun getProcess(processId: Long, filterProcessesForCurrentCategory: Boolean) {
-        if (processId != -1L) {
-            _uid.value = processId
+    fun getProcess(processUuid: String?, filterProcessesForCurrentCategory: Boolean) {
+        if (processUuid != null) {
+            _uuid.value = processUuid
             viewModelScope.launch {
-                val process = repository.loadProcessById(processId)
+                val process = repository.loadProcessByUuid(processUuid)
                 if (process != null) {
                     _name.value = process.name
                     _processTime.value = process.processTime
