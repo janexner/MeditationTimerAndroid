@@ -1,7 +1,5 @@
 package com.exner.tools.meditationtimer
 
-import android.accounts.Account
-import android.accounts.AccountManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle

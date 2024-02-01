@@ -34,7 +34,7 @@ class ProcessEditViewModel @Inject constructor(
     private val _hasAutoChain: MutableLiveData<Boolean> = MutableLiveData(false)
     val hasAutoChain: LiveData<Boolean> = _hasAutoChain
 
-    private val _gotoId: MutableLiveData<String?> = MutableLiveData(null)
+    private val _gotoUuid: MutableLiveData<String?> = MutableLiveData(null)
     private val _gotoName: MutableLiveData<String?> = MutableLiveData(null)
 
     private val _uuid: MutableLiveData<String?> = MutableLiveData(UUID.randomUUID().toString())
@@ -97,7 +97,7 @@ class ProcessEditViewModel @Inject constructor(
                     _processTime.value = process.processTime
                     _intervalTime.value = process.intervalTime
                     _hasAutoChain.value = process.hasAutoChain
-                    _gotoId.value = process.gotoUuid
+                    _gotoUuid.value = process.gotoUuid
                     if (process.gotoUuid != null && process.gotoUuid != "") {
                         val nextProcess = repository.loadProcessByUuid(process.gotoUuid)
                         if (nextProcess != null) {
@@ -120,7 +120,7 @@ class ProcessEditViewModel @Inject constructor(
                     processTime = if (processTime.value != null) processTime.value!!.toInt() else 30,
                     intervalTime = if (intervalTime.value != null) intervalTime.value!!.toInt() else 10,
                     hasAutoChain =  hasAutoChain.value == true,
-                    gotoUuid = _gotoId.value,
+                    gotoUuid = _gotoUuid.value,
                     gotoName = _gotoName.value,
                     categoryId = currentCategory.value.uid,
                     uuid = if (_uuid.value != null) _uuid.value!! else UUID.randomUUID().toString()
@@ -153,12 +153,8 @@ class ProcessEditViewModel @Inject constructor(
     }
 
     fun updateGotoUuidAndName(gotoUuid: String?, name: String?) {
-        _gotoId.value = gotoUuid
+        _gotoUuid.value = gotoUuid
         _gotoName.value = name
-    }
-
-    fun updateUuid(uuid: String) {
-        _uuid.value = uuid
     }
 
     fun updateNextProcessesName(nextProcessesName: String?) {

@@ -175,7 +175,8 @@ fun RemoteProcessManagement(
                                             HeaderText(text = genericProcess.name)
                                         },
                                         supportingContent = {
-                                            BodyText(text = "${genericProcess.processTime} / ${genericProcess.intervalTime} > ${genericProcess.gotoId}")
+                                            val nextOrNotText = if (null != genericProcess.gotoName) " > ${genericProcess.gotoName}" else ""
+                                            BodyText(text = "${genericProcess.processTime} / ${genericProcess.intervalTime}$nextOrNotText")
                                         }
                                     )
                                 }

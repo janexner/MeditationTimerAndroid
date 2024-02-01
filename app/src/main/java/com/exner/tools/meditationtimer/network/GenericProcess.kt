@@ -9,7 +9,8 @@ data class GenericProcess (
     var intervalTime: Int,
 
     var hasAutoChain: Boolean,
-    var gotoId: String?,
+    var gotoUUid: String?,
+    var gotoName: String?,
 
     var uuid: String
 )
@@ -21,6 +22,7 @@ fun createGenericProcessFrom(meditationTimerProcess: MeditationTimerProcess): Ge
         meditationTimerProcess.intervalTime * 60,
         meditationTimerProcess.hasAutoChain,
         meditationTimerProcess.gotoUuid,
+        meditationTimerProcess.gotoName,
         meditationTimerProcess.uuid
     )
 

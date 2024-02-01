@@ -11,7 +11,6 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -29,8 +28,8 @@ class MeditationTimerUserPreferencesManager @Inject constructor(
 
     init {
         val am: AccountManager = AccountManager.get(appContext)
-        val accounts: Array<out Account> = am.getAccountsByType("com.google")
-        Log.d("ACCOUNTS", accounts.toString())
+        val accounts: Array<out Account> = am.getAccountsByType("net.fototimer")
+        // TODO
     }
 
     fun accountId(): Flow<String> {
