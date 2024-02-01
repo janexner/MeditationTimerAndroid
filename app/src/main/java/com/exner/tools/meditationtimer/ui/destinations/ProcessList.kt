@@ -160,32 +160,26 @@ fun ProcessList(
             }
         },
         bottomBar = {
-            MeditationTimerListBottomBar(navigator)
-        }
-    )
-}
-
-@Composable
-private fun MeditationTimerListBottomBar(
-    navigator: DestinationsNavigator
-) {
-    BottomAppBar(
-        actions = {
-        },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                text = { Text(text = "Add") },
-                icon = {
-                    Icon(Icons.Filled.Add, "Add a process")
+            BottomAppBar(
+                actions = {
                 },
-                onClick = {
-                    navigator.navigate(
-                        ProcessEditDestination(null)
+                floatingActionButton = {
+                    ExtendedFloatingActionButton(
+                        text = { Text(text = "Add") },
+                        icon = {
+                            Icon(Icons.Filled.Add, "Add a process")
+                        },
+                        onClick = {
+                            navigator.navigate(
+                                ProcessEditDestination(null)
+                            )
+                        },
+                        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
                     )
-                },
-                containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
+                }
             )
         }
     )
 }
+
