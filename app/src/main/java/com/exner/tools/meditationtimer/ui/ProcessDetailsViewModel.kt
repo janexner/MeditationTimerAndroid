@@ -32,11 +32,10 @@ class ProcessDetailsViewModel @Inject constructor(
     private val _hasAutoChain: MutableLiveData<Boolean> = MutableLiveData(false)
     val hasAutoChain: LiveData<Boolean> = _hasAutoChain
 
-    private val _gotoId: MutableLiveData<Long> = MutableLiveData(-1L)
-    val gotoId: LiveData<Long> = _gotoId
-
-    private val _nextProcessesName: MutableLiveData<String> = MutableLiveData("")
-    val nextProcessesName: LiveData<String> = _nextProcessesName
+    private val _gotoUuid: MutableLiveData<String?> = MutableLiveData(null)
+    val gotoUuid: LiveData<String?> = _gotoUuid
+    private val _gotoName: MutableLiveData<String?> = MutableLiveData(null)
+    val gotoName: LiveData<String?> = _gotoName
 
     private val _currentCategory = MutableStateFlow(MeditationTimerProcessCategory("None", -1L))
     val currentCategory: StateFlow<MeditationTimerProcessCategory>
@@ -62,11 +61,15 @@ class ProcessDetailsViewModel @Inject constructor(
                     _processTime.value = process.processTime.toString()
                     _intervalTime.value = process.intervalTime.toString()
                     _hasAutoChain.value = process.hasAutoChain
-                    _gotoId.value = process.gotoId ?: -1L
-                    if (process.gotoId != null && process.gotoId != -1L) {
-                        val nextProcess = repository.loadProcessById(process.gotoId)
+                    _gotoUuid.value = process.gotoUuid
+                    _gotoName.value = process.gotoName
+                    if (process.gotoUuid != null && process.gotoUuid != "") {
+                        val nextProcess = repository.loadProcessByUuid(process.gotoUuid)
                         if (nextProcess != null) {
-                            _nextProcessesName.value = nextProcess.name
+                            if (_gotoName.value != nextProcess.name) {
+                                // this is weird!
+                                _gotoName.value = nextProcess.name
+                            }
                         }
                     }
                     updateCategoryId(process.categoryId ?: -1L)

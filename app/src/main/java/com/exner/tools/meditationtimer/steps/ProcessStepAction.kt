@@ -31,7 +31,7 @@ class ProcessSoundAction(
 
 class ProcessGotoAction(
     processName: String,
-    val gotoId: Long
+    val gotoId: String
 ): ProcessStepAction(processName)
 
 class ProcessJumpbackAction(

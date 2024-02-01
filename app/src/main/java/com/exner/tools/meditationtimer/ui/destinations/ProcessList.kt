@@ -147,8 +147,8 @@ fun ProcessList(
                                 },
                         ) {
                             var supText = "${mtProcess.processTime}/${mtProcess.intervalTime}"
-                            if (mtProcess.hasAutoChain && null != mtProcess.gotoId && mtProcess.gotoId >= 0) {
-                                supText += ". Next: ${mtProcess.gotoId}"
+                            if (mtProcess.hasAutoChain && null != mtProcess.gotoUuid && mtProcess.gotoUuid != "") {
+                                supText += ". Next: '${mtProcess.gotoName}'"
                             }
                             ListItem(
                                 headlineContent = { HeaderText(text = mtProcess.name) },

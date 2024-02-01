@@ -1,12 +1,17 @@
 package com.exner.tools.meditationtimer.data.preferences
 
+import android.accounts.Account
+import android.accounts.AccountManager
 import android.content.Context
+import android.util.Log
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -21,6 +26,26 @@ class MeditationTimerUserPreferencesManager @Inject constructor(
 ) {
 
     private val userDataStorePreferences = appContext.dataStore
+
+    init {
+        val am: AccountManager = AccountManager.get(appContext)
+        val accounts: Array<out Account> = am.getAccountsByType("com.google")
+        Log.d("ACCOUNTS", accounts.toString())
+    }
+
+    fun accountId(): Flow<String> {
+        return userDataStorePreferences.data.catch {
+            emit(emptyPreferences())
+        }.map { preferences ->
+            preferences[KEY_ACCOUNT_ID] ?: ""
+        }
+    }
+
+    suspend fun setAccountId(id: String) {
+        userDataStorePreferences.edit { preferences ->
+            preferences[KEY_ACCOUNT_ID] = id
+        }
+    }
 
     fun beforeCountingWait(): Flow<Boolean> {
         return userDataStorePreferences.data.catch {
@@ -131,5 +156,6 @@ class MeditationTimerUserPreferencesManager @Inject constructor(
         val KEY_NO_SOUNDS = booleanPreferencesKey(name = "no_sounds")
         val KEY_VIBRATE_ENABLED = booleanPreferencesKey(name = "vibrate_enabled")
         val KEY_ONLY_SHOW_FIRST_IN_CHAIN = booleanPreferencesKey(name = "only_show_first_in_chain")
+        val KEY_ACCOUNT_ID = stringPreferencesKey(name = "account_id")
     }
 }

@@ -94,7 +94,7 @@ fun RemoteProcessManagement(
                     }
                 }
                 when (tabIndex) {
-                    0 -> Column(
+                    -1 -> Column(
                         modifier = Modifier
                             .padding(innerPadding)
                             .padding(8.dp)
@@ -131,14 +131,14 @@ fun RemoteProcessManagement(
                                             HeaderText(text = genericProcess.name)
                                         },
                                         supportingContent = {
-                                            BodyText(text = "${genericProcess.processTime} / ${genericProcess.intervalTime} > ${genericProcess.gotoId}")
+                                            BodyText(text = "${genericProcess.processTime} / ${genericProcess.intervalTime} > ${genericProcess.gotoUuid}")
                                         }
                                     )
                                 }
                             }
                         }
                     }
-                    1 -> Column(
+                    0 -> Column(
                         modifier = Modifier
                             .padding(innerPadding)
                             .padding(8.dp)

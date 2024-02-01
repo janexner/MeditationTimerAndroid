@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,7 +34,10 @@ class ProcessEditViewModel @Inject constructor(
     private val _hasAutoChain: MutableLiveData<Boolean> = MutableLiveData(false)
     val hasAutoChain: LiveData<Boolean> = _hasAutoChain
 
-    private val _gotoId: MutableLiveData<Long?> = MutableLiveData(-1L)
+    private val _gotoId: MutableLiveData<String?> = MutableLiveData(null)
+    private val _gotoName: MutableLiveData<String?> = MutableLiveData(null)
+
+    private val _uuid: MutableLiveData<String?> = MutableLiveData(UUID.randomUUID().toString())
 
     private val _nextProcessesName: MutableLiveData<String?> = MutableLiveData("")
     val nextProcessesName: LiveData<String?> = _nextProcessesName
@@ -93,14 +97,15 @@ class ProcessEditViewModel @Inject constructor(
                     _processTime.value = process.processTime
                     _intervalTime.value = process.intervalTime
                     _hasAutoChain.value = process.hasAutoChain
-                    _gotoId.value = process.gotoId ?: -1L
-                    if (process.gotoId != null && process.gotoId != -1L) {
-                        val nextProcess = repository.loadProcessById(process.gotoId)
+                    _gotoId.value = process.gotoUuid
+                    if (process.gotoUuid != null && process.gotoUuid != "") {
+                        val nextProcess = repository.loadProcessByUuid(process.gotoUuid)
                         if (nextProcess != null) {
                             _nextProcessesName.value = nextProcess.name
                         }
                     }
                     updateCategoryId(process.categoryId ?: -1L, filterProcessesForCurrentCategory)
+                    _uuid.value = process.uuid
                 }
             }
         }
@@ -115,8 +120,10 @@ class ProcessEditViewModel @Inject constructor(
                     processTime = if (processTime.value != null) processTime.value!!.toInt() else 30,
                     intervalTime = if (intervalTime.value != null) intervalTime.value!!.toInt() else 10,
                     hasAutoChain =  hasAutoChain.value == true,
-                    gotoId = if (_gotoId.value != null) _gotoId.value!!.toLong() else null,
-                    categoryId = currentCategory.value.uid
+                    gotoUuid = _gotoId.value,
+                    gotoName = _gotoName.value,
+                    categoryId = currentCategory.value.uid,
+                    uuid = if (_uuid.value != null) _uuid.value!! else UUID.randomUUID().toString()
                 )
                 if (uid.value == -1L) {
                     repository.insert(process.copy(
@@ -145,8 +152,13 @@ class ProcessEditViewModel @Inject constructor(
         _hasAutoChain.value = hasAutoChain
     }
 
-    fun updateGotoId(gotoId: Long?) {
-        _gotoId.value = gotoId
+    fun updateGotoUuidAndName(gotoUuid: String?, name: String?) {
+        _gotoId.value = gotoUuid
+        _gotoName.value = name
+    }
+
+    fun updateUuid(uuid: String) {
+        _uuid.value = uuid
     }
 
     fun updateNextProcessesName(nextProcessesName: String?) {

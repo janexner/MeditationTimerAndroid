@@ -8,7 +8,7 @@ interface MeditationTimerDataDAO {
     @Query("SELECT * FROM meditationtimerprocess ORDER BY name ASC")
     fun observeProcessesAlphabeticallyOrdered(): Flow<List<MeditationTimerProcess>>
 
-    @Query("SELECT * FROM meditationtimerprocess WHERE uid NOT IN (SELECT goto_id FROM meditationtimerprocess WHERE goto_id > 0) ORDER BY name ASC")
+    @Query("SELECT * FROM meditationtimerprocess WHERE uid NOT IN (SELECT goto_uuid FROM meditationtimerprocess WHERE goto_uuid > 0) ORDER BY name ASC")
     fun observeFirstProcessesAlphabeticallyOrdered(): Flow<List<MeditationTimerProcess>>
 
     @Query("SELECT * FROM meditationtimerprocess WHERE category_id IN (:categoryId) ORDER BY name ASC")
@@ -29,11 +29,14 @@ interface MeditationTimerDataDAO {
     @Query("SELECT meditationtimerprocesscategory.uid, meditationtimerprocesscategory.name, COUNT(meditationtimerprocess.uid) AS usageCount FROM meditationtimerprocesscategory LEFT JOIN meditationtimerprocess ON meditationtimerprocess.category_id = meditationtimerprocesscategory.uid")
     fun observeCategoryUsageCount(): Flow<List<MeditationTimerCategoryIdNameCount>>
 
-    @Query("SELECT uid, name FROM meditationtimerprocess WHERE goto_id=:id ORDER BY name ASC")
-    suspend fun getIdsAndNamesOfDependantProcesses(id: Long): List<MeditationTimerDataIdAndName>
+    @Query("SELECT uid, name FROM meditationtimerprocess WHERE goto_uuid=:uuid ORDER BY name ASC")
+    suspend fun getIdsAndNamesOfDependantProcesses(uuid: String): List<MeditationTimerDataIdAndName>
 
     @Query("SELECT * FROM meditationtimerprocess WHERE uid=:id")
     suspend fun getMeditationTimerProcess(id : Long): MeditationTimerProcess?
+
+    @Query("SELECT * FROM meditationtimerprocess WHERE uuid=:uuid")
+    suspend fun getMeditationTimerProcessByUuid(uuid: String): MeditationTimerProcess?
 
     @Query("SELECT name FROM meditationtimerprocess WHERE uid=:id")
     suspend fun getProcessNameById(id: Long): String?

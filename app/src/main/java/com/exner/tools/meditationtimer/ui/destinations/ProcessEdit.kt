@@ -265,7 +265,7 @@ fun ProcessEdit(
                                         DropdownMenuItem(
                                             text = { Text(text = process.name) },
                                             onClick = {
-                                                processEditViewModel.updateGotoId(process.uid)
+                                                processEditViewModel.updateGotoUuidAndName(process.uuid, process.name)
                                                 processEditViewModel.updateNextProcessesName(process.name)
                                                 modified = true
                                                 expanded = false

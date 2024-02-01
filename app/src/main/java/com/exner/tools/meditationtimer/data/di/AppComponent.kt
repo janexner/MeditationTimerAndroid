@@ -16,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Provider
 import javax.inject.Singleton
 
@@ -61,8 +62,10 @@ object AppComponent {
                     30,
                     10,
                     true,
-                    2L,
-                    -1L
+                    gotoUuid = null,
+                    gotoName = null,
+                    -1L,
+                    uuid = UUID.randomUUID().toString()
                 )
             provider.get().insert(meditationTimerProcess)
             meditationTimerProcess =
@@ -71,8 +74,10 @@ object AppComponent {
                     15,
                     5,
                     false,
-                    0,
-                    -1L
+                    gotoUuid = null,
+                    gotoName = null,
+                    -1L,
+                    uuid = UUID.randomUUID().toString()
                 )
             provider.get().insert(meditationTimerProcess)
         }

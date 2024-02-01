@@ -52,12 +52,11 @@ fun ProcessDetails(
     val processTime by processDetailsViewModel.processTime.observeAsState()
     val intervalTime by processDetailsViewModel.intervalTime.observeAsState()
     val hasAutoChain by processDetailsViewModel.hasAutoChain.observeAsState()
-    val gotoId by processDetailsViewModel.gotoId.observeAsState()
+    val gotoId by processDetailsViewModel.gotoUuid.observeAsState()
+    val gotoName by processDetailsViewModel.gotoName.observeAsState()
     val currentCategory: MeditationTimerProcessCategory by processDetailsViewModel.currentCategory.collectAsStateWithLifecycle(
         initialValue = MeditationTimerProcessCategory("None", -1L)
     )
-    // this one is the odd one out
-    val nextProcessesName by processDetailsViewModel.nextProcessesName.observeAsState()
 
     processDetailsViewModel.getProcess(processId)
 
@@ -80,11 +79,11 @@ fun ProcessDetails(
                     processTime,
                     intervalTime,
                 )
-                if (hasAutoChain == true && (null != gotoId) && (-1L < gotoId!!)) {
-                    if (null != nextProcessesName) {
+                if (hasAutoChain == true && (null != gotoId) && ("" != gotoId!!)) {
+                    if (null != gotoName) {
                         ListItem(
                             headlineContent = { SmallBodyText(text = "After") },
-                            supportingContent = { BodyText(text = "Afterwards, '$nextProcessesName' will be started.") },
+                            supportingContent = { BodyText(text = "Afterwards, '$gotoName' will be started.") },
                             leadingContent = {
                                 Icon(
                                     painterResource(id = R.drawable.ic_baseline_navigate_next_24),
