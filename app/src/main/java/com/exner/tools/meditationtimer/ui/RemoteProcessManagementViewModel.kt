@@ -32,7 +32,7 @@ class RemoteProcessManagementViewModel @Inject constructor() : ViewModel() {
             .build()
         val service: RemoteProcessesService =
             retrofit.create(RemoteProcessesService::class.java)
-        val call: Call<RemoteProcessData?>? = service.getProcessList()
+        val call: Call<RemoteProcessData?>? = service.getProcessData()
 
         call?.enqueue(object : Callback<RemoteProcessData?> {
             override fun onResponse(

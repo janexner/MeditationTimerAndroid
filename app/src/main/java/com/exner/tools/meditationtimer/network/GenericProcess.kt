@@ -1,6 +1,6 @@
 package com.exner.tools.meditationtimer.network
 
-import com.google.gson.annotations.SerializedName
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
 
 data class GenericProcess (
     var name: String,
@@ -13,3 +13,16 @@ data class GenericProcess (
 
     var uuid: String
 )
+
+fun createGenericProcessFrom(meditationTimerProcess: MeditationTimerProcess): GenericProcess {
+    val result = GenericProcess(
+        meditationTimerProcess.name,
+        meditationTimerProcess.processTime,
+        meditationTimerProcess.intervalTime,
+        meditationTimerProcess.hasAutoChain,
+        meditationTimerProcess.gotoId.toString(),
+        "" // TODO
+    )
+
+    return result
+}

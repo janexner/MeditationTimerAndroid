@@ -5,5 +5,5 @@ import retrofit2.http.GET
 
 interface RemoteProcessesService {
     @GET("testJSON.php")
-    fun getProcessList() : Call<RemoteProcessData?>?
+    fun getProcessData() : Call<RemoteProcessData?>?
 }

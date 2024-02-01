@@ -56,7 +56,7 @@ class ProcessListViewModel @Inject constructor(
                 observeProcessesRaw.collect { itemsList ->
                     val filteredItemsList: List<MeditationTimerProcess> =
                         itemsList.filter { item ->
-                            item.categoryId == currentCategory.value.uid || currentCategory.value.uid == -1L
+                            item.categoryId == currentCategory.value.uid || currentCategory.value.uid <= -1L
                         }
                     _observeProcessesForCurrentCategory.value = filteredItemsList
                 }
