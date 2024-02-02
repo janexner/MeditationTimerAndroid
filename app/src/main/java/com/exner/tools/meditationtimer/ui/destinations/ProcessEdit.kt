@@ -69,8 +69,8 @@ fun ProcessEdit(
     val processTime by processEditViewModel.processTime.observeAsState()
     val intervalTime by processEditViewModel.intervalTime.observeAsState()
     val hasAutoChain by processEditViewModel.hasAutoChain.observeAsState()
+    val gotoName by processEditViewModel.gotoName.observeAsState()
     // some odd ones out
-    val nextProcessesName by processEditViewModel.nextProcessesName.observeAsState()
     val processes: List<MeditationTimerProcess> by processEditViewModel.observeProcessesForCurrentCategory.collectAsStateWithLifecycle(
         initialValue = emptyList()
     )
@@ -110,7 +110,9 @@ fun ProcessEdit(
                         modifier = Modifier.weight(0.75f)
                     )
                 }
-                Row(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)) {
                     OutlinedTextField(
                         value = info ?: "Details",
                         onValueChange = {
@@ -130,7 +132,8 @@ fun ProcessEdit(
                 ) {
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth().padding(8.dp),
+                            .fillMaxWidth()
+                            .padding(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -264,7 +267,7 @@ fun ProcessEdit(
                                     .menuAnchor()
                                     .fillMaxWidth(),
                                 readOnly = true,
-                                value = nextProcessesName ?: "",
+                                value = gotoName ?: "",
                                 placeholder = { Text("Select next Process") },
                                 onValueChange = {},
                                 label = { Text("Next Process") },
@@ -279,7 +282,6 @@ fun ProcessEdit(
                                             text = { Text(text = process.name) },
                                             onClick = {
                                                 processEditViewModel.updateGotoUuidAndName(process.uuid, process.name)
-                                                processEditViewModel.updateNextProcessesName(process.name)
                                                 modified = true
                                                 expanded = false
                                             },

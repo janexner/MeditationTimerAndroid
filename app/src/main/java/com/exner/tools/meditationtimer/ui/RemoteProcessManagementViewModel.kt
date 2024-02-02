@@ -107,15 +107,11 @@ class RemoteProcessManagementViewModel @Inject constructor(
                     ) {
                         if (response.code() == 200) {
                             val genericProcess = response.body()!!
-                            Log.d("PROCESSES", "About to add $uuid...")
                             val meditationTimerProcess =
                                 createMeditationTimerProcessFrom(genericProcess)
                             runBlocking {
-                                Log.d("PROCESSES", "Adding $uuid...")
                                 repository.insert(meditationTimerProcess)
-                                Log.d("PROCESSES", "Added $uuid...")
                                 if (importAndUploadRestOfChainAutomatically && null != meditationTimerProcess.gotoUuid) {
-                                    Log.d("PROCESSES", "Diving $uuid...")
                                     importProcessFromRemote(
                                         service,
                                         meditationTimerProcess.gotoUuid,
@@ -123,8 +119,6 @@ class RemoteProcessManagementViewModel @Inject constructor(
                                     )
                                 }
                             }
-                        } else {
-                            Log.i("PROCESSES", "Response code is ${response.code()}: ${response.body()}")
                         }
                     }
 
@@ -132,7 +126,7 @@ class RemoteProcessManagementViewModel @Inject constructor(
                         call: Call<GenericProcess?>,
                         t: Throwable
                     ) {
-                        Log.i("PROCESSES", "Failed! $t")
+                        // Nothing to do
                     }
                 })
             }

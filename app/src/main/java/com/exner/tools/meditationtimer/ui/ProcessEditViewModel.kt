@@ -39,11 +39,9 @@ class ProcessEditViewModel @Inject constructor(
 
     private val _gotoUuid: MutableLiveData<String?> = MutableLiveData(null)
     private val _gotoName: MutableLiveData<String?> = MutableLiveData(null)
+    val gotoName: LiveData<String?> = _gotoName
 
     private val _uuid: MutableLiveData<String?> = MutableLiveData(null)
-
-    private val _nextProcessesName: MutableLiveData<String?> = MutableLiveData("")
-    val nextProcessesName: LiveData<String?> = _nextProcessesName
 
     private val observeProcessesRaw = repository.observeProcesses
 
@@ -96,18 +94,14 @@ class ProcessEditViewModel @Inject constructor(
             viewModelScope.launch {
                 val process = repository.loadProcessByUuid(processUuid)
                 if (process != null) {
+                    _uid.value = process.uid
                     _name.value = process.name
                     _info.value = process.info
                     _processTime.value = process.processTime
                     _intervalTime.value = process.intervalTime
                     _hasAutoChain.value = process.hasAutoChain
                     _gotoUuid.value = process.gotoUuid
-                    if (process.gotoUuid != null && process.gotoUuid != "") {
-                        val nextProcess = repository.loadProcessByUuid(process.gotoUuid)
-                        if (nextProcess != null) {
-                            _nextProcessesName.value = nextProcess.name
-                        }
-                    }
+                    _gotoName.value = process.gotoName
                     updateCategoryId(process.categoryId ?: -1L, filterProcessesForCurrentCategory)
                     _uuid.value = process.uuid
                 }
@@ -116,7 +110,6 @@ class ProcessEditViewModel @Inject constructor(
     }
 
     fun commitProcess() {
-        if (uid.value != null) {
             viewModelScope.launch {
                 val process = MeditationTimerProcess(
                     uid = uid.value!!.toLong(),
@@ -130,7 +123,7 @@ class ProcessEditViewModel @Inject constructor(
                     categoryId = currentCategory.value.uid,
                     uuid = if (_uuid.value != null) _uuid.value!! else UUID.randomUUID().toString()
                 )
-                if (uid.value == -1L) {
+                if (_uuid.value != null && !repository.doesProcessWithUuidExist(uuid = _uuid.value!!)) {
                     repository.insert(process.copy(
                         uid = 0
                     ))
@@ -138,7 +131,6 @@ class ProcessEditViewModel @Inject constructor(
                     repository.update(process)
                 }
             }
-        }
     }
 
     fun updateName(name: String) {
@@ -164,10 +156,6 @@ class ProcessEditViewModel @Inject constructor(
     fun updateGotoUuidAndName(gotoUuid: String?, name: String?) {
         _gotoUuid.value = gotoUuid
         _gotoName.value = name
-    }
-
-    fun updateNextProcessesName(nextProcessesName: String?) {
-        _nextProcessesName.value = nextProcessesName
     }
 
     fun createNewCategory(newCategoryName: String) {
