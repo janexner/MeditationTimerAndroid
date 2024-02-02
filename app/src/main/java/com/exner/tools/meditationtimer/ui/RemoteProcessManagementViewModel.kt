@@ -23,7 +23,7 @@ class RemoteProcessManagementViewModel @Inject constructor() : ViewModel() {
         get() = _remoteProcessesRaw
 
     // val observeRemoteProcesses: Flow<List<MeditationTimerProcess>>
-    private val baseURL = "http://www.jan-exner.de/orm/ft/"
+    private val baseURL = "https://www.jan-exner.de/orm/ft/"
 
     fun loadRemoteProcesses() {
         val retrofit: Retrofit = Retrofit.Builder()

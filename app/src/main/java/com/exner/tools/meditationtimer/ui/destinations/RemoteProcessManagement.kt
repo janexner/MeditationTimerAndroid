@@ -62,7 +62,7 @@ fun RemoteProcessManagement(
     val localProcesses by processListViewModel.observeProcessesForCurrentCategory.collectAsStateWithLifecycle()
 
     val listOfProcessIdsToUpload = remember {
-        mutableStateListOf<Long>()
+        mutableStateListOf<String>()
     }
 
     val loadingRemote = remember { mutableStateOf(false) }
@@ -113,16 +113,16 @@ fun RemoteProcessManagement(
                                         leadingContent = {
                                             Checkbox(
                                                 checked = listOfProcessIdsToUpload.contains(
-                                                    genericProcess.uid
+                                                    genericProcess.uuid
                                                 ),
                                                 onCheckedChange = { checked ->
                                                     if (checked) {
                                                         listOfProcessIdsToUpload.add(
-                                                            genericProcess.uid
+                                                            genericProcess.uuid
                                                         )
                                                     } else {
                                                         listOfProcessIdsToUpload.remove(
-                                                            genericProcess.uid
+                                                            genericProcess.uuid
                                                         )
                                                     }
                                                 })
@@ -207,7 +207,7 @@ fun RemoteProcessManagement(
             BottomAppBar(
                 actions = {},
                 floatingActionButton = {
-                    if (tabIndex == 0 && listOfProcessIdsToUpload.size > 0) {
+                    if (tabIndex == -1 && listOfProcessIdsToUpload.size > 0) {
                         ExtendedFloatingActionButton(
                             text = { Text(text = "Upload Processes") },
                             icon = {
@@ -223,7 +223,7 @@ fun RemoteProcessManagement(
                             containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
                             elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
                         )
-                    } else if (tabIndex == 1 && listOfProcessUuidsToImport.size > 0) {
+                    } else if (tabIndex == 0 && listOfProcessUuidsToImport.size > 0) {
                         ExtendedFloatingActionButton(
                             text = { Text(text = "Import Processes") },
                             icon = {
