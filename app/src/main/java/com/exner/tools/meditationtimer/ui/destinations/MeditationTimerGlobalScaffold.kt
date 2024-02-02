@@ -59,12 +59,9 @@ fun MeditationTimerGlobalScaffold() {
 private fun MeditationTimerTopBar(
     destination: Destination?,
     navController: NavHostController,
-    settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     var displayMainMenu by remember { mutableStateOf(false) }
     
-    val onlyShowFirstInChain by settingsViewModel.onlyShowFirstInChain.collectAsStateWithLifecycle()
-
     TopAppBar(
         title = { Text(text = "Meditation Timer") },
         navigationIcon = {
@@ -116,18 +113,6 @@ private fun MeditationTimerTopBar(
                     onClick = {
                         displayMainMenu = false
                         navController.navigate(RemoteProcessManagementDestination)
-                    }
-                )
-                DropdownMenuItem(
-                    enabled = destination == ProcessListDestination,
-                    text = { if (onlyShowFirstInChain) { 
-                        Text(text = "Show all processes")
-                    } else { 
-                        Text(text = "Show only first process in chain (hide the others)")
-                    } }, 
-                    onClick = { 
-                        displayMainMenu = false
-                        settingsViewModel.updateOnlyShowFirstInChain(!onlyShowFirstInChain)
                     }
                 )
                 DropdownMenuItem(

@@ -35,6 +35,7 @@ fun Settings(
     val noSounds by settingsViewModel.noSounds.collectAsStateWithLifecycle()
     val vibrateEnabled by settingsViewModel.vibrateEnabled.collectAsStateWithLifecycle()
     val onlyShowFirstInChain by settingsViewModel.onlyShowFirstInChain.collectAsStateWithLifecycle()
+    val importAndUploadRestOfChainAutomatically by settingsViewModel.importAndUploadRestOfChainAutomatically.collectAsStateWithLifecycle()
 
     // unlock screen rotation
     LockScreenOrientation(orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR)
@@ -90,6 +91,12 @@ fun Settings(
             checked = onlyShowFirstInChain
         ) {
             settingsViewModel.updateOnlyShowFirstInChain(it)
+        }
+        TextAndSwitch(
+            text = "When selecting a process for import or upload, automatically select rest of chain, too",
+            checked = importAndUploadRestOfChainAutomatically
+        ) {
+            settingsViewModel.updateImportAndUploadRestOfChainAutomatically(it)
         }
     }
 

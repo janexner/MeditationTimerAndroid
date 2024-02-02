@@ -3,7 +3,6 @@ package com.exner.tools.meditationtimer.ui
 import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
 import com.exner.tools.meditationtimer.network.GenericProcess
 import com.exner.tools.meditationtimer.network.RemoteProcessData
@@ -12,7 +11,7 @@ import com.exner.tools.meditationtimer.network.createMeditationTimerProcessFrom
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -47,9 +46,9 @@ class RemoteProcessManagementViewModel @Inject constructor(
                 response: Response<RemoteProcessData?>
             ) {
                 if (response.code() == 200) {
-                    val movieResponse = response.body()!!
+                    val processesResponse = response.body()!!
                     val newList = mutableListOf<GenericProcess>()
-                    for (genericProcess in movieResponse.processes) {
+                    for (genericProcess in processesResponse.processes) {
                         Log.v("PROCESSES", genericProcess.name)
                         newList.add(genericProcess)
                     }
@@ -66,42 +65,76 @@ class RemoteProcessManagementViewModel @Inject constructor(
         })
     }
 
-    fun importProcessesFromRemote(listOfProcessUuidsToImport: SnapshotStateList<String>) {
-        viewModelScope.launch {
-            val retrofit: Retrofit = Retrofit.Builder()
-                .baseUrl(baseURL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-            val service: RemoteProcessesService =
-                retrofit.create(RemoteProcessesService::class.java)
-            if (listOfProcessUuidsToImport.isNotEmpty()) {
-                listOfProcessUuidsToImport.forEach { uuid ->
-                    val call: Call<GenericProcess?>? = service.getProcess(uuid = uuid)
+    fun importProcessesFromRemote(
+        listOfProcessUuidsToImport: SnapshotStateList<String>,
+        importAndUploadRestOfChainAutomatically: Boolean
+    ) {
+        val processUuidsThatHaveBeenImportedSoFar = mutableListOf<String>()
+        val retrofit: Retrofit = Retrofit.Builder()
+            .baseUrl(baseURL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        val service: RemoteProcessesService =
+            retrofit.create(RemoteProcessesService::class.java)
 
-                    call?.enqueue(object : Callback<GenericProcess?> {
-                        override fun onResponse(
-                            call: Call<GenericProcess?>,
-                            response: Response<GenericProcess?>
-                        ) {
-                            if (response.code() == 200) {
-                                val genericProcess = response.body()!!
-                                Log.d("PROCESSES", "About to add $uuid...")
-                                val meditationTimerProcess =
-                                    createMeditationTimerProcessFrom(genericProcess)
-                                viewModelScope.launch {
-                                    repository.insert(meditationTimerProcess)
+        if (listOfProcessUuidsToImport.isNotEmpty()) {
+            listOfProcessUuidsToImport.forEach { uuid ->
+                importProcessFromRemote(
+                    service,
+                    uuid,
+                    importAndUploadRestOfChainAutomatically
+                )
+                processUuidsThatHaveBeenImportedSoFar.add(uuid)
+            }
+        }
+    }
+
+    private fun importProcessFromRemote(
+        service: RemoteProcessesService,
+        uuid: String,
+        importAndUploadRestOfChainAutomatically: Boolean,
+    ) {
+        // check - does it actually have to be loaded?
+        runBlocking {
+            if (!repository.doesProcessWithUuidExist(uuid)) {
+                // OK - load it!
+                val call: Call<GenericProcess?>? = service.getProcess(uuid = uuid)
+
+                call?.enqueue(object : Callback<GenericProcess?> {
+                    override fun onResponse(
+                        call: Call<GenericProcess?>,
+                        response: Response<GenericProcess?>
+                    ) {
+                        if (response.code() == 200) {
+                            val genericProcess = response.body()!!
+                            Log.d("PROCESSES", "About to add $uuid...")
+                            val meditationTimerProcess =
+                                createMeditationTimerProcessFrom(genericProcess)
+                            runBlocking {
+                                Log.d("PROCESSES", "Adding $uuid...")
+                                repository.insert(meditationTimerProcess)
+                                Log.d("PROCESSES", "Added $uuid...")
+                                if (importAndUploadRestOfChainAutomatically && null != meditationTimerProcess.gotoUuid) {
+                                    Log.d("PROCESSES", "Diving $uuid...")
+                                    importProcessFromRemote(
+                                        service,
+                                        meditationTimerProcess.gotoUuid,
+                                        true
+                                    )
                                 }
                             }
+                        } else {
+                            Log.i("PROCESSES", "Response code is ${response.code()}: ${response.body()}")
                         }
+                    }
 
-                        override fun onFailure(
-                            call: Call<GenericProcess?>,
-                            t: Throwable
-                        ) {
-                            Log.i("PROCESSES", "Failed! $t")
-                        }
-                    })
-                }
+                    override fun onFailure(
+                        call: Call<GenericProcess?>,
+                        t: Throwable
+                    ) {
+                        Log.i("PROCESSES", "Failed! $t")
+                    }
+                })
             }
         }
     }

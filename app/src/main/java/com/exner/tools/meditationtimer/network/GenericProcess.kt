@@ -12,7 +12,7 @@ data class GenericProcess (
     var intervalTime: Int,
 
     var hasAutoChain: Boolean,
-    var gotoUUid: String?,
+    var gotoUuid: String?,
     var gotoName: String?,
 
     var uuid: String
@@ -21,12 +21,12 @@ data class GenericProcess (
 fun createGenericProcessFrom(meditationTimerProcess: MeditationTimerProcess): GenericProcess {
     val result = GenericProcess(
         name = meditationTimerProcess.name,
-        info = "",
+        info = meditationTimerProcess.info,
         categoryId = meditationTimerProcess.categoryId,
         processTime = meditationTimerProcess.processTime * 60,
         intervalTime = meditationTimerProcess.intervalTime * 60,
         hasAutoChain = meditationTimerProcess.hasAutoChain,
-        gotoUUid = meditationTimerProcess.gotoUuid,
+        gotoUuid = meditationTimerProcess.gotoUuid,
         gotoName = meditationTimerProcess.gotoName,
         uuid = meditationTimerProcess.uuid
     )
@@ -41,7 +41,7 @@ fun createMeditationTimerProcessFrom(genericProcess: GenericProcess): Meditation
         processTime = genericProcess.processTime / 60, // minutes!
         intervalTime = genericProcess.intervalTime / 60,
         hasAutoChain = genericProcess.hasAutoChain,
-        gotoUuid = genericProcess.gotoUUid,
+        gotoUuid = genericProcess.gotoUuid,
         gotoName = genericProcess.gotoName,
         categoryId = genericProcess.categoryId,
         uid = 0
