@@ -30,6 +30,21 @@ fun createGenericProcessFrom(meditationTimerProcess: MeditationTimerProcess): Ge
         gotoName = meditationTimerProcess.gotoName,
         uuid = meditationTimerProcess.uuid
     )
+    return result
+}
 
+fun createMeditationTimerProcessFrom(genericProcess: GenericProcess): MeditationTimerProcess {
+    val result = MeditationTimerProcess(
+        name = genericProcess.name,
+        info = genericProcess.info,
+        uuid = genericProcess.uuid,
+        processTime = genericProcess.processTime / 60, // minutes!
+        intervalTime = genericProcess.intervalTime / 60,
+        hasAutoChain = genericProcess.hasAutoChain,
+        gotoUuid = genericProcess.gotoUUid,
+        gotoName = genericProcess.gotoName,
+        categoryId = genericProcess.categoryId,
+        uid = 0
+    )
     return result
 }

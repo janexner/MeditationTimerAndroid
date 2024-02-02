@@ -233,7 +233,7 @@ fun RemoteProcessManagement(
                                 )
                             },
                             onClick = {
-                                // TODO import those!
+                                remoteProcessManagementViewModel.importProcessesFromRemote(listOfProcessUuidsToImport)
                                 navigator.navigateUp()
                             },
                             containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
