@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.LocalTextStyle
@@ -57,7 +58,7 @@ fun HeaderText(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
         style = MaterialTheme.typography.headlineSmall,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().padding(8.dp),
     )
 }
 

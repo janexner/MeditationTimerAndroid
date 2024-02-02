@@ -49,6 +49,7 @@ fun ProcessDetails(
 ) {
 
     val name by processDetailsViewModel.name.observeAsState()
+    val info by processDetailsViewModel.info.observeAsState()
     val processTime by processDetailsViewModel.processTime.observeAsState()
     val intervalTime by processDetailsViewModel.intervalTime.observeAsState()
     val hasAutoChain by processDetailsViewModel.hasAutoChain.observeAsState()
@@ -69,8 +70,9 @@ fun ProcessDetails(
                     .verticalScroll(rememberScrollState())
             ) {
                 // top - process information
-                ProcessNameAndCategory(
+                ProcessNameInfoAndCategory(
                     name,
+                    info,
                     currentCategory.name,
                     modifier = Modifier.padding(8.dp)
                 )
@@ -167,9 +169,13 @@ fun MeditationTimerDetailsBottomBar(
 }
 
 @Composable
-fun ProcessNameAndCategory(name: String?, category: String?, modifier: Modifier) {
+fun ProcessNameInfoAndCategory(name: String?, info: String?, category: String?, modifier: Modifier) {
     HeaderText(
         text = name ?: "Name",
+        modifier = modifier
+    )
+    Text(
+        text = info ?: "",
         modifier = modifier
     )
     Text(

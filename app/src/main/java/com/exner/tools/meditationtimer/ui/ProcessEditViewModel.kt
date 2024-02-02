@@ -25,6 +25,9 @@ class ProcessEditViewModel @Inject constructor(
     private val _name: MutableLiveData<String> = MutableLiveData("Name")
     val name: LiveData<String> = _name
 
+    private val _info: MutableLiveData<String> = MutableLiveData("Details")
+    val info: LiveData<String> = _info
+
     private val _processTime: MutableLiveData<Int> = MutableLiveData(30)
     val processTime: LiveData<Int> = _processTime
 
@@ -94,6 +97,7 @@ class ProcessEditViewModel @Inject constructor(
                 val process = repository.loadProcessByUuid(processUuid)
                 if (process != null) {
                     _name.value = process.name
+                    _info.value = process.info
                     _processTime.value = process.processTime
                     _intervalTime.value = process.intervalTime
                     _hasAutoChain.value = process.hasAutoChain
@@ -117,6 +121,7 @@ class ProcessEditViewModel @Inject constructor(
                 val process = MeditationTimerProcess(
                     uid = uid.value!!.toLong(),
                     name = name.value.toString(),
+                    info = info.value.toString(),
                     processTime = if (processTime.value != null) processTime.value!!.toInt() else 30,
                     intervalTime = if (intervalTime.value != null) intervalTime.value!!.toInt() else 10,
                     hasAutoChain =  hasAutoChain.value == true,
@@ -138,6 +143,10 @@ class ProcessEditViewModel @Inject constructor(
 
     fun updateName(name: String) {
         _name.value = name
+    }
+
+    fun updateInfo(info: String) {
+        _info.value = info
     }
 
     fun updateProcessTime(processTime: Int) {

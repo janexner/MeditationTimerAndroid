@@ -65,6 +65,7 @@ fun ProcessEdit(
 ) {
 
     val name by processEditViewModel.name.observeAsState()
+    val info by processEditViewModel.info.observeAsState()
     val processTime by processEditViewModel.processTime.observeAsState()
     val intervalTime by processEditViewModel.intervalTime.observeAsState()
     val hasAutoChain by processEditViewModel.hasAutoChain.observeAsState()
@@ -109,6 +110,18 @@ fun ProcessEdit(
                         modifier = Modifier.weight(0.75f)
                     )
                 }
+                Row(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                    OutlinedTextField(
+                        value = info ?: "Details",
+                        onValueChange = {
+                            processEditViewModel.updateInfo(it)
+                            modified = true
+                        },
+                        label = { Text(text = "Details / Information") },
+                        singleLine = false,
+                        modifier = Modifier.weight(0.75f)
+                    )
+                }
                 var categoryExpanded by remember { mutableStateOf(false) }
                 val openDialog = remember { mutableStateOf(false) }
                 ExposedDropdownMenuBox(
@@ -117,7 +130,7 @@ fun ProcessEdit(
                 ) {
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth().padding(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {

@@ -23,6 +23,9 @@ class ProcessDetailsViewModel @Inject constructor(
     private val _name: MutableLiveData<String> = MutableLiveData("Name")
     val name: LiveData<String> = _name
 
+    private val _info: MutableLiveData<String> = MutableLiveData("Details")
+    val info: LiveData<String> = _info
+
     private val _uuid: MutableLiveData<String> = MutableLiveData("")
     val uuid: LiveData<String> = _uuid
 
@@ -60,6 +63,7 @@ class ProcessDetailsViewModel @Inject constructor(
             val process = repository.loadProcessByUuid(processUuid)
             if (process != null) {
                 _name.value = process.name
+                _info.value = process.info
                 _processTime.value = process.processTime.toString()
                 _intervalTime.value = process.intervalTime.toString()
                 _hasAutoChain.value = process.hasAutoChain

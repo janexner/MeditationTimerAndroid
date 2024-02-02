@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class MeditationTimerProcess (
     @ColumnInfo(name = "name") val name : String,
+    @ColumnInfo(name = "info") val info : String,
     @ColumnInfo(name = "uuid") val uuid: String,
 
     @ColumnInfo(name = "process_time") val processTime : Int = 30,

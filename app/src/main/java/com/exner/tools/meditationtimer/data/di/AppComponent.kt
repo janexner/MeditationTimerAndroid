@@ -60,31 +60,35 @@ object AppComponent {
             val secondUuid = UUID.randomUUID().toString()
             var meditationTimerProcess =
                 MeditationTimerProcess(
-                    "Test Process 1",
+                    name = "Test Process 1",
+                    info = "A test process that runs for 30 minutes, then leads directly into 'Test Process 2'",
+                    categoryId = null,
                     uuid = UUID.randomUUID().toString(),
-                    30,
-                    10,
-                    true,
+                    processTime = 30,
+                    intervalTime = 10,
+                    hasAutoChain = true,
                     gotoUuid = secondUuid,
                     gotoName = "Test Process 2",
-                    -1L,
+                    uid = 0L,
                 )
             provider.get().insert(meditationTimerProcess)
             meditationTimerProcess =
                 MeditationTimerProcess(
-                    "Test Process 2",
+                    name = "Test Process 2",
+                    info = "Test process that is launched by 'Test Process 2'. It runs for 15 minutes.",
+                    categoryId = null,
                     uuid = secondUuid,
-                    15,
-                    5,
-                    false,
+                    processTime = 15,
+                    intervalTime = 5,
+                    hasAutoChain = false,
                     gotoUuid = null,
                     gotoName = null,
-                    -1L,
+                    uid = 0L,
                 )
             provider.get().insert(meditationTimerProcess)
             val demoCategory = MeditationTimerProcessCategory(
-                "Category 1",
-                0
+                name = "Category 1",
+                uid = 0
             )
             provider.get().insertCategory(demoCategory)
         }
