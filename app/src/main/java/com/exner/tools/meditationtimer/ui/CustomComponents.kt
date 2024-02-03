@@ -115,7 +115,7 @@ fun TextFieldForTimes(
     OutlinedTextField(
         value = text,
         label = label,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         onValueChange = { raw ->

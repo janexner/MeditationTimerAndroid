@@ -86,7 +86,8 @@ fun ProcessList(
                         // The `menuAnchor` modifier must be passed to the text field for correctness.
                         modifier = Modifier
                             .menuAnchor()
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .padding(8.dp),
                         readOnly = true,
                         value = currentCategory.name,
                         onValueChange = {},

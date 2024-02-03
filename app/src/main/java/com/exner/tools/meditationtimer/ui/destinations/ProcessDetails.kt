@@ -70,11 +70,18 @@ fun ProcessDetails(
                     .verticalScroll(rememberScrollState())
             ) {
                 // top - process information
-                ProcessNameInfoAndCategory(
-                    name,
-                    info,
-                    currentCategory.name,
-                    modifier = Modifier.padding(8.dp)
+                val modifier1 = Modifier.padding(8.dp)
+                HeaderText(
+                    text = name ?: "Name",
+                    modifier = modifier1
+                )
+                Text(
+                    text = info ?: "",
+                    modifier = modifier1.padding(8.dp, 0.dp)
+                )
+                Text(
+                    text = "Category: " + currentCategory.name,
+                    modifier = modifier1.padding(8.dp, 0.dp)
                 )
                 HorizontalDivider(modifier = Modifier.padding(8.dp))
                 ProcessTimerData(
@@ -165,22 +172,6 @@ fun MeditationTimerDetailsBottomBar(
                 elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
             )
         }
-    )
-}
-
-@Composable
-fun ProcessNameInfoAndCategory(name: String?, info: String?, category: String?, modifier: Modifier) {
-    HeaderText(
-        text = name ?: "Name",
-        modifier = modifier
-    )
-    Text(
-        text = info ?: "",
-        modifier = modifier
-    )
-    Text(
-        text = "Category: " + (category ?: "None"),
-        modifier = modifier
     )
 }
 

@@ -4,21 +4,15 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.AlertDialogDefaults
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
-import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -26,12 +20,9 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -40,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -98,7 +88,9 @@ fun ProcessEdit(
                     .verticalScroll(rememberScrollState())
             ) {
                 // top - fields
-                Row(modifier = Modifier.fillMaxWidth()) {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)) {
                     OutlinedTextField(
                         value = name ?: "Name",
                         onValueChange = {
@@ -127,34 +119,28 @@ fun ProcessEdit(
                     )
                 }
                 var categoryExpanded by remember { mutableStateOf(false) }
-                val openDialog = remember { mutableStateOf(false) }
                 ExposedDropdownMenuBox(
                     expanded = categoryExpanded,
                     onExpandedChange = { categoryExpanded = !categoryExpanded }
                 ) {
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
+                            .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         OutlinedTextField(
                             // The `menuAnchor` modifier must be passed to the text field for correctness.
                             modifier = Modifier
-                                .menuAnchor(),
+                                .menuAnchor()
+                                .fillMaxWidth()
+                                .padding(8.dp),
                             readOnly = true,
                             value = if (currentCategory.uid == -1L) "None" else currentCategory.name,
                             onValueChange = {},
                             label = { Text("Process category") },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded) },
                         )
-                        Button(
-                            shape = RectangleShape,
-                            onClick = { openDialog.value = true }
-                        ) {
-                            Text(text = "+")
-                        }
                     }
                     ExposedDropdownMenu(
                         expanded = categoryExpanded,
@@ -186,49 +172,6 @@ fun ProcessEdit(
                             )
                         }
                     }
-                }
-                if (openDialog.value) {
-                    BasicAlertDialog(
-                        onDismissRequest = {
-                            // Dismiss the dialog when the user clicks outside the dialog or on the back
-                            // button. If you want to disable that functionality, simply use an empty
-                            // onDismissRequest.
-                            openDialog.value = false
-                        }
-                    ) {
-                        Surface(
-                            modifier = Modifier
-                                .wrapContentWidth()
-                                .wrapContentHeight(),
-                            shape = MaterialTheme.shapes.large,
-                            tonalElevation = AlertDialogDefaults.TonalElevation
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                var newCategoryName by remember { mutableStateOf("Category 1") }
-                                OutlinedTextField(
-                                    value = newCategoryName,
-                                    onValueChange = {
-                                        newCategoryName = it
-                                    },
-                                    label = { Text(text = "Category name") },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    singleLine = true,
-                                    textStyle = MaterialTheme.typography.bodyLarge
-                                )
-                                Spacer(modifier = Modifier.height(24.dp))
-                                TextButton(
-                                    onClick = {
-                                        processEditViewModel.createNewCategory(newCategoryName)
-                                        openDialog.value = false
-                                    },
-                                    modifier = Modifier.align(Alignment.End)
-                                ) {
-                                    Text("Save")
-                                }
-                            }
-                        }
-                    }
-
                 }
                 HeaderText(text = "Times")
                 TextFieldForTimes(
@@ -267,7 +210,8 @@ fun ProcessEdit(
                                 // The `menuAnchor` modifier must be passed to the text field for correctness.
                                 modifier = Modifier
                                     .menuAnchor()
-                                    .fillMaxWidth(),
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
                                 readOnly = true,
                                 value = gotoName ?: "",
                                 placeholder = { Text("Select next Process") },
@@ -307,7 +251,10 @@ fun ProcessEdit(
                     ExtendedFloatingActionButton(
                         text = { Text(text = "Save") },
                         icon = {
-                            Icon(imageVector = Icons.Filled.Done, contentDescription = "Save the process")
+                            Icon(
+                                imageVector = Icons.Filled.Done,
+                                contentDescription = "Save the process"
+                            )
                         },
                         onClick = {
                             processEditViewModel.commitProcess()

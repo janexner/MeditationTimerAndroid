@@ -11,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -61,7 +60,7 @@ fun ProcessDelete(
                 Text(text = "'$processName'.")
                 // double-check in case there are chains that contain this
                 if (processIsTarget == true) {
-                    if (dependantProcesses != null) {
+                    if (dependantProcesses != null && dependantProcesses!!.dependentProcessIdsAndNames.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(text = "Other processes link to this one!")
                         Spacer(modifier = Modifier.height(8.dp))

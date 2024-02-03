@@ -106,7 +106,10 @@ fun RemoteProcessManagement(
                             .padding(8.dp)
                             .fillMaxWidth()
                     ) {
-                        Text(text = "Tick processes you want to import, then use the 'Import Processes' button to import them.")
+                        Text(
+                            text = "Tick processes you want to import, then use the 'Import Processes' button to import them.",
+                            modifier = Modifier.padding(8.dp, 0.dp)
+                        )
                         Spacer(modifier = Modifier.size(8.dp))
                         LazyColumn(
                             state = listStateRemote,
