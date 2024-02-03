@@ -6,7 +6,7 @@ import androidx.room.RoomDatabase
 @Database(
     entities = [MeditationTimerProcess::class, MeditationTimerProcessCategory::class],
     views = [MeditationTimerCategoryIdNameCount::class],
-    version = 11,
+    version = 12,
     exportSchema = false
 )
 abstract class MeditationTimerRoomDatabase : RoomDatabase() {
