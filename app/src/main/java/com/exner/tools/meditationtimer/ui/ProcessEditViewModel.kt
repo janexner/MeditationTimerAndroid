@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProcessEditViewModel @Inject constructor(
     private val repository: MeditationTimerDataRepository,
-): ViewModel() {
+) : ViewModel() {
 
     private val _uid: MutableLiveData<Long> = MutableLiveData(-1L)
     val uid: LiveData<Long> = _uid
@@ -45,7 +45,8 @@ class ProcessEditViewModel @Inject constructor(
 
     private val observeProcessesRaw = repository.observeProcesses
 
-    private val _observeProcessesForCurrentCategory = MutableStateFlow(emptyList<MeditationTimerProcess>())
+    private val _observeProcessesForCurrentCategory =
+        MutableStateFlow(emptyList<MeditationTimerProcess>())
     val observeProcessesForCurrentCategory: StateFlow<List<MeditationTimerProcess>>
         get() = _observeProcessesForCurrentCategory
 
@@ -57,7 +58,7 @@ class ProcessEditViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            observeProcessesRaw.collect {itemsList ->
+            observeProcessesRaw.collect { itemsList ->
                 val filteredItemsList: List<MeditationTimerProcess> = itemsList.filter { item ->
                     item.categoryId == currentCategory.value.uid || currentCategory.value.uid == -1L
                 }
@@ -71,11 +72,12 @@ class ProcessEditViewModel @Inject constructor(
             _currentCategory.value = MeditationTimerProcessCategory("All", -1L)
         } else {
             viewModelScope.launch {
-                _currentCategory.value = repository.getCategoryById(id) ?: MeditationTimerProcessCategory("All", -1L)
+                _currentCategory.value =
+                    repository.getCategoryById(id) ?: MeditationTimerProcessCategory("All", -1L)
             }
         }
         viewModelScope.launch {
-            observeProcessesRaw.collect {itemsList ->
+            observeProcessesRaw.collect { itemsList ->
                 val filteredItemsList: List<MeditationTimerProcess> = itemsList.filter { item ->
                     if (currentCategory.value.uid == -1L || !filterProcessesForCurrentCategory) {
                         true
@@ -110,27 +112,29 @@ class ProcessEditViewModel @Inject constructor(
     }
 
     fun commitProcess() {
-            viewModelScope.launch {
-                val process = MeditationTimerProcess(
-                    uid = uid.value!!.toLong(),
-                    name = name.value.toString(),
-                    info = info.value.toString(),
-                    processTime = if (processTime.value != null) processTime.value!!.toInt() else 30,
-                    intervalTime = if (intervalTime.value != null) intervalTime.value!!.toInt() else 10,
-                    hasAutoChain =  hasAutoChain.value == true,
-                    gotoUuid = _gotoUuid.value,
-                    gotoName = _gotoName.value,
-                    categoryId = currentCategory.value.uid,
-                    uuid = if (_uuid.value != null) _uuid.value!! else UUID.randomUUID().toString()
-                )
-                if (_uuid.value != null && !repository.doesProcessWithUuidExist(uuid = _uuid.value!!)) {
-                    repository.insert(process.copy(
+        viewModelScope.launch {
+            val process = MeditationTimerProcess(
+                uid = uid.value!!.toLong(),
+                name = name.value.toString(),
+                info = info.value.toString(),
+                processTime = if (processTime.value != null) processTime.value!!.toInt() else 30,
+                intervalTime = if (intervalTime.value != null) intervalTime.value!!.toInt() else 10,
+                hasAutoChain = hasAutoChain.value == true,
+                gotoUuid = _gotoUuid.value,
+                gotoName = _gotoName.value,
+                categoryId = currentCategory.value.uid,
+                uuid = if (_uuid.value != null) _uuid.value!! else UUID.randomUUID().toString()
+            )
+            if (_uuid.value != null && !repository.doesProcessWithUuidExist(uuid = _uuid.value!!)) {
+                repository.insert(
+                    process.copy(
                         uid = 0
-                    ))
-                } else {
-                    repository.update(process)
-                }
+                    )
+                )
+            } else {
+                repository.update(process)
             }
+        }
     }
 
     fun updateName(name: String) {

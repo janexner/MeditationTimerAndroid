@@ -110,9 +110,11 @@ fun ProcessEdit(
                         modifier = Modifier.weight(0.75f)
                     )
                 }
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
                     OutlinedTextField(
                         value = info ?: "Details",
                         onValueChange = {
@@ -281,7 +283,10 @@ fun ProcessEdit(
                                         DropdownMenuItem(
                                             text = { Text(text = process.name) },
                                             onClick = {
-                                                processEditViewModel.updateGotoUuidAndName(process.uuid, process.name)
+                                                processEditViewModel.updateGotoUuidAndName(
+                                                    process.uuid,
+                                                    process.name
+                                                )
                                                 modified = true
                                                 expanded = false
                                             },
@@ -296,30 +301,24 @@ fun ProcessEdit(
             }
         },
         bottomBar = {
-            MeditationTimerEditBottomBar(navigator = navigator, commitProcess = {
-                processEditViewModel.commitProcess()
-            })
-        }
-    )
-}
-
-@Composable
-fun MeditationTimerEditBottomBar(navigator: DestinationsNavigator, commitProcess: () -> Unit) {
-    BottomAppBar(
-        actions = {},
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                text = { Text(text = "Save") },
-                icon = {
-                    Icon(imageVector = Icons.Filled.Done, contentDescription = "Save the process")
-                },
-                onClick = {
-                    commitProcess()
-                    navigator.navigateUp()
-                },
-                containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
+            BottomAppBar(
+                actions = {},
+                floatingActionButton = {
+                    ExtendedFloatingActionButton(
+                        text = { Text(text = "Save") },
+                        icon = {
+                            Icon(imageVector = Icons.Filled.Done, contentDescription = "Save the process")
+                        },
+                        onClick = {
+                            processEditViewModel.commitProcess()
+                            navigator.navigateUp()
+                        },
+                        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
+                    )
+                }
             )
         }
     )
 }
+

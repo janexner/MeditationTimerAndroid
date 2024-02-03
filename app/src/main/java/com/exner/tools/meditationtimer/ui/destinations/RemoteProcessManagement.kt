@@ -166,7 +166,8 @@ fun RemoteProcessManagement(
                 }
                 // Alert Dialog
                 if (openAlertDialog.value) {
-                    val andDependents = if (importAndUploadRestOfChainAutomatically) " plus those started by them" else ""
+                    val andDependents =
+                        if (importAndUploadRestOfChainAutomatically) " plus those started by them" else ""
                     AlertDialog(
                         icon = {},
                         title = { Text(text = "Import?") },

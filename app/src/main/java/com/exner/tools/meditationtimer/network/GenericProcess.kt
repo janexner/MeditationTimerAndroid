@@ -18,21 +18,6 @@ data class GenericProcess (
     var uuid: String
 )
 
-fun createGenericProcessFrom(meditationTimerProcess: MeditationTimerProcess): GenericProcess {
-    val result = GenericProcess(
-        name = meditationTimerProcess.name,
-        info = meditationTimerProcess.info,
-        categoryId = meditationTimerProcess.categoryId,
-        processTime = meditationTimerProcess.processTime * 60,
-        intervalTime = meditationTimerProcess.intervalTime * 60,
-        hasAutoChain = meditationTimerProcess.hasAutoChain,
-        gotoUuid = meditationTimerProcess.gotoUuid,
-        gotoName = meditationTimerProcess.gotoName,
-        uuid = meditationTimerProcess.uuid
-    )
-    return result
-}
-
 fun createMeditationTimerProcessFrom(genericProcess: GenericProcess): MeditationTimerProcess {
     val result = MeditationTimerProcess(
         name = genericProcess.name,
