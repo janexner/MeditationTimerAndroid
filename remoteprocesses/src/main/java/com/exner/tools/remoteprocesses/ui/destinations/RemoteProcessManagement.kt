@@ -1,4 +1,4 @@
-package com.exner.tools.meditationtimer.ui.destinations
+package com.exner.tools.remoteprocesses.ui.destinations
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,20 +42,26 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.ProcessListViewModel
-import com.exner.tools.meditationtimer.ui.RemoteProcessManagementViewModel
 import com.exner.tools.meditationtimer.ui.SettingsViewModel
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.NavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 sealed class ProcessListTabs(val name: String) {
     data object RemoteOnlyTab : ProcessListTabs("Remote")
 }
 
+@NavGraph
+annotation class RemoteProcessManagementNavGraph(
+    val start: Boolean = false
+)
+
+@RemoteProcessManagementNavGraph(start = true)
 @Destination
 @Composable
 fun RemoteProcessManagement(
     processListViewModel: ProcessListViewModel = hiltViewModel(),
-    remoteProcessManagementViewModel: RemoteProcessManagementViewModel = hiltViewModel(),
+    remoteProcessManagementViewModel: com.exner.tools.remoteprocesses.ui.RemoteProcessManagementViewModel = hiltViewModel(),
     settingsViewModel: SettingsViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
 ) {

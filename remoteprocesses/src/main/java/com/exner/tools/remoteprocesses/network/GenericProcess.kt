@@ -1,4 +1,4 @@
-package com.exner.tools.meditationtimer.network
+package com.exner.tools.remoteprocesses.network
 
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
 

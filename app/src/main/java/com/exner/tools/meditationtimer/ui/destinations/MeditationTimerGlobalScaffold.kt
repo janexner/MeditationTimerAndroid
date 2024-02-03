@@ -18,20 +18,30 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.exner.tools.meditationtimer.ui.SettingsViewModel
 import com.exner.tools.meditationtimer.ui.destinations.destinations.AboutDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.CategoryListDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.Destination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessListDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessRunDestination
-import com.exner.tools.meditationtimer.ui.destinations.destinations.RemoteProcessManagementDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.SettingsDestination
 import com.ramcosta.composedestinations.DestinationsNavHost
-import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.rememberNavHostEngine
+import com.ramcosta.composedestinations.spec.DestinationSpec
+import com.ramcosta.composedestinations.spec.NavGraphSpec
+
+object RootNavGraph: NavGraphSpec {
+
+    override val route = "root"
+
+    override val destinationsByRoute = emptyMap<String, DestinationSpec<*>>()
+
+    override val startRoute = ProcessListDestination
+
+    override val nestedNavGraphs = listOf(
+        RemoteProcessNavGraph
+    )
+}
 
 @Composable
 fun MeditationTimerGlobalScaffold() {
@@ -46,7 +56,7 @@ fun MeditationTimerGlobalScaffold() {
         content = { innerPadding ->
             DestinationsNavHost(
                 navController = navController,
-                navGraph = NavGraphs.root,
+                navGraph = RootNavGraph,
                 modifier = Modifier.padding(innerPadding)
             ) {
             }

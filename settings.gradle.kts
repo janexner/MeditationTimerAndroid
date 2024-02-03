@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Meditation Timer for Android"
 include(":app")
+include(":remoteprocesses")

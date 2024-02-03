@@ -1,4 +1,4 @@
-package com.exner.tools.meditationtimer.network
+package com.exner.tools.remoteprocesses.network
 
 import retrofit2.Call
 import retrofit2.http.GET

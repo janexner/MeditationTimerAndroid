@@ -1,13 +1,9 @@
-package com.exner.tools.meditationtimer.ui
+package com.exner.tools.remoteprocesses.ui
 
 import android.util.Log
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
-import com.exner.tools.meditationtimer.network.GenericProcess
-import com.exner.tools.meditationtimer.network.RemoteProcessData
-import com.exner.tools.meditationtimer.network.RemoteProcessesService
-import com.exner.tools.meditationtimer.network.createMeditationTimerProcessFrom
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,8 +20,8 @@ class RemoteProcessManagementViewModel @Inject constructor(
     private val repository: MeditationTimerDataRepository,
 ) : ViewModel() {
 
-    private val _remoteProcessesRaw = MutableStateFlow(emptyList<GenericProcess>())
-    val remoteProcessesRaw: StateFlow<List<GenericProcess>>
+    private val _remoteProcessesRaw = MutableStateFlow(emptyList<com.exner.tools.remoteprocesses.network.GenericProcess>())
+    val remoteProcessesRaw: StateFlow<List<com.exner.tools.remoteprocesses.network.GenericProcess>>
         get() = _remoteProcessesRaw
 
     // val observeRemoteProcesses: Flow<List<MeditationTimerProcess>>
@@ -36,18 +32,18 @@ class RemoteProcessManagementViewModel @Inject constructor(
             .baseUrl(baseURL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-        val service: RemoteProcessesService =
-            retrofit.create(RemoteProcessesService::class.java)
-        val call: Call<RemoteProcessData?>? = service.getProcessData()
+        val service: com.exner.tools.remoteprocesses.network.RemoteProcessesService =
+            retrofit.create(com.exner.tools.remoteprocesses.network.RemoteProcessesService::class.java)
+        val call: Call<com.exner.tools.remoteprocesses.network.RemoteProcessData?>? = service.getProcessData()
 
-        call?.enqueue(object : Callback<RemoteProcessData?> {
+        call?.enqueue(object : Callback<com.exner.tools.remoteprocesses.network.RemoteProcessData?> {
             override fun onResponse(
-                call: Call<RemoteProcessData?>,
-                response: Response<RemoteProcessData?>
+                call: Call<com.exner.tools.remoteprocesses.network.RemoteProcessData?>,
+                response: Response<com.exner.tools.remoteprocesses.network.RemoteProcessData?>
             ) {
                 if (response.code() == 200) {
                     val processesResponse = response.body()!!
-                    val newList = mutableListOf<GenericProcess>()
+                    val newList = mutableListOf<com.exner.tools.remoteprocesses.network.GenericProcess>()
                     for (genericProcess in processesResponse.processes) {
                         Log.v("PROCESSES", genericProcess.name)
                         newList.add(genericProcess)
@@ -57,7 +53,7 @@ class RemoteProcessManagementViewModel @Inject constructor(
             }
 
             override fun onFailure(
-                call: Call<RemoteProcessData?>,
+                call: Call<com.exner.tools.remoteprocesses.network.RemoteProcessData?>,
                 t: Throwable
             ) {
                 Log.i("PROCESSES", "Failed! $t")
@@ -74,8 +70,8 @@ class RemoteProcessManagementViewModel @Inject constructor(
             .baseUrl(baseURL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-        val service: RemoteProcessesService =
-            retrofit.create(RemoteProcessesService::class.java)
+        val service: com.exner.tools.remoteprocesses.network.RemoteProcessesService =
+            retrofit.create(com.exner.tools.remoteprocesses.network.RemoteProcessesService::class.java)
 
         if (listOfProcessUuidsToImport.isNotEmpty()) {
             listOfProcessUuidsToImport.forEach { uuid ->
@@ -90,7 +86,7 @@ class RemoteProcessManagementViewModel @Inject constructor(
     }
 
     private fun importProcessFromRemote(
-        service: RemoteProcessesService,
+        service: com.exner.tools.remoteprocesses.network.RemoteProcessesService,
         uuid: String,
         importAndUploadRestOfChainAutomatically: Boolean,
     ) {
@@ -98,23 +94,25 @@ class RemoteProcessManagementViewModel @Inject constructor(
         runBlocking {
             if (!repository.doesProcessWithUuidExist(uuid)) {
                 // OK - load it!
-                val call: Call<GenericProcess?>? = service.getProcess(uuid = uuid)
+                val call: Call<com.exner.tools.remoteprocesses.network.GenericProcess?>? = service.getProcess(uuid = uuid)
 
-                call?.enqueue(object : Callback<GenericProcess?> {
+                call?.enqueue(object : Callback<com.exner.tools.remoteprocesses.network.GenericProcess?> {
                     override fun onResponse(
-                        call: Call<GenericProcess?>,
-                        response: Response<GenericProcess?>
+                        call: Call<com.exner.tools.remoteprocesses.network.GenericProcess?>,
+                        response: Response<com.exner.tools.remoteprocesses.network.GenericProcess?>
                     ) {
                         if (response.code() == 200) {
                             val genericProcess = response.body()!!
                             val meditationTimerProcess =
-                                createMeditationTimerProcessFrom(genericProcess)
+                                com.exner.tools.remoteprocesses.network.createMeditationTimerProcessFrom(
+                                    genericProcess
+                                )
                             runBlocking {
                                 repository.insert(meditationTimerProcess)
                                 if (importAndUploadRestOfChainAutomatically && null != meditationTimerProcess.gotoUuid) {
                                     importProcessFromRemote(
                                         service,
-                                        meditationTimerProcess.gotoUuid,
+                                        meditationTimerProcess.gotoUuid!!,
                                         true
                                     )
                                 }
@@ -123,7 +121,7 @@ class RemoteProcessManagementViewModel @Inject constructor(
                     }
 
                     override fun onFailure(
-                        call: Call<GenericProcess?>,
+                        call: Call<com.exner.tools.remoteprocesses.network.GenericProcess?>,
                         t: Throwable
                     ) {
                         // Nothing to do

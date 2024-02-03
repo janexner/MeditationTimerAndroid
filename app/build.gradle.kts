@@ -55,6 +55,9 @@ kotlin {
 }
 
 dependencies {
+    // module dependencies
+    implementation(project(":remoteprocesses"))
+
     // now sorted by https://developer.android.com/jetpack/androidx/releases
 
     // jetpack
@@ -99,10 +102,6 @@ dependencies {
     // compose destinations
     implementation(libs.compose.destinations.core)
     ksp(libs.compose.destinations.ksp)
-
-    // retrofit
-    implementation(libs.squareup.retrofit)
-    implementation(libs.squareup.retrofit.converter.gson)
 
     // testing
     testImplementation(libs.junit)

@@ -1,4 +1,4 @@
-package com.exner.tools.meditationtimer.network
+package com.exner.tools.remoteprocesses.network
 
 data class RemoteProcessData (
     var version: Int,
