@@ -8,7 +8,7 @@ interface MeditationTimerDataDAO {
     @Query("SELECT * FROM meditationtimerprocess ORDER BY name ASC")
     fun observeProcessesAlphabeticallyOrdered(): Flow<List<MeditationTimerProcess>>
 
-    @Query("SELECT * FROM meditationtimerprocess WHERE uid NOT IN (SELECT goto_uuid FROM meditationtimerprocess WHERE goto_uuid > 0) ORDER BY name ASC")
+    @Query("SELECT * FROM meditationtimerprocess WHERE uid NOT IN (SELECT goto_uuid FROM meditationtimerprocess WHERE goto_uuid IS NOT NULL AND TRIM(goto_uuid,\" \") != \"\") ORDER BY name ASC")
     fun observeFirstProcessesAlphabeticallyOrdered(): Flow<List<MeditationTimerProcess>>
 
     @Query("SELECT * FROM meditationtimerprocess WHERE category_id IN (:categoryId) ORDER BY name ASC")
@@ -20,7 +20,7 @@ interface MeditationTimerDataDAO {
     @Query("SELECT * FROM meditationtimerprocesscategory ORDER BY name ASC")
     fun observeCategoriesAlphabeticallyOrdered(): Flow<List<MeditationTimerProcessCategory>>
 
-    @Query("SELECT meditationtimerprocesscategory.uid, meditationtimerprocesscategory.name, COUNT(meditationtimerprocess.uid) AS usageCount FROM meditationtimerprocesscategory LEFT JOIN meditationtimerprocess ON meditationtimerprocess.category_id = meditationtimerprocesscategory.uid")
+    @Query("SELECT * FROM meditationtimercategoryidnamecount")
     fun observeCategoryUsageCount(): Flow<List<MeditationTimerCategoryIdNameCount>>
 
     @Query("SELECT uuid FROM meditationtimerprocess WHERE goto_uuid=:uuid ORDER BY name ASC")

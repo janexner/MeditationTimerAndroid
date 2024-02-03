@@ -5,6 +5,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [MeditationTimerProcess::class, MeditationTimerProcessCategory::class],
+    views = [MeditationTimerCategoryIdNameCount::class],
     version = 8,
     exportSchema = false
 )
