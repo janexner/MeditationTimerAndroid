@@ -1,26 +1,22 @@
 package com.exner.tools.meditationtimer.ui.destinations
 
 import android.content.res.Configuration
-import android.view.ViewGroup
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import com.exner.tools.meditationtimer.BuildConfig
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.theme.MeditationTimerTheme
@@ -29,74 +25,89 @@ import com.ramcosta.composedestinations.annotation.Destination
 @Destination
 @Composable
 fun About() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ) {
+        HeaderText(
+            text = "About Meditation Timer",
+            modifier = Modifier.padding(8.dp)
+        )
 
-    // what's the orientation, right now?
-    val configuration = LocalConfiguration.current
-    when (configuration.orientation) {
-        Configuration.ORIENTATION_LANDSCAPE -> {
-            // show horizontally
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp)
-            ) { AboutScreenElements() }
-        }
+        // what's the orientation, right now?
+        val configuration = LocalConfiguration.current
+        when (configuration.orientation) {
+            Configuration.ORIENTATION_LANDSCAPE -> {
+                // show horizontally
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+                ) {
+                    Text(
+                        text = "Meditation Timer ${BuildConfig.VERSION_NAME}",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    AboutText()
+                }
+            }
 
-        else -> {
-            // show
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp)
-            ) { AboutScreenElements() }
+            else -> {
+                // show
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+                ) {
+                    Text(
+                        text = "Meditation Timer ${BuildConfig.VERSION_NAME}",
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(8.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    AboutText()
+                }
+            }
         }
     }
 }
 
 @Composable
-fun AboutScreenElements() {
-    Column {
-        HeaderText(
-            text = "About Meditation Timer",
+fun AboutText() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        Text(
+            text = "Meditation Timer is a flexible timer application that can be used for timed tasks, simple or complex.",
             modifier = Modifier.padding(8.dp)
         )
         Text(
-            text = "Meditation Timer ${BuildConfig.VERSION_NAME}",
-            fontWeight = FontWeight.Bold,
+            text = "In simple terms, Meditation Timer counts and beeps.",
+            modifier = Modifier.padding(8.dp)
+        )
+        Text(
+            text = "Use cases:\n" +
+                    "\n" +
+                    "    Meditation\n" +
+                    "    Any repetitive task that you do\n",
+            modifier = Modifier.padding(8.dp)
+        )
+        Text(
+            text = "Meditation Timer started as an app for Palm OS in the 90s. I have now finally been able to re-write it for Android.",
+            modifier = Modifier.padding(8.dp)
+        )
+        Text(
+            text = "It runs on Android phones and tablets running Android 10 or later. I aim to support the latest 3 versions of Android.",
             modifier = Modifier.padding(8.dp)
         )
     }
-    Spacer(modifier = Modifier.height(8.dp))
-    val payload = "buildConfigAID=${BuildConfig.APPLICATION_ID}"
-    val url = "https://www.jan-exner.de/software/android/meditationtimer/about/?$payload"
-    val uriHandler = LocalUriHandler.current
-    AndroidView(factory = { context ->
-        WebView(context).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            webViewClient = object : WebViewClient() {
-                override fun shouldOverrideUrlLoading(
-                    view: WebView?,
-                    request: WebResourceRequest?
-                ): Boolean {
-                    if (request != null) {
-                        return if (request.url.toString() == url) { // load this, and only this, URL in webView
-                            false
-                        } else { // load anything else in the Android default browser
-                            uriHandler.openUri(request.url.toString())
-                            true
-                        }
-                    }
-                    return true
-                }
-            }
-            loadUrl(url)
-        }
-    }, update = {
-        it.loadUrl(url)
-    })
 }
 
 @Preview(
