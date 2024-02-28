@@ -15,6 +15,11 @@ class SettingsViewModel @Inject constructor(
     private val userPreferencesManager: MeditationTimerUserPreferencesManager
 ) : ViewModel() {
 
+    val nightMode: StateFlow<Boolean> = userPreferencesManager.nightMode().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(),
+        false
+    )
     val beforeCountingWait: StateFlow<Boolean> = userPreferencesManager.beforeCountingWait().stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(),
@@ -55,6 +60,12 @@ class SettingsViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(),
         false
     )
+
+    fun updateNightMode(newNightMode: Boolean) {
+        viewModelScope.launch {
+            userPreferencesManager.setNightMode(newNightMode)
+        }
+    }
 
     fun updateBeforeCountingWait(newBeforeCountingWait: Boolean) {
         viewModelScope.launch {

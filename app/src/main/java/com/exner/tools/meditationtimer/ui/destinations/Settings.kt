@@ -30,6 +30,7 @@ fun Settings(
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
 
+    val nightMode by settingsViewModel.nightMode.collectAsStateWithLifecycle()
     val beforeCountingWait by settingsViewModel.beforeCountingWait.collectAsStateWithLifecycle()
     val howLongToWaitBeforeCounting by settingsViewModel.howLongToWaitBeforeCounting.collectAsStateWithLifecycle()
     val countBackwards by settingsViewModel.countBackwards.collectAsStateWithLifecycle()
@@ -48,6 +49,9 @@ fun Settings(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
+        TextAndSwitch(text = "Force night mode", checked = nightMode) {
+            settingsViewModel.updateNightMode(it)
+        }
         TextAndSwitch(text = "Before counting, wait", checked = beforeCountingWait) {
             settingsViewModel.updateBeforeCountingWait(it)
         }

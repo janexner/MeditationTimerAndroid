@@ -22,6 +22,20 @@ class MeditationTimerUserPreferencesManager @Inject constructor(
 
     private val userDataStorePreferences = appContext.dataStore
 
+    fun nightMode(): Flow<Boolean> {
+        return userDataStorePreferences.data.catch {
+            emit(emptyPreferences())
+        }.map { preferences ->
+            preferences[KEY_NIGHT_MODE] ?: false
+        }
+    }
+
+    suspend fun setNightMode(newNightMode: Boolean) {
+        userDataStorePreferences.edit { preferences ->
+            preferences[KEY_NIGHT_MODE] = newNightMode
+        }
+    }
+
     fun beforeCountingWait(): Flow<Boolean> {
         return userDataStorePreferences.data.catch {
             emit(emptyPreferences())
@@ -136,6 +150,7 @@ class MeditationTimerUserPreferencesManager @Inject constructor(
 
     private companion object {
 
+        val KEY_NIGHT_MODE = booleanPreferencesKey(name = "preference_night_mode")
         val KEY_BEFORE_COUNTING_WAIT = booleanPreferencesKey(name = "before_counting_wait")
         val KEY_HOW_LONG_TO_WAIT_BEFORE_COUNTING =
             intPreferencesKey(name = "how_long_to_wait_before_counting")
