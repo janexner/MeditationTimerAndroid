@@ -1,0 +1,6 @@
+<account-authenticator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accountType="net.fototimer"
+    android:icon="@drawable/logo_app_extensions_croix_2"
+    android:smallIcon="@drawable/logo_app_extensions_croix_2_circle_shape"
+    android:label="@string/label"
+    android:accountPreferences="@xml/prefs"/>

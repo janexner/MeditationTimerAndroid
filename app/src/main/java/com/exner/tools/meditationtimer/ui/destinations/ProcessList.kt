@@ -9,6 +9,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -18,6 +20,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -38,6 +41,7 @@ import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.ProcessListViewModel
 import com.exner.tools.meditationtimer.ui.SettingsViewModel
+import com.exner.tools.meditationtimer.ui.destinations.destinations.LoginDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessDetailsDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessEditDestination
 import com.ramcosta.composedestinations.annotation.Destination
@@ -163,6 +167,16 @@ fun ProcessList(
         bottomBar = {
             BottomAppBar(
                 actions = {
+                    IconButton(onClick = {
+                        navigator.navigate(
+                            LoginDestination()
+                        )
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Lock,
+                            contentDescription = "Login"
+                        )
+                    }
                 },
                 floatingActionButton = {
                     ExtendedFloatingActionButton(

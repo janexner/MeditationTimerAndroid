@@ -8,12 +8,10 @@ import android.os.VibratorManager
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.exner.tools.meditationtimer.audio.SoundPoolHolder
 import com.exner.tools.meditationtimer.audio.VibratorHolder
