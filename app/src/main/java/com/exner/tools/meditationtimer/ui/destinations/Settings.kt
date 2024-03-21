@@ -1,6 +1,7 @@
 package com.exner.tools.meditationtimer.ui.destinations
 
 import android.content.pm.ActivityInfo
+import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -80,11 +81,13 @@ fun Settings(
         ) {
             settingsViewModel.updateNoSounds(it)
         }
-        TextAndSwitch(
-            text = "Vibrate",
-            checked = vibrateEnabled
-        ) {
-            settingsViewModel.updateVibrateEnabled(it)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            TextAndSwitch(
+                text = "Vibrate",
+                checked = vibrateEnabled
+            ) {
+                settingsViewModel.updateVibrateEnabled(it)
+            }
         }
         TextAndSwitch(
             text = "Chain to same category only",
