@@ -125,7 +125,7 @@ class ProcessEditViewModel @Inject constructor(
                 categoryId = currentCategory.value.uid,
                 uuid = if (_uuid.value != null) _uuid.value!! else UUID.randomUUID().toString()
             )
-            if (_uuid.value != null && !repository.doesProcessWithUuidExist(uuid = _uuid.value!!)) {
+            if (!repository.doesProcessWithUuidExist(uuid = process.uuid)) {
                 repository.insert(
                     process.copy(
                         uid = 0

@@ -1,5 +1,6 @@
 package com.exner.tools.meditationtimer.ui.destinations
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -18,10 +19,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.exner.tools.meditationtimer.ui.SettingsViewModel
 import com.exner.tools.meditationtimer.ui.destinations.destinations.AboutDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.CategoryListDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.Destination
@@ -44,10 +44,16 @@ fun MeditationTimerGlobalScaffold() {
             MeditationTimerTopBar(destination, navController)
         },
         content = { innerPadding ->
+            val newPadding = PaddingValues.Absolute(
+                innerPadding.calculateLeftPadding(LayoutDirection.Ltr),
+                innerPadding.calculateTopPadding(),
+                innerPadding.calculateRightPadding(LayoutDirection.Ltr),
+                0.dp
+            )
             DestinationsNavHost(
                 navController = navController,
                 navGraph = NavGraphs.root,
-                modifier = Modifier.padding(innerPadding)
+                modifier = Modifier.padding(newPadding)
             ) {
             }
         }

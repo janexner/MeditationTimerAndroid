@@ -4,8 +4,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -74,14 +77,19 @@ fun CategoryList(
         content = { innerPadding ->
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
+                    .consumeWindowInsets(innerPadding)
                     .padding(innerPadding)
             ) {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 250.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(innerPadding)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .consumeWindowInsets(innerPadding)
+                        .padding(innerPadding)
+                        .imePadding()
                 ) {
                     items(count = categories.size) { index ->
                         val category = categories[index]
@@ -111,6 +119,7 @@ fun CategoryList(
                 // dialog for making a new category
                 if (openDialog.value) {
                     BasicAlertDialog(
+                        modifier = Modifier.consumeWindowInsets(innerPadding),
                         onDismissRequest = {
                             // Dismiss the dialog when the user clicks outside the dialog or on the back
                             // button. If you want to disable that functionality, simply use an empty
@@ -195,4 +204,3 @@ fun CategoryList(
         }
     )
 }
-
