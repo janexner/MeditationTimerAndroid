@@ -78,8 +78,6 @@ fun CategoryList(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .consumeWindowInsets(innerPadding)
-                    .padding(innerPadding)
             ) {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 250.dp),
@@ -119,7 +117,6 @@ fun CategoryList(
                 // dialog for making a new category
                 if (openDialog.value) {
                     BasicAlertDialog(
-                        modifier = Modifier.consumeWindowInsets(innerPadding),
                         onDismissRequest = {
                             // Dismiss the dialog when the user clicks outside the dialog or on the back
                             // button. If you want to disable that functionality, simply use an empty
@@ -174,6 +171,7 @@ fun CategoryList(
         },
         bottomBar = {
             BottomAppBar(
+                modifier = Modifier.imePadding(),
                 actions = {
                     IconButton(onClick = {
                         navigator.navigate(

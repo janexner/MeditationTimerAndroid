@@ -2,7 +2,10 @@ package com.exner.tools.meditationtimer.ui.destinations
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -61,13 +64,17 @@ fun CategoryBulkDelete(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(innerPadding)
             ) {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 250.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(innerPadding)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .consumeWindowInsets(innerPadding)
+                        .padding(innerPadding)
+                        .imePadding()
+
                 ) {
                     items(count = categories.size) { meditationTimerCategory ->
                         val category = categories[meditationTimerCategory]
@@ -113,7 +120,9 @@ fun CategoryBulkDelete(
                         },
                         confirmButton = {
                             TextButton(onClick = {
-                                categoryListViewModel.deleteAllCategoriesFromListOfIds(listOfCategoryIdsToDelete)
+                                categoryListViewModel.deleteAllCategoriesFromListOfIds(
+                                    listOfCategoryIdsToDelete
+                                )
                                 openAlertDialog.value = false
                                 navigator.navigateUp()
                             }) {
