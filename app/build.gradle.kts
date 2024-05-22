@@ -37,7 +37,7 @@ android {
         compose = true
         buildConfig = true
     }
-    buildToolsVersion = "34.0.0"
+    buildToolsVersion = "35.0.0 rc4"
 }
 
 kotlin {
@@ -55,27 +55,45 @@ dependencies {
     // now sorted by https://developer.android.com/jetpack/androidx/releases
 
     // jetpack
-    implementation(libs.androidx.activity.ktx)
-    implementation(libs.androidx.appcompat)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.foundation.layout)
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material3.windowSizeClass)
     implementation(libs.androidx.runtime)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.viewModelCompose)
-    implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.common.java8)
-    implementation(libs.androidx.webkit)
-    implementation(libs.androidx.window.manager)
+
+    // suggested by Dependency Analysis Plugin
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.annotation)
+    implementation(libs.androidx.animation)
+    implementation(libs.androidx.runtime.saveable)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.text)
+    implementation(libs.androidx.ui.unit)
+    implementation(libs.androidx.core)
+    implementation(libs.androidx.datastore.core)
+    implementation(libs.androidx.datastore.preferences.core)
+    implementation(libs.androidx.fragment)
+    implementation(libs.androidx.lifecycle.common)
+    implementation(libs.androidx.lifecycle.livedata.core)
+    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
+    implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.androidx.navigation.common)
+    implementation(libs.androidx.navigation.runtime)
+    implementation(libs.androidx.room.common)
+    implementation(libs.androidx.sqlite)
+    implementation(libs.dagger)
+    implementation(libs.hilt.core)
+    implementation(libs.javax.inject)
+    implementation(libs.kotlinx.coroutines.core)
 
     // hilt
     implementation(libs.hilt.android)
@@ -91,7 +109,7 @@ dependencies {
     implementation(libs.google.material)
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.datastore.preferences)
-    implementation(libs.kotlinx.coroutines.android)
+    runtimeOnly(libs.kotlinx.coroutines.android)
 
     // compose destinations
     implementation(libs.compose.destinations.core)
@@ -100,9 +118,6 @@ dependencies {
     // retrofit
     implementation(libs.squareup.retrofit)
     implementation(libs.squareup.retrofit.converter.gson)
-
-    // testing
-    testImplementation(libs.junit)
 }
 
 hilt {
