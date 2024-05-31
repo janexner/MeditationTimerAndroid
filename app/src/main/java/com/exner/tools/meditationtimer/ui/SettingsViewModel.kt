@@ -3,6 +3,7 @@ package com.exner.tools.meditationtimer.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.data.preferences.MeditationTimerUserPreferencesManager
+import com.exner.tools.meditationtimer.ui.theme.Theme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -15,10 +16,10 @@ class SettingsViewModel @Inject constructor(
     private val userPreferencesManager: MeditationTimerUserPreferencesManager
 ) : ViewModel() {
 
-    val nightMode: StateFlow<Boolean> = userPreferencesManager.nightMode().stateIn(
+    val userSelectedTheme: StateFlow<Theme> = userPreferencesManager.theme().stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
-        false
+        Theme.Auto
     )
     val beforeCountingWait: StateFlow<Boolean> = userPreferencesManager.beforeCountingWait().stateIn(
             viewModelScope,
@@ -56,9 +57,9 @@ class SettingsViewModel @Inject constructor(
         false
     )
 
-    fun updateNightMode(newNightMode: Boolean) {
+    fun updateUserSelectedTheme(newTheme: Theme) {
         viewModelScope.launch {
-            userPreferencesManager.setNightMode(newNightMode)
+            userPreferencesManager.setTheme(newTheme)
         }
     }
 

@@ -5,7 +5,9 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.exner.tools.meditationtimer.ui.theme.Theme
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -22,20 +24,21 @@ class MeditationTimerUserPreferencesManager @Inject constructor(
 
     private val userDataStorePreferences = appContext.dataStore
 
-    fun nightMode(): Flow<Boolean> {
+    fun theme(): Flow<Theme> {
         return userDataStorePreferences.data.catch {
             emit(emptyPreferences())
         }.map { preferences ->
-            preferences[KEY_NIGHT_MODE] ?: false
+            val wasDark = preferences[KEY_NIGHT_MODE] ?: false
+            val default = if (wasDark) Theme.Dark.name else Theme.Auto.name
+            Theme.valueOf(preferences[KEY_THEME] ?: default)
         }
     }
 
-    suspend fun setNightMode(newNightMode: Boolean) {
+    suspend fun setTheme(newTheme: Theme) {
         userDataStorePreferences.edit { preferences ->
-            preferences[KEY_NIGHT_MODE] = newNightMode
+            preferences[KEY_THEME] = newTheme.name
         }
     }
-
     fun beforeCountingWait(): Flow<Boolean> {
         return userDataStorePreferences.data.catch {
             emit(emptyPreferences())
@@ -146,5 +149,6 @@ class MeditationTimerUserPreferencesManager @Inject constructor(
         val KEY_NO_SOUNDS = booleanPreferencesKey(name = "no_sounds")
         val KEY_VIBRATE_ENABLED = booleanPreferencesKey(name = "vibrate_enabled")
         val KEY_ONLY_SHOW_FIRST_IN_CHAIN = booleanPreferencesKey(name = "only_show_first_in_chain")
+        val KEY_THEME = stringPreferencesKey(name = "preference_theme")
     }
 }

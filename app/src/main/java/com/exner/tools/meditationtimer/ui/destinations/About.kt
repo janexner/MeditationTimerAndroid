@@ -86,7 +86,7 @@ fun About() {
 private fun AboutVersionAndButton(localContext: Context) {
     Column {
         Text(
-            text = "Foto Timer ${BuildConfig.VERSION_NAME}",
+            text = "Meditation Timer ${BuildConfig.VERSION_NAME}",
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(8.dp)
         )

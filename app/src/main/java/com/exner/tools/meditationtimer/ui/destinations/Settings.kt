@@ -20,8 +20,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.exner.tools.meditationtimer.ui.LockScreenOrientation
 import com.exner.tools.meditationtimer.ui.SettingsViewModel
 import com.exner.tools.meditationtimer.ui.TextAndSwitch
+import com.exner.tools.meditationtimer.ui.TextAndTriStateToggle
 import com.exner.tools.meditationtimer.ui.TextFieldForTimes
 import com.exner.tools.meditationtimer.ui.theme.MeditationTimerTheme
+import com.exner.tools.meditationtimer.ui.theme.Theme
 import com.ramcosta.composedestinations.annotation.Destination
 
 @Destination
@@ -30,7 +32,7 @@ fun Settings(
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
 
-    val nightMode by settingsViewModel.nightMode.collectAsStateWithLifecycle()
+    val userSelectedTheme by settingsViewModel.userSelectedTheme.collectAsStateWithLifecycle()
     val beforeCountingWait by settingsViewModel.beforeCountingWait.collectAsStateWithLifecycle()
     val howLongToWaitBeforeCounting by settingsViewModel.howLongToWaitBeforeCounting.collectAsStateWithLifecycle()
     val countBackwards by settingsViewModel.countBackwards.collectAsStateWithLifecycle()
@@ -48,9 +50,15 @@ fun Settings(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        TextAndSwitch(text = "Force night mode", checked = nightMode) {
-            settingsViewModel.updateNightMode(it)
-        }
+        TextAndTriStateToggle(
+            text = "Theme",
+            currentTheme = userSelectedTheme,
+            updateTheme = { it: Theme ->
+                settingsViewModel.updateUserSelectedTheme(
+                    it
+                )
+            }
+        )
         TextAndSwitch(text = "Before counting, wait", checked = beforeCountingWait) {
             settingsViewModel.updateBeforeCountingWait(it)
         }
