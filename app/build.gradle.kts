@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.exner.tools.meditationtimer"
-    compileSdkPreview = "VanillaIceCream"
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.exner.tools.meditationtimer"
@@ -28,6 +28,8 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             isDebuggable = false
+            vcsInfo.include = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         debug {
             isDebuggable = true
@@ -37,7 +39,19 @@ android {
         compose = true
         buildConfig = true
     }
-    buildToolsVersion = "35.0.0 rc4"
+    buildToolsVersion = "34.0.0"
+
+    applicationVariants.all {
+        val variant = this
+        variant.outputs
+            .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
+            .forEach { output ->
+                val outputFileName = "Meditation_Timer_${variant.baseName}_${variant.versionName}_${variant.versionCode}.apk"
+                println("OutputFileName: $outputFileName")
+                output.outputFileName = outputFileName
+            }
+    }
+
 }
 
 kotlin {

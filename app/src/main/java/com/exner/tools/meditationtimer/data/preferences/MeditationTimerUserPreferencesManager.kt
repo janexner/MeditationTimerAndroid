@@ -134,20 +134,6 @@ class MeditationTimerUserPreferencesManager @Inject constructor(
         }
     }
 
-    fun importAndUploadRestOfChainAutomatically(): Flow<Boolean> {
-        return userDataStorePreferences.data.catch {
-            emit(emptyPreferences())
-        }.map { preferences ->
-            preferences[KEY_IMPORT_AND_UPLOAD_REST_OF_CHAIN_AUTOMATICALLY] ?: false
-        }
-    }
-
-    suspend fun setImportAndUploadRestOfChainAutomatically(doThemAll: Boolean) {
-        userDataStorePreferences.edit { preferences ->
-            preferences[KEY_IMPORT_AND_UPLOAD_REST_OF_CHAIN_AUTOMATICALLY] = doThemAll
-        }
-    }
-
     private companion object {
 
         val KEY_NIGHT_MODE = booleanPreferencesKey(name = "preference_night_mode")
@@ -160,6 +146,5 @@ class MeditationTimerUserPreferencesManager @Inject constructor(
         val KEY_NO_SOUNDS = booleanPreferencesKey(name = "no_sounds")
         val KEY_VIBRATE_ENABLED = booleanPreferencesKey(name = "vibrate_enabled")
         val KEY_ONLY_SHOW_FIRST_IN_CHAIN = booleanPreferencesKey(name = "only_show_first_in_chain")
-        val KEY_IMPORT_AND_UPLOAD_REST_OF_CHAIN_AUTOMATICALLY = booleanPreferencesKey(name = "import_and_upload_rest_of_chain_automatically")
     }
 }

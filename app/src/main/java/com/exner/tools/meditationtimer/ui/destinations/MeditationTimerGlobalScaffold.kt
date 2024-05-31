@@ -27,7 +27,6 @@ import com.exner.tools.meditationtimer.ui.destinations.destinations.CategoryList
 import com.exner.tools.meditationtimer.ui.destinations.destinations.Destination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessListDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessRunDestination
-import com.exner.tools.meditationtimer.ui.destinations.destinations.RemoteProcessManagementDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.SettingsDestination
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.navigate
@@ -111,14 +110,6 @@ private fun MeditationTimerTopBar(
                     onClick = {
                         displayMainMenu = false
                         navController.navigate(CategoryListDestination())
-                    }
-                )
-                DropdownMenuItem(
-                    enabled = destination != RemoteProcessManagementDestination,
-                    text = { Text(text = "Manage remote processes") },
-                    onClick = {
-                        displayMainMenu = false
-                        navController.navigate(RemoteProcessManagementDestination)
                     }
                 )
                 DropdownMenuItem(
