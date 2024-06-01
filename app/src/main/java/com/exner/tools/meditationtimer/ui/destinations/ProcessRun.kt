@@ -3,6 +3,8 @@ package com.exner.tools.meditationtimer.ui.destinations
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -27,6 +29,7 @@ import com.exner.tools.meditationtimer.steps.ProcessLeadInDisplayStepAction
 import com.exner.tools.meditationtimer.ui.BigTimerText
 import com.exner.tools.meditationtimer.ui.KeepScreenOn
 import com.exner.tools.meditationtimer.ui.MediumTimerAndIntervalText
+import com.exner.tools.meditationtimer.ui.NotesText
 import com.exner.tools.meditationtimer.ui.ProcessRunViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -45,6 +48,7 @@ fun ProcessRun(
     val currentStepNumber by processRunViewModel.currentStepNumber.observeAsState()
     val hasLoop by processRunViewModel.hasLoop.observeAsState()
     val hasHours by processRunViewModel.hasHours.observeAsState()
+    val showStages by processRunViewModel.showStages.observeAsState()
 
     processRunViewModel.initialiseRun(
         processUuid = processUuid
@@ -105,23 +109,30 @@ fun ProcessRun(
                                         .fillMaxWidth(0.5f)
                                         .alignByBaseline()
                                 )
-                                MediumTimerAndIntervalText(
-                                    duration = pdAction.currentProcessTime.seconds,
-                                    withHours = hasHours == true,
-                                    intervalText = "${pdAction.currentRound} of ${pdAction.totalRounds}",
-                                    modifier = Modifier.alignByBaseline()
-                                )
+                                if (showStages == true) {
+                                    MediumTimerAndIntervalText(
+                                        duration = pdAction.currentProcessTime.seconds,
+                                        withHours = hasHours == true,
+                                        intervalText = "${pdAction.currentRound} of ${pdAction.totalRounds}",
+                                        modifier = Modifier.alignByBaseline()
+                                    )
+                                }
                             }
                         } else {
                             BigTimerText(
                                 duration = pdAction.currentIntervalTime.seconds,
                                 withHours = hasHours == true
                             )
-                            MediumTimerAndIntervalText(
-                                duration = pdAction.currentProcessTime.seconds,
-                                withHours = hasHours == true,
-                                intervalText = "${pdAction.currentRound} of ${pdAction.totalRounds}"
-                            )
+                            if (showStages == true) {
+                                MediumTimerAndIntervalText(
+                                    duration = pdAction.currentProcessTime.seconds,
+                                    withHours = hasHours == true,
+                                    intervalText = "${pdAction.currentRound} of ${pdAction.totalRounds}"
+                                )
+                            }
+                            // show notes
+                            Spacer(Modifier.fillMaxHeight(0.3f))
+                            NotesText(notesText = pdAction.currentNotes)
                         }
                     }
 

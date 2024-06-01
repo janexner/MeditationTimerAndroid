@@ -37,7 +37,6 @@ import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCa
 import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.ProcessListViewModel
-import com.exner.tools.meditationtimer.ui.SettingsViewModel
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessDetailsDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessEditDestination
 import com.ramcosta.composedestinations.annotation.Destination
@@ -51,7 +50,6 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun ProcessList(
     processListViewModel: ProcessListViewModel = hiltViewModel(),
-    settingsViewModel: SettingsViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
 ) {
 
@@ -64,11 +62,8 @@ fun ProcessList(
     val categories: List<MeditationTimerProcessCategory> by processListViewModel.observeCategoriesRaw.collectAsStateWithLifecycle(
         initialValue = emptyList()
     )
-    val onlyShowFirstInChain = settingsViewModel.onlyShowFirstInChain.collectAsStateWithLifecycle()
 
     var modified by remember { mutableStateOf(false) }
-
-    processListViewModel.updateOnlyFirstState(onlyShowFirstInChain.value)
 
     Scaffold(
         content = { innerPadding ->

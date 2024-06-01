@@ -24,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -50,6 +51,9 @@ class ProcessRunViewModel @Inject constructor(
     private val _hasHours: MutableLiveData<Boolean> = MutableLiveData(false)
     val hasHours: LiveData<Boolean> = _hasHours
 
+    private val _showStages: MutableLiveData<Boolean> = MutableLiveData(false)
+    val showStages: LiveData<Boolean> = _showStages
+
     private var job: Job? = null
 
     private var isRunning: Boolean = false
@@ -61,6 +65,8 @@ class ProcessRunViewModel @Inject constructor(
         processUuid: String,
     ) {
         val result = mutableListOf<List<ProcessStepAction>>()
+
+        _showStages.value = false // bcs default for simple screen is yes
 
         if (!isRunning) {
             isRunning = true
@@ -87,6 +93,8 @@ class ProcessRunViewModel @Inject constructor(
                         result.addAll(partialResult)
                         // do we need hours in the display?
                         _hasHours.value = hasHours.value == true || process.processTime > 60
+                        // do we want to simplify the display?
+                        _showStages.value = !(userPreferencesRepository.showSimpleDisplay().firstOrNull() ?: true) || (process.processTime != process.intervalTime)
                         // prepare for the next iteration
                         firstRound = false
                         if (process.gotoUuid != null && process.gotoUuid != "" && repository.doesProcessWithUuidExist(

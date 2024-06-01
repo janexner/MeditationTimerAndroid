@@ -65,7 +65,9 @@ fun HeaderText(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
         style = MaterialTheme.typography.headlineSmall,
-        modifier = modifier.fillMaxWidth().padding(8.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp),
     )
 }
 
@@ -122,7 +124,9 @@ fun TextFieldForTimes(
     OutlinedTextField(
         value = text,
         label = label,
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         onValueChange = { raw ->
@@ -258,6 +262,23 @@ fun MediumTimerAndIntervalText(
                 style = MaterialTheme.typography.headlineLarge,
                 textAlign = TextAlign.Center,
                 fontSize = 48.dp.toTextDp(),
+                constraints = constraints
+            )
+        }
+    }
+}
+
+@Composable
+fun NotesText(
+    notesText: String,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier = modifier) {
+        BoxWithConstraints {
+            AutoSizeText(
+                text = AnnotatedString(notesText),
+                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 32.dp.toTextDp(),
                 constraints = constraints
             )
         }

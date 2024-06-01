@@ -39,7 +39,7 @@ fun Settings(
     val chainToSameCategoryOnly by settingsViewModel.chainToSameCategoryOnly.collectAsStateWithLifecycle()
     val noSounds by settingsViewModel.noSounds.collectAsStateWithLifecycle()
     val vibrateEnabled by settingsViewModel.vibrateEnabled.collectAsStateWithLifecycle()
-    val onlyShowFirstInChain by settingsViewModel.onlyShowFirstInChain.collectAsStateWithLifecycle()
+    val showSimpleDisplay by settingsViewModel.showSimpleDisplay.collectAsStateWithLifecycle()
 
     // unlock screen rotation
     LockScreenOrientation(orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR)
@@ -59,12 +59,17 @@ fun Settings(
                 )
             }
         )
+        TextAndSwitch(text = "Simplify Display", checked = showSimpleDisplay) {
+            settingsViewModel.updateShowSimpleDisplay(it)
+        }
         TextAndSwitch(text = "Before counting, wait", checked = beforeCountingWait) {
             settingsViewModel.updateBeforeCountingWait(it)
         }
         AnimatedVisibility(visible = beforeCountingWait) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(8.dp, 0.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp, 0.dp)
             ) {
                 TextFieldForTimes(
                     value = howLongToWaitBeforeCounting,
@@ -98,12 +103,6 @@ fun Settings(
             checked = chainToSameCategoryOnly
         ) {
             settingsViewModel.updateChainToSameCategoryOnly(it)
-        }
-        TextAndSwitch(
-            text = "Only show first process of any chain (hide others)",
-            checked = onlyShowFirstInChain
-        ) {
-            settingsViewModel.updateOnlyShowFirstInChain(it)
         }
     }
 

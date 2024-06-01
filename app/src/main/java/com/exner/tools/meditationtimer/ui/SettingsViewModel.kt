@@ -51,10 +51,10 @@ class SettingsViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(),
         false
     )
-    val onlyShowFirstInChain: StateFlow<Boolean> = userPreferencesManager.onlyShowFirstInChain().stateIn(
+    val showSimpleDisplay: StateFlow<Boolean> = userPreferencesManager.showSimpleDisplay().stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
-        false
+        true
     )
 
     fun updateUserSelectedTheme(newTheme: Theme) {
@@ -99,9 +99,9 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun updateOnlyShowFirstInChain(newFirstOnly: Boolean) {
+    fun updateShowSimpleDisplay(newSimpleDisplay: Boolean) {
         viewModelScope.launch {
-            userPreferencesManager.setOnlyShowFirstInChain(newFirstOnly)
+            userPreferencesManager.setShowSimpleDisplay(newSimpleDisplay)
         }
     }
 }

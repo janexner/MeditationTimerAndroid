@@ -15,7 +15,8 @@ class ProcessDisplayStepAction(
     val currentRound: Int,
     val totalRounds: Int,
     val currentProcessTime: Int,
-    val currentIntervalTime: Int
+    val currentIntervalTime: Int,
+    val currentNotes: String
 ) : ProcessStepAction(processName)
 
 class ProcessLeadInDisplayStepAction(

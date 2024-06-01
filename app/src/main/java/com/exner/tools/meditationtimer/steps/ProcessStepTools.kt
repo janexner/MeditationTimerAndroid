@@ -63,7 +63,8 @@ fun getProcessStepListForOneProcess(
             1 + currentProcessTime / (process.intervalTime * 60),
             ceil(process.processTime.toDouble() / process.intervalTime).toInt(),
             currentProcessTime,
-            currentIntervalTime
+            currentIntervalTime,
+            process.info
         )
         actionsList.add(ftpdAction)
         // any sounds?
