@@ -39,33 +39,6 @@ class MeditationTimerUserPreferencesManager @Inject constructor(
             preferences[KEY_THEME] = newTheme.name
         }
     }
-    fun beforeCountingWait(): Flow<Boolean> {
-        return userDataStorePreferences.data.catch {
-            emit(emptyPreferences())
-        }.map { preferences ->
-            preferences[KEY_BEFORE_COUNTING_WAIT] ?: false
-        }
-    }
-
-    suspend fun setBeforeCountingWait(newBeforeCountingWait: Boolean) {
-        userDataStorePreferences.edit { preferences ->
-            preferences[KEY_BEFORE_COUNTING_WAIT] = newBeforeCountingWait
-        }
-    }
-
-    fun howLongToWaitBeforeCounting(): Flow<Int> {
-        return userDataStorePreferences.data.catch {
-            emit(emptyPreferences())
-        }.map { preferences ->
-            preferences[KEY_HOW_LONG_TO_WAIT_BEFORE_COUNTING] ?: 5
-        }
-    }
-
-    suspend fun setHowLongToWaitBeforeCounting(newHowLongToWaitBeforeCounting: Int) {
-        userDataStorePreferences.edit { preferences ->
-            preferences[KEY_HOW_LONG_TO_WAIT_BEFORE_COUNTING] = newHowLongToWaitBeforeCounting
-        }
-    }
 
     fun countBackwards(): Flow<Boolean> {
         return userDataStorePreferences.data.catch {

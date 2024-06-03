@@ -8,8 +8,6 @@ const val STEP_LENGTH_IN_MILLISECONDS = 1000
 
 fun getProcessStepListForOneProcess(
     process: MeditationTimerProcess,
-    hasLeadIn: Boolean = false,
-    leadInTime: Int = 5,
     useSounds: Boolean = true,
     countBackwards: Boolean = false,
 ): MutableList<List<ProcessStepAction>> {
@@ -17,29 +15,7 @@ fun getProcessStepListForOneProcess(
     val result = mutableListOf<List<ProcessStepAction>>()
 
     var processParameters = ""
-    if (hasLeadIn && leadInTime > 0) {
-        processParameters += "$leadInTime > "
-    }
     processParameters += "${process.processTime} / ${process.intervalTime}"
-
-    // do we need steps for lead-in, and how many?
-    if (hasLeadIn && leadInTime > 0) {
-        val howManySteps = leadInTime * 1000 / STEP_LENGTH_IN_MILLISECONDS
-        for (i in 1..howManySteps) {
-            val actionsList = mutableListOf<ProcessStepAction>()
-            val timeToShow =
-                if (countBackwards) (howManySteps + 1) - i * STEP_LENGTH_IN_MILLISECONDS / 1000 else i * STEP_LENGTH_IN_MILLISECONDS / 1000
-            // add actions as needed
-            val ftpliAction = ProcessLeadInDisplayStepAction(
-                processName = process.name,
-                processParameters = processParameters,
-                currentLeadInTime = timeToShow
-            )
-            actionsList.add(ftpliAction)
-            // add the chain of actions to the overall list
-            result.add(actionsList)
-        }
-    }
 
     // how many steps do we need for the regular interval?
     val howManySteps = process.processTime * 60 * 1000 / STEP_LENGTH_IN_MILLISECONDS

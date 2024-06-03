@@ -21,16 +21,6 @@ class SettingsViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(),
         Theme.Auto
     )
-    val beforeCountingWait: StateFlow<Boolean> = userPreferencesManager.beforeCountingWait().stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            false
-        )
-    val howLongToWaitBeforeCounting: StateFlow<Int> = userPreferencesManager.howLongToWaitBeforeCounting().stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(),
-        5
-    )
     val countBackwards: StateFlow<Boolean> = userPreferencesManager.countBackwards().stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(),
@@ -60,18 +50,6 @@ class SettingsViewModel @Inject constructor(
     fun updateUserSelectedTheme(newTheme: Theme) {
         viewModelScope.launch {
             userPreferencesManager.setTheme(newTheme)
-        }
-    }
-
-    fun updateBeforeCountingWait(newBeforeCountingWait: Boolean) {
-        viewModelScope.launch {
-            userPreferencesManager.setBeforeCountingWait(newBeforeCountingWait)
-        }
-    }
-
-    fun updateHowLongToWaitBeforeCounting(newHowLongToWaitBeforeCounting: Int) {
-        viewModelScope.launch {
-            userPreferencesManager.setHowLongToWaitBeforeCounting(newHowLongToWaitBeforeCounting)
         }
     }
 

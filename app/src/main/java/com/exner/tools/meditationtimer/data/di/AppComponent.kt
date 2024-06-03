@@ -60,26 +60,26 @@ object AppComponent {
             val secondUuid = UUID.randomUUID().toString()
             var meditationTimerProcess =
                 MeditationTimerProcess(
-                    name = "Test Process 1",
-                    info = "A test process that runs for 30 minutes, then leads directly into 'Test Process 2'",
-                    categoryId = null,
+                    name = "Basic 1 - Arriving",
+                    info = "5 minutes for you to slow down and arrive.",
+                    categoryId = 1L,
                     uuid = UUID.randomUUID().toString(),
-                    processTime = 30,
-                    intervalTime = 10,
+                    processTime = 5,
+                    intervalTime = 5,
                     hasAutoChain = true,
                     gotoUuid = secondUuid,
-                    gotoName = "Test Process 2",
+                    gotoName = "Basic 1 - Mindful Breathing",
                     uid = 0L,
                 )
             provider.get().insert(meditationTimerProcess)
             meditationTimerProcess =
                 MeditationTimerProcess(
-                    name = "Test Process 2",
-                    info = "Test process that is launched by 'Test Process 2'. It runs for 15 minutes.",
-                    categoryId = null,
+                    name = "Basic 1 - Mindful Breathing",
+                    info = "15 minutes for mindful breathing.",
+                    categoryId = 1L,
                     uuid = secondUuid,
                     processTime = 15,
-                    intervalTime = 5,
+                    intervalTime = 15,
                     hasAutoChain = false,
                     gotoUuid = null,
                     gotoName = null,
@@ -87,8 +87,8 @@ object AppComponent {
                 )
             provider.get().insert(meditationTimerProcess)
             val demoCategory = MeditationTimerProcessCategory(
-                name = "Category 1",
-                uid = 0
+                name = "Breathing",
+                uid = 0L
             )
             provider.get().insertCategory(demoCategory)
         }

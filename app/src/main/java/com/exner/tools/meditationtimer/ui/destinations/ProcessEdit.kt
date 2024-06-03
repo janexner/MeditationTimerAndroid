@@ -22,9 +22,9 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -95,7 +95,7 @@ fun ProcessEdit(
                 Row(modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)) {
-                    OutlinedTextField(
+                    TextField(
                         value = name ?: "Name",
                         onValueChange = {
                             processEditViewModel.updateName(it)
@@ -111,7 +111,7 @@ fun ProcessEdit(
                         .fillMaxWidth()
                         .padding(8.dp)
                 ) {
-                    OutlinedTextField(
+                    TextField(
                         value = info ?: "Details",
                         onValueChange = {
                             processEditViewModel.updateInfo(it)
@@ -133,7 +133,7 @@ fun ProcessEdit(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        OutlinedTextField(
+                        TextField(
                             // The `menuAnchor` modifier must be passed to the text field for correctness.
                             modifier = Modifier
                                 .menuAnchor()
@@ -210,7 +210,7 @@ fun ProcessEdit(
                         ExposedDropdownMenuBox(
                             expanded = expanded,
                             onExpandedChange = { expanded = !expanded }) {
-                            OutlinedTextField(
+                            TextField(
                                 // The `menuAnchor` modifier must be passed to the text field for correctness.
                                 modifier = Modifier
                                     .menuAnchor()

@@ -86,8 +86,6 @@ class ProcessRunViewModel @Inject constructor(
                         val partialResult =
                             getProcessStepListForOneProcess(
                                 process = process,
-                                hasLeadIn = firstRound && userPreferencesRepository.beforeCountingWait().firstOrNull() ?: false,
-                                leadInTime = userPreferencesRepository.howLongToWaitBeforeCounting().firstOrNull() ?: 5,
                                 countBackwards = userPreferencesRepository.countBackwards().firstOrNull() ?: false,
                             )
                         result.addAll(partialResult)
