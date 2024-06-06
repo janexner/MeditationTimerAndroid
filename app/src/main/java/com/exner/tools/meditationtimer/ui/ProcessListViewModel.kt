@@ -3,7 +3,6 @@ package com.exner.tools.meditationtimer.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
-import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,47 +15,22 @@ class ProcessListViewModel @Inject constructor(
     private val repository: MeditationTimerDataRepository,
 ) : ViewModel() {
 
-    private val observeProcessesRaw = repository.observeProcesses
-
-    private val _observeProcessesForCurrentCategory =
-        MutableStateFlow(emptyList<MeditationTimerProcess>())
-    val observeProcessesForCurrentCategory: StateFlow<List<MeditationTimerProcess>>
-        get() = _observeProcessesForCurrentCategory
+    val observeProcessesRaw = repository.observeProcesses
 
     val observeCategoriesRaw = repository.observeCategories
 
-    private val _currentCategory = MutableStateFlow(MeditationTimerProcessCategory("All", -1L))
+    private val _currentCategory = MutableStateFlow(MeditationTimerProcessCategory("All", CategoryListDefinitions.CATEGORY_UID_ALL))
     val currentCategory: StateFlow<MeditationTimerProcessCategory>
         get() = _currentCategory
 
-    init {
-        viewModelScope.launch {
-            reReadProcessList()
-        }
-    }
-
-    private suspend fun reReadProcessList() {
-        observeProcessesRaw.collect { itemsList ->
-            val filteredItemsList: List<MeditationTimerProcess> =
-                itemsList.filter { item ->
-                    item.categoryId == currentCategory.value.uid || currentCategory.value.uid <= -1L
-                }
-            _observeProcessesForCurrentCategory.value = filteredItemsList
-        }
-    }
-
     fun updateCategoryId(id: Long) {
-        if (id == -2L) {
-            _currentCategory.value = MeditationTimerProcessCategory("All", -2L)
+        if (id == CategoryListDefinitions.CATEGORY_UID_ALL) {
+            _currentCategory.value = MeditationTimerProcessCategory("All", CategoryListDefinitions.CATEGORY_UID_ALL)
         } else {
             viewModelScope.launch {
                 _currentCategory.value =
-                    repository.getCategoryById(id) ?: MeditationTimerProcessCategory("None", -1L)
+                    repository.getCategoryById(id) ?: MeditationTimerProcessCategory("None", CategoryListDefinitions.CATEGORY_UID_NONE)
             }
         }
-        viewModelScope.launch {
-            reReadProcessList()
-        }
     }
-
 }

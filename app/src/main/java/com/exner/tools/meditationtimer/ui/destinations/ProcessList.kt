@@ -39,6 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCategory
 import com.exner.tools.meditationtimer.ui.BodyText
+import com.exner.tools.meditationtimer.ui.CategoryListDefinitions
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.ProcessListViewModel
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessDetailsDestination
@@ -57,11 +58,11 @@ fun ProcessList(
     navigator: DestinationsNavigator
 ) {
 
-    val processes: List<MeditationTimerProcess> by processListViewModel.observeProcessesForCurrentCategory.collectAsStateWithLifecycle(
+    val processes: List<MeditationTimerProcess> by processListViewModel.observeProcessesRaw.collectAsStateWithLifecycle(
         initialValue = emptyList()
     )
     val currentCategory: MeditationTimerProcessCategory by processListViewModel.currentCategory.collectAsStateWithLifecycle(
-        initialValue = MeditationTimerProcessCategory("All", -1L)
+        initialValue = MeditationTimerProcessCategory("All", CategoryListDefinitions.CATEGORY_UID_ALL)
     )
     val categories: List<MeditationTimerProcessCategory> by processListViewModel.observeCategoriesRaw.collectAsStateWithLifecycle(
         initialValue = emptyList()
@@ -99,7 +100,7 @@ fun ProcessList(
                         DropdownMenuItem(
                             text = { Text(text = "All") },
                             onClick = {
-                                processListViewModel.updateCategoryId(-2L)
+                                processListViewModel.updateCategoryId(CategoryListDefinitions.CATEGORY_UID_ALL)
                                 modified = true
                                 categoryExpanded = false
                             },
@@ -119,7 +120,7 @@ fun ProcessList(
                         DropdownMenuItem(
                             text = { Text(text = "None") },
                             onClick = {
-                                processListViewModel.updateCategoryId(-1L)
+                                processListViewModel.updateCategoryId(CategoryListDefinitions.CATEGORY_UID_NONE)
                                 modified = true
                                 categoryExpanded = false
                             },
@@ -128,14 +129,25 @@ fun ProcessList(
                     }
                 }
 
+                val filteredProcesses = if (currentCategory.uid == CategoryListDefinitions.CATEGORY_UID_ALL) {
+                    processes
+                } else if (currentCategory.uid == CategoryListDefinitions.CATEGORY_UID_NONE) {
+                    processes.filter { process ->
+                        CategoryListDefinitions.CATEGORY_UID_NONE == process.categoryId || 0L == process.categoryId || null == process.categoryId
+                    }
+                } else {
+                    processes.filter { process ->
+                        currentCategory.uid == process.categoryId
+                    }
+                }
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 250.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(innerPadding)
                 ) {
-                    items(count = processes.size) { meditationTimerProcess ->
-                        val mtProcess = processes[meditationTimerProcess]
+                    items(count = filteredProcesses.size) { meditationTimerProcess ->
+                        val mtProcess = filteredProcesses[meditationTimerProcess]
                         Surface(
                             modifier = Modifier
                                 .clickable {
