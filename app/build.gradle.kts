@@ -15,7 +15,7 @@ android {
         minSdk = 29
         targetSdk = 34
         versionCode = 6
-        versionName = "1.0.2"
+        versionName = "1.0.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -111,6 +111,7 @@ dependencies {
 
     // hilt
     implementation(libs.hilt.android)
+    implementation(libs.play.services.nearby)
     ksp(libs.dagger.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
@@ -124,6 +125,7 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.datastore.preferences)
     runtimeOnly(libs.kotlinx.coroutines.android)
+    implementation(libs.accompanist.permissions)
 
     // compose destinations
     implementation(libs.compose.destinations.core)
