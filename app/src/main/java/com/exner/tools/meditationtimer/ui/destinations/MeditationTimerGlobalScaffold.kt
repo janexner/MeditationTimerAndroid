@@ -27,6 +27,7 @@ import com.exner.tools.meditationtimer.ui.destinations.destinations.CategoryList
 import com.exner.tools.meditationtimer.ui.destinations.destinations.Destination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessListDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessRunDestination
+import com.exner.tools.meditationtimer.ui.destinations.destinations.SendToNearbyDeviceDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.SettingsDestination
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.rememberNavHostEngine
@@ -117,6 +118,14 @@ private fun MeditationTimerTopBar(
                     onClick = {
                         displayMainMenu = false
                         navController.navigate(SettingsDestination())
+                    }
+                )
+                DropdownMenuItem(
+                    enabled = destination != SendToNearbyDeviceDestination,
+                    text = { Text(text = "Send processes to nearby device") },
+                    onClick = {
+                        displayMainMenu = false
+                        navController.navigate(SendToNearbyDeviceDestination)
                     }
                 )
                 DropdownMenuItem(
