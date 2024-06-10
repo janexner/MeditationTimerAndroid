@@ -8,15 +8,12 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,30 +21,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.exner.tools.meditationtimer.ui.destinations.destinations.AboutDestination
+import com.exner.tools.meditationtimer.ui.destinations.destinations.CategoryListDestination
+import com.exner.tools.meditationtimer.ui.destinations.destinations.Destination
+import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessListDestination
+import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessRunDestination
+import com.exner.tools.meditationtimer.ui.destinations.destinations.SendToNearbyDeviceDestination
+import com.exner.tools.meditationtimer.ui.destinations.destinations.SettingsDestination
 import com.ramcosta.composedestinations.DestinationsNavHost
-import com.ramcosta.composedestinations.generated.NavGraphs
-import com.ramcosta.composedestinations.generated.destinations.AboutDestination
-import com.ramcosta.composedestinations.generated.destinations.CategoryListDestination
-import com.ramcosta.composedestinations.generated.destinations.ProcessListDestination
-import com.ramcosta.composedestinations.generated.destinations.ProcessRunDestination
-import com.ramcosta.composedestinations.generated.destinations.SendToNearbyDeviceDestination
-import com.ramcosta.composedestinations.generated.destinations.SettingsDestination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.rememberNavHostEngine
-import com.ramcosta.composedestinations.spec.DestinationSpec
-import com.ramcosta.composedestinations.utils.currentDestinationAsState
-import com.ramcosta.composedestinations.utils.rememberDestinationsNavigator
 
 @Composable
-fun MeditationTimerGlobalScaffold(enableExportToActivityTimer: State<Boolean>) {
+fun MeditationTimerGlobalScaffold() {
     val engine = rememberNavHostEngine()
     val navController = engine.rememberNavController()
-    val destinationsNavigator = navController.rememberDestinationsNavigator()
-    val destination = navController.currentDestinationAsState().value
+    val destination = navController.appCurrentDestinationAsState().value
 
     Scaffold(
         topBar = {
-            MeditationTimerTopBar(destination, destinationsNavigator, enableExportToActivityTimer)
+            MeditationTimerTopBar(destination, navController)
         },
         content = { innerPadding ->
             val newPadding = PaddingValues.Absolute(
@@ -69,9 +63,8 @@ fun MeditationTimerGlobalScaffold(enableExportToActivityTimer: State<Boolean>) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MeditationTimerTopBar(
-    destination: DestinationSpec?,
-    destinationsNavigator: DestinationsNavigator,
-    enableExportToActivityTimer: State<Boolean>,
+    destination: Destination?,
+    navController: NavHostController,
 ) {
     var displayMainMenu by remember { mutableStateOf(false) }
     
@@ -88,9 +81,9 @@ private fun MeditationTimerTopBar(
                 }
 
                 else -> {
-                    IconButton(onClick = { destinationsNavigator.navigateUp() }) {
+                    IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
                         )
                     }
@@ -104,7 +97,7 @@ private fun MeditationTimerTopBar(
                 }
             ) {
                 Icon(
-                    imageVector = Icons.Default.Menu,
+                    imageVector = Icons.Filled.Menu,
                     contentDescription = "Menu"
                 )
             }
@@ -114,42 +107,34 @@ private fun MeditationTimerTopBar(
             ) {
                 DropdownMenuItem(
                     enabled = destination != CategoryListDestination,
-                    text = { Text(text = "Manage categories", style = MaterialTheme.typography.bodyLarge) },
+                    text = { Text(text = "Manage categories") },
                     onClick = {
                         displayMainMenu = false
-                        destinationsNavigator.navigate(CategoryListDestination())
+                        navController.navigate(CategoryListDestination())
                     }
                 )
                 DropdownMenuItem(
                     enabled = destination != SettingsDestination,
-                    text = { Text(text = "Settings", style = MaterialTheme.typography.bodyLarge) },
+                    text = { Text(text = "Settings") },
                     onClick = {
                         displayMainMenu = false
-                        destinationsNavigator.navigate(SettingsDestination())
+                        navController.navigate(SettingsDestination())
                     }
                 )
-                if (enableExportToActivityTimer.value) {
-                    DropdownMenuItem(
-                        enabled = destination != SendToNearbyDeviceDestination,
-                        text = {
-                            Text(
-                                text = "Share to nearby device",
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                        },
-                        onClick = {
-                            displayMainMenu = false
-                            destinationsNavigator.navigate(SendToNearbyDeviceDestination)
-                        }
-                    )
-                }
-                HorizontalDivider()
                 DropdownMenuItem(
-                    enabled = destination != AboutDestination,
-                    text = { Text(text = "About Meditation Timer", style = MaterialTheme.typography.bodyLarge) },
+                    enabled = destination != SendToNearbyDeviceDestination,
+                    text = { Text(text = "Send processes to nearby device") },
                     onClick = {
                         displayMainMenu = false
-                        destinationsNavigator.navigate(AboutDestination())
+                        navController.navigate(SendToNearbyDeviceDestination)
+                    }
+                )
+                DropdownMenuItem(
+                    enabled = destination != AboutDestination,
+                    text = { Text(text = "About Meditation Timer") },
+                    onClick = {
+                        displayMainMenu = false
+                        navController.navigate(AboutDestination())
                     }
                 )
             }
