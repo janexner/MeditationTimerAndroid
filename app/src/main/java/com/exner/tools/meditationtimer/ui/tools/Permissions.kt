@@ -18,12 +18,12 @@ class Permissions(
         IndividualPermission(
             name = "android.permission.ACCESS_WIFI_STATE",
             mindSdkVersion = 28,
-            maxSdkVersion = 31
+            maxSdkVersion = 34
         ),
         IndividualPermission(
             name = "android.permission.CHANGE_WIFI_STATE",
             mindSdkVersion = 28,
-            maxSdkVersion = 31
+            maxSdkVersion = 34
         ),
         IndividualPermission(
             name = "android.permission.BLUETOOTH",
@@ -38,12 +38,12 @@ class Permissions(
         IndividualPermission(
             name = "android.permission.ACCESS_COARSE_LOCATION",
             mindSdkVersion = 28,
-            maxSdkVersion = 28
+            maxSdkVersion = 34
         ),
         IndividualPermission(
             name = "android.permission.ACCESS_FINE_LOCATION",
             mindSdkVersion = 29,
-            maxSdkVersion = 31
+            maxSdkVersion = 34
         ),
         IndividualPermission(
             name = "android.permission.BLUETOOTH_ADVERTISE",
@@ -61,6 +61,10 @@ class Permissions(
             name = "android.permission.NEARBY_WIFI_DEVICES",
             mindSdkVersion = 32,
         ),
+        IndividualPermission(
+            name = "android.permission.INTERNET",
+            mindSdkVersion = 28
+        )
     )
 
     private val currentReleaseLevel: Int = Build.VERSION.SDK_INT
