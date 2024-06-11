@@ -77,6 +77,7 @@ fun SendToNearbyDevice(
             ProcessStateConstants.AWAITING_DISCOVERY -> {
                 Column(modifier = Modifier.fillMaxSize()) {
                     Text(text = "All permissions OK, looking for devices...")
+                    sendToNearbyDeviceViewModel.startDiscovery(context = context)
                 }
             }
 
