@@ -19,7 +19,7 @@ class TimerConnectionLifecycleCallback(
     }
 
     override fun onConnectionResult(endpointId: String, result: ConnectionResolution) {
-        when (result.getStatus().getStatusCode()) {
+        when (result.status.statusCode) {
             ConnectionsStatusCodes.STATUS_OK -> {}
             ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED -> {}
             ConnectionsStatusCodes.STATUS_ERROR -> {}
