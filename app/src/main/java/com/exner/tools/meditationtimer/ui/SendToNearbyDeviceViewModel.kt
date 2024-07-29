@@ -3,9 +3,12 @@ package com.exner.tools.meditationtimer.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
+import com.exner.tools.meditationtimer.network.TimerEndpoint
 import com.exner.tools.meditationtimer.network.TimerEndpointDiscoveryCallback
 import com.google.android.gms.nearby.connection.ConnectionsClient
+import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo
 import com.google.android.gms.nearby.connection.DiscoveryOptions
+import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback
 import com.google.android.gms.nearby.connection.Strategy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,13 +16,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
-
 enum class ProcessStateConstants {
     AWAITING_PERMISSIONS, // IDLE
     PERMISSIONS_GRANTED,
     PERMISSIONS_DENIED,
     DISCOVERY_STARTED,
-    FOUND_PARTNER,
+    PARTNER_FOUND,
+    CONNECTING,
     AUTHENTICATION_OK,
     AUTHENTICATION_DENIED,
     CONNECTION_ESTABLISHED,
@@ -31,8 +34,37 @@ enum class ProcessStateConstants {
     ERROR
 }
 
-const val endpointId = "com.exner.tools.activitytimerfortv"
-const val userName = "Anonymous"
+/****
+ * Here's the flow:
+ *
+ * AWAITING PERMISSIONS ("IDLE")
+ * - show brief explanation why permissions are needed, and a button "Get permissions"
+ * - check whether permissions are all given.
+ *   - If so -> PERMISSIONS_GRANTED
+ *   - Otherwise -> PERMISSIONS_DENIED (same as AWAITING_PERMISSIONS?)
+ *
+ * PERMISSIONS_GRANTED
+ * - show "Start discovery" button
+ * - the button has two callbacks
+ *   - success -> DISCOVERY_STARTED
+ *   - fail -> ERROR
+ * - the discovery method also has a callback
+ *   - called when partner found -> PARTNER_FOUND
+ *
+ * PARTNER_FOUND
+ * - authenticate
+ *   - If OK -> AUTHENTICATION_OK
+ *   - else -> AUTHENTICATION_DENIED (back to DISCOVERY_STARTED)
+ *
+ * AUTHENTICATION_OK
+ * - connect (requestConnection) gets passed a callback, and has a failure callback, too
+ *   - callback -> CONNECTION_ESTABLISHED
+ *   - fail -> CONNECTION_DENIED
+ *
+ */
+
+const val endpointId: String = "com.exner.tools.activitytimerfortv"
+const val userName: String = "Anonymous"
 
 data class ProcessState(
     val currentState: ProcessStateConstants = ProcessStateConstants.AWAITING_PERMISSIONS,
@@ -58,8 +90,8 @@ class SendToNearbyDeviceViewModel @Inject constructor(
     private val _processStateFlow = MutableStateFlow(ProcessState())
     val processStateFlow: StateFlow<ProcessState> = _processStateFlow.asStateFlow()
 
-    lateinit var endpointDiscoveryCallback: TimerEndpointDiscoveryCallback
-    lateinit var connectionsClient: ConnectionsClient
+    private lateinit var endpointDiscoveryCallback: TimerEndpointDiscoveryCallback
+    private lateinit var connectionsClient: ConnectionsClient
 
     fun provideDiscoveryCallback(endpointDiscoveryCallback: TimerEndpointDiscoveryCallback) {
         this.endpointDiscoveryCallback = endpointDiscoveryCallback
@@ -68,6 +100,10 @@ class SendToNearbyDeviceViewModel @Inject constructor(
     fun provideConnectionsClient(connectionsClient: ConnectionsClient) {
         this.connectionsClient = connectionsClient
     }
+
+    val discoveredEndpoints: MutableMap<String, TimerEndpoint> = mutableMapOf()
+    val pendingConnections: MutableMap<String, TimerEndpoint> = mutableMapOf()
+    val establishedConnections: MutableMap<String, TimerEndpoint> = mutableMapOf()
 
     fun transitionToNewState(
         newState: ProcessStateConstants,
@@ -80,6 +116,10 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                 when (newState) {
                     ProcessStateConstants.PERMISSIONS_GRANTED -> {
                         _processStateFlow.value = ProcessState(newState, "OK")
+                        transitionToNewState(
+                            newState = ProcessStateConstants.DISCOVERY_STARTED,
+                            message = "Automatically move to discovery..."
+                        )
                     }
 
                     ProcessStateConstants.PERMISSIONS_DENIED -> {
@@ -103,19 +143,33 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                 // handled in the UI
                 when (newState) {
                     ProcessStateConstants.DISCOVERY_STARTED -> {
-                        _processStateFlow.value = ProcessState(newState, "OK")
                         // trigger the actual discovery
                         val discoveryOptions =
                             DiscoveryOptions.Builder().setStrategy(Strategy.P2P_POINT_TO_POINT)
                                 .build()
                         connectionsClient.startDiscovery(
                             endpointId,
-                            endpointDiscoveryCallback,
+                            object: EndpointDiscoveryCallback() {
+                                override fun onEndpointFound(
+                                    endpointId: String,
+                                    endpointInfo: DiscoveredEndpointInfo
+                                ) {
+                                    Log.d("SNDVM/TEDC", "OnEndpointFound... $endpointId / ${endpointInfo.endpointName}")
+                                    val discoveredEndpoint = TimerEndpoint(endpointId, endpointInfo.endpointName)
+                                    discoveredEndpoints[endpointId] = discoveredEndpoint
+                                    transitionToNewState(ProcessStateConstants.PARTNER_FOUND, endpointId)
+                                }
+
+                                override fun onEndpointLost(endpointId: String) {
+                                    Log.d("SNDVM/TEDC", "On Endpoint Lost... $endpointId")
+                                    discoveredEndpoints.remove(endpointId)
+                                }
+                            },
                             discoveryOptions
                         )
-                            .addOnSuccessListener { _: Void? ->
-                                Log.d("SNDVM", "Success! Discovered a nearby device!")
-                                transitionToNewState(ProcessStateConstants.FOUND_PARTNER)
+                            .addOnSuccessListener { _ ->
+                                Log.d("SNDVM", "Success! Discovery started")
+                                transitionToNewState(ProcessStateConstants.DISCOVERY_STARTED)
                             }
                             .addOnFailureListener { e: Exception? ->
                                 val errorMessage = "Error discovering" + if (e != null) {
@@ -123,11 +177,16 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                                 } else {
                                     ""
                                 }
-                                transitionToNewState(ProcessStateConstants.ERROR, message = errorMessage)
+                                Log.d("SNDVM", errorMessage)
+                                transitionToNewState(
+                                    ProcessStateConstants.ERROR,
+                                    message = errorMessage
+                                )
                             }
                     }
 
                     ProcessStateConstants.CANCELLED -> {
+                        connectionsClient.stopDiscovery()
                         _processStateFlow.value = ProcessState(newState, "Cancelled")
                     }
 
@@ -143,10 +202,41 @@ class SendToNearbyDeviceViewModel @Inject constructor(
             ProcessStateConstants.PERMISSIONS_DENIED -> TODO()
             ProcessStateConstants.DISCOVERY_STARTED -> {
                 // not sure what to do here...
-                Log.d("SNDVM", "Now in discovery...")
+                when (newState) {
+                    ProcessStateConstants.PARTNER_FOUND -> {
+                        Log.d("SNDVM", "Found partner...")
+                        // stop discovery, bcs
+                        connectionsClient.stopDiscovery()
+                        // this is where we build an endpoint and initiate connection
+                        val endpointId = message // probably should check that!
+                        // find endpoint in discoveredEndpoints
+                        // add it to pendingConnections
+                        // then initiate connection
+                        // TODO
+                    }
+
+                    ProcessStateConstants.CANCELLED -> {
+                        Log.d("SNDVM", "Cancelling discovery...")
+                        connectionsClient.stopDiscovery()
+                    }
+                    else -> {
+                        _processStateFlow.value = invalidTransitionProcessState(
+                            currentState = processStateFlow.value.currentState,
+                            newState = newState
+                        )
+                    }
+                }
             }
-            ProcessStateConstants.FOUND_PARTNER -> {
+
+            ProcessStateConstants.PARTNER_FOUND -> {
+                Log.d("SNDVM", "Found device...")
                 // trigger authentication on both devices
+                // TODO
+            }
+
+            ProcessStateConstants.CONNECTING -> {
+                Log.d("SNDVM", "Connecting to device")
+                // TODO
             }
 
             ProcessStateConstants.AUTHENTICATION_OK -> TODO()
@@ -159,6 +249,10 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                 // don't think there is anything to do here
             }
         }
+    }
+
+    fun cancel() {
+        transitionToNewState(ProcessStateConstants.CANCELLED)
     }
 
 }
