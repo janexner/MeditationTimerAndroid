@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId = "com.exner.tools.meditationtimer"
         minSdk = 29
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 6
         versionName = "1.0.6"
 

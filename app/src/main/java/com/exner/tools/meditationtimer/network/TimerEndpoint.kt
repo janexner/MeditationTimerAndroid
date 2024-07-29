@@ -10,4 +10,10 @@ class TimerEndpoint(
         }
         return false
     }
+
+    override fun hashCode(): Int {
+        var result = endpointId.hashCode()
+        result = 31 * result + userName.hashCode()
+        return result
+    }
 }
