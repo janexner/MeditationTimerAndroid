@@ -1,7 +1,6 @@
 package com.exner.tools.meditationtimer.ui
 
 import android.util.Log
-import androidx.compose.material3.Text
 import androidx.lifecycle.ViewModel
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
 import com.exner.tools.meditationtimer.network.TimerEndpoint
@@ -12,9 +11,12 @@ import com.google.android.gms.nearby.connection.DiscoveryOptions
 import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback
 import com.google.android.gms.nearby.connection.Strategy
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 enum class ProcessStateConstants {
@@ -67,6 +69,7 @@ enum class ProcessStateConstants {
 
 const val endpointId: String = "com.exner.tools.activitytimerfortv"
 const val userName: String = "Anonymous"
+const val checkInterval: Long = 500 // this should be milliseconds
 
 data class ProcessState(
     val currentState: ProcessStateConstants = ProcessStateConstants.AWAITING_PERMISSIONS,
@@ -106,6 +109,13 @@ class SendToNearbyDeviceViewModel @Inject constructor(
     val discoveredEndpoints: MutableMap<String, TimerEndpoint> = mutableMapOf()
     val pendingConnections: MutableMap<String, TimerEndpoint> = mutableMapOf()
     val establishedConnections: MutableMap<String, TimerEndpoint> = mutableMapOf()
+
+    var endpointsFound: Flow<List<TimerEndpoint>> = flow {
+        while (processStateFlow.value.currentState == ProcessStateConstants.AWAITING_PERMISSIONS || processStateFlow.value.currentState == ProcessStateConstants.PERMISSIONS_GRANTED || processStateFlow.value.currentState == ProcessStateConstants.STARTING_DISCOVERY || processStateFlow.value.currentState == ProcessStateConstants.DISCOVERY_STARTED || processStateFlow.value.currentState == ProcessStateConstants.PERMISSIONS_DENIED) {
+            emit(discoveredEndpoints.values.toList());
+            delay(checkInterval)
+        }
+    }
 
     fun transitionToNewState(
         newState: ProcessStateConstants,
@@ -151,15 +161,22 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                                 .build()
                         connectionsClient.startDiscovery(
                             endpointId,
-                            object: EndpointDiscoveryCallback() {
+                            object : EndpointDiscoveryCallback() {
                                 override fun onEndpointFound(
                                     endpointId: String,
                                     endpointInfo: DiscoveredEndpointInfo
                                 ) {
-                                    Log.d("SNDVM/TEDC", "OnEndpointFound... $endpointId / ${endpointInfo.endpointName}")
-                                    val discoveredEndpoint = TimerEndpoint(endpointId, endpointInfo.endpointName)
+                                    Log.d(
+                                        "SNDVM/TEDC",
+                                        "OnEndpointFound... $endpointId / ${endpointInfo.endpointName}"
+                                    )
+                                    val discoveredEndpoint =
+                                        TimerEndpoint(endpointId, endpointInfo.endpointName)
                                     discoveredEndpoints[endpointId] = discoveredEndpoint
-                                    transitionToNewState(ProcessStateConstants.PARTNER_FOUND, endpointId)
+                                    transitionToNewState(
+                                        ProcessStateConstants.PARTNER_FOUND,
+                                        endpointId
+                                    )
                                 }
 
                                 override fun onEndpointLost(endpointId: String) {
@@ -231,7 +248,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                 // not sure what to do here...
                 when (newState) {
                     ProcessStateConstants.PARTNER_FOUND -> {
-                        Log.d("SNDVM", "Found partner...")
+                        Log.d("SNDVM", "Found partner: $message.")
                         // stop discovery, bcs
                         connectionsClient.stopDiscovery()
                         // this is where we build an endpoint and initiate connection
@@ -246,6 +263,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                         Log.d("SNDVM", "Cancelling discovery...")
                         connectionsClient.stopDiscovery()
                     }
+
                     else -> {
                         _processStateFlow.value = invalidTransitionProcessState(
                             currentState = processStateFlow.value.currentState,
