@@ -111,7 +111,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
     val establishedConnections: MutableMap<String, TimerEndpoint> = mutableMapOf()
 
     var endpointsFound: Flow<List<TimerEndpoint>> = flow {
-        while (processStateFlow.value.currentState == ProcessStateConstants.AWAITING_PERMISSIONS || processStateFlow.value.currentState == ProcessStateConstants.PERMISSIONS_GRANTED || processStateFlow.value.currentState == ProcessStateConstants.STARTING_DISCOVERY || processStateFlow.value.currentState == ProcessStateConstants.DISCOVERY_STARTED || processStateFlow.value.currentState == ProcessStateConstants.PERMISSIONS_DENIED) {
+        while (processStateFlow.value.currentState == ProcessStateConstants.AWAITING_PERMISSIONS || processStateFlow.value.currentState == ProcessStateConstants.PERMISSIONS_GRANTED || processStateFlow.value.currentState == ProcessStateConstants.STARTING_DISCOVERY || processStateFlow.value.currentState == ProcessStateConstants.DISCOVERY_STARTED || processStateFlow.value.currentState == ProcessStateConstants.PERMISSIONS_DENIED || processStateFlow.value.currentState == ProcessStateConstants.PARTNER_FOUND) {
             emit(discoveredEndpoints.values.toList());
             delay(checkInterval)
         }
@@ -155,6 +155,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                 // handled in the UI
                 when (newState) {
                     ProcessStateConstants.STARTING_DISCOVERY -> {
+                        _processStateFlow.value = ProcessState(newState, "OK")
                         // trigger the actual discovery
                         val discoveryOptions =
                             DiscoveryOptions.Builder().setStrategy(Strategy.P2P_POINT_TO_POINT)
@@ -227,6 +228,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                 when (newState) {
                     ProcessStateConstants.DISCOVERY_STARTED -> {
                         Log.d("SNDVM", "Discovery started...")
+                        _processStateFlow.value = ProcessState(newState, "OK")
                     }
 
                     ProcessStateConstants.CANCELLED -> {
@@ -257,11 +259,13 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                         // add it to pendingConnections
                         // then initiate connection
                         // TODO
+                        _processStateFlow.value = ProcessState(newState, "OK")
                     }
 
                     ProcessStateConstants.CANCELLED -> {
                         Log.d("SNDVM", "Cancelling discovery...")
                         connectionsClient.stopDiscovery()
+                        _processStateFlow.value = ProcessState(newState, "Cancelled")
                     }
 
                     else -> {
