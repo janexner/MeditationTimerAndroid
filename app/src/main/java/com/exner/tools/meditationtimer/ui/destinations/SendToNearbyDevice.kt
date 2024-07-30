@@ -1,11 +1,16 @@
 package com.exner.tools.meditationtimer.ui.destinations
 
 import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
@@ -28,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.exner.tools.meditationtimer.network.Permissions
+import com.exner.tools.meditationtimer.network.TimerEndpoint
 import com.exner.tools.meditationtimer.ui.ProcessState
 import com.exner.tools.meditationtimer.ui.ProcessStateConstants
 import com.exner.tools.meditationtimer.ui.SendToNearbyDeviceViewModel
@@ -35,9 +41,10 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.nearby.Nearby
-import com.google.android.gms.nearby.connection.ConnectionsClient
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Destination
@@ -64,6 +71,10 @@ fun SendToNearbyDevice(
     val connectionsClient = Nearby.getConnectionsClient(context)
     sendToNearbyDeviceViewModel.provideConnectionsClient(connectionsClient = connectionsClient)
 
+    val discoveredEndpoints: List<TimerEndpoint> by sendToNearbyDeviceViewModel.endpointsFound.collectAsStateWithLifecycle(
+        initialValue = emptyList()
+    )
+
     // some sanity checking for state
     Log.d("STND", "All permissions granted: ${permissionsNeeded.allPermissionsGranted}")
     if (processState.currentState == ProcessStateConstants.AWAITING_PERMISSIONS && permissionsNeeded.allPermissionsGranted) {
@@ -82,7 +93,7 @@ fun SendToNearbyDevice(
                     .fillMaxSize()
             ) {
                 Spacer(modifier = Modifier.size(16.dp))
-                Text(text = "Now ${processState.currentState.name}")
+                Text(text = "Now at ${processState.currentState.name}")
                 Spacer(modifier = Modifier.size(16.dp))
 
                 // UI, depending on state
@@ -108,7 +119,9 @@ fun SendToNearbyDevice(
                     }
 
                     ProcessStateConstants.PARTNER_FOUND -> {
-                        ProcessStatePartnerFoundScreen()
+                        ProcessStatePartnerFoundScreen(discoveredEndpoints) { endpointId ->
+                            sendToNearbyDeviceViewModel.transitionToNewState(ProcessStateConstants.PARTNER_FOUND, endpointId)
+                        }
                     }
 
                     ProcessStateConstants.CONNECTING -> {
@@ -165,7 +178,6 @@ private fun ProcessStateAwaitingPermissionsScreen(permissionsNeeded: MultiplePer
 private fun ProcessStatePermissionsGrantedScreen() {
     Column(modifier = Modifier.fillMaxSize()) {
         Text(text = "All permissions OK.")
-        Text(text = "Now starting discovery...")
     }
 }
 
@@ -184,16 +196,29 @@ private fun ProcessStateDiscoveryStartedScreen() {
 }
 
 @Composable
-private fun ProcessStatePartnerFoundScreen() {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Found a partner!")
+private fun ProcessStatePartnerFoundScreen(discoveredEndpoints: List<TimerEndpoint>, onItemClick : (String) -> Unit) {
+    LazyColumn(
+        modifier = Modifier
+            .padding(PaddingValues(8.dp))
+            .fillMaxSize()
+    ) {
+        item {
+            Text(text = "Partner(s) found!")
+        }
+        items(discoveredEndpoints) { endpoint ->
+            Box(modifier = Modifier.clickable {
+                onItemClick(endpoint.endpointId)
+            }) {
+                Text(text = endpoint.endpointId)
+            }
+        }
     }
 }
 
 @Composable
 private fun ProcessStateConnectingScreen() {
     Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Connecting...")
+        Text(text = "Connecting to partner...")
     }
 }
 
