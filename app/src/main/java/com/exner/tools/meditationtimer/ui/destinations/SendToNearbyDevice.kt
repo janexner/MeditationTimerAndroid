@@ -34,6 +34,8 @@ import com.exner.tools.meditationtimer.ui.SendToNearbyDeviceViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.android.gms.nearby.Nearby
+import com.google.android.gms.nearby.connection.ConnectionsClient
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -58,6 +60,9 @@ fun SendToNearbyDevice(
         )
 
     val processState by sendToNearbyDeviceViewModel.processStateFlow.collectAsState()
+
+    val connectionsClient = Nearby.getConnectionsClient(context)
+    sendToNearbyDeviceViewModel.provideConnectionsClient(connectionsClient = connectionsClient)
 
     // some sanity checking for state
     Log.d("STND", "All permissions granted: ${permissionsNeeded.allPermissionsGranted}")
@@ -92,6 +97,10 @@ fun SendToNearbyDevice(
 
                     ProcessStateConstants.PERMISSIONS_DENIED -> {
                         ProcessStateAwaitingPermissionsScreen(permissionsNeeded)
+                    }
+
+                    ProcessStateConstants.STARTING_DISCOVERY -> {
+                        ProcessStateStartingDiscovery()
                     }
 
                     ProcessStateConstants.DISCOVERY_STARTED -> {
@@ -161,9 +170,16 @@ private fun ProcessStatePermissionsGrantedScreen() {
 }
 
 @Composable
+private fun ProcessStateStartingDiscovery() {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Text(text = "All permissions OK, starting discovery...")
+    }
+}
+
+@Composable
 private fun ProcessStateDiscoveryStartedScreen() {
     Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "All permissions OK, looking for devices...")
+        Text(text = "Looking for devices...")
     }
 }
 
