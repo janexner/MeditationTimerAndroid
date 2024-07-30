@@ -1,6 +1,7 @@
 package com.exner.tools.meditationtimer.ui
 
 import android.util.Log
+import androidx.compose.material3.Text
 import androidx.lifecycle.ViewModel
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
 import com.exner.tools.meditationtimer.network.TimerEndpoint
@@ -20,6 +21,7 @@ enum class ProcessStateConstants {
     AWAITING_PERMISSIONS, // IDLE
     PERMISSIONS_GRANTED,
     PERMISSIONS_DENIED,
+    STARTING_DISCOVERY,
     DISCOVERY_STARTED,
     PARTNER_FOUND,
     CONNECTING,
@@ -117,7 +119,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                     ProcessStateConstants.PERMISSIONS_GRANTED -> {
                         _processStateFlow.value = ProcessState(newState, "OK")
                         transitionToNewState(
-                            newState = ProcessStateConstants.DISCOVERY_STARTED,
+                            newState = ProcessStateConstants.STARTING_DISCOVERY,
                             message = "Automatically move to discovery..."
                         )
                     }
@@ -142,7 +144,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
             ProcessStateConstants.PERMISSIONS_GRANTED -> {
                 // handled in the UI
                 when (newState) {
-                    ProcessStateConstants.DISCOVERY_STARTED -> {
+                    ProcessStateConstants.STARTING_DISCOVERY -> {
                         // trigger the actual discovery
                         val discoveryOptions =
                             DiscoveryOptions.Builder().setStrategy(Strategy.P2P_POINT_TO_POINT)
@@ -183,6 +185,31 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                                     message = errorMessage
                                 )
                             }
+                    }
+
+                    ProcessStateConstants.DISCOVERY_STARTED -> {
+                        _processStateFlow.value = ProcessState(newState, "Discovering...")
+                    }
+
+                    ProcessStateConstants.CANCELLED -> {
+                        connectionsClient.stopDiscovery()
+                        _processStateFlow.value = ProcessState(newState, "Cancelled")
+                    }
+
+                    else -> {
+                        _processStateFlow.value = invalidTransitionProcessState(
+                            currentState = processStateFlow.value.currentState,
+                            newState = newState
+                        )
+                    }
+                }
+            }
+
+            ProcessStateConstants.STARTING_DISCOVERY -> {
+                // handled in the UI
+                when (newState) {
+                    ProcessStateConstants.DISCOVERY_STARTED -> {
+                        Log.d("SNDVM", "Discovery started...")
                     }
 
                     ProcessStateConstants.CANCELLED -> {
