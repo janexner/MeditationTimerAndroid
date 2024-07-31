@@ -22,6 +22,7 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,6 +45,7 @@ import com.google.android.gms.nearby.Nearby
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.exner.tools.meditationtimer.ui.BodyText
 
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -115,13 +117,13 @@ fun SendToNearbyDevice(
                     }
 
                     ProcessStateConstants.DISCOVERY_STARTED -> {
-                        ProcessStateDiscoveryStartedScreen()
+                        ProcessStateDiscoveryStartedScreen(discoveredEndpoints) { endpointId ->
+                            sendToNearbyDeviceViewModel.transitionToNewState(ProcessStateConstants.PARTNER_CHOSEN, endpointId)
+                        }
                     }
 
-                    ProcessStateConstants.PARTNER_FOUND -> {
-                        ProcessStatePartnerFoundScreen(discoveredEndpoints) { endpointId ->
-                            sendToNearbyDeviceViewModel.transitionToNewState(ProcessStateConstants.PARTNER_FOUND, endpointId)
-                        }
+                    ProcessStateConstants.PARTNER_CHOSEN -> {
+                        ProcessStatePartnerFoundScreen()
                     }
 
                     ProcessStateConstants.CONNECTING -> {
@@ -189,29 +191,29 @@ private fun ProcessStateStartingDiscovery() {
 }
 
 @Composable
-private fun ProcessStateDiscoveryStartedScreen() {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Looking for devices...")
-    }
-}
-
-@Composable
-private fun ProcessStatePartnerFoundScreen(discoveredEndpoints: List<TimerEndpoint>, onItemClick : (String) -> Unit) {
+private fun ProcessStateDiscoveryStartedScreen(discoveredEndpoints: List<TimerEndpoint>, onItemClick : (String) -> Unit) {
     LazyColumn(
         modifier = Modifier
             .padding(PaddingValues(8.dp))
             .fillMaxSize()
     ) {
         item {
-            Text(text = "Partner(s) found!")
+            Text(text = "Looking for partners... once found, tap to connect.")
         }
         items(discoveredEndpoints) { endpoint ->
-            Box(modifier = Modifier.clickable {
+            Box(modifier = Modifier.padding(PaddingValues(8.dp)).clickable {
                 onItemClick(endpoint.endpointId)
             }) {
-                Text(text = endpoint.endpointId)
+                BodyText(text = endpoint.endpointId)
             }
         }
+    }
+}
+
+@Composable
+private fun ProcessStatePartnerFoundScreen() {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Text(text = "Connecting to partner...")
     }
 }
 
