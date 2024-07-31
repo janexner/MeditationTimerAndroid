@@ -25,7 +25,7 @@ enum class ProcessStateConstants {
     PERMISSIONS_DENIED,
     STARTING_DISCOVERY,
     DISCOVERY_STARTED,
-    PARTNER_FOUND,
+    PARTNER_CHOSEN,
     CONNECTING,
     AUTHENTICATION_OK,
     AUTHENTICATION_DENIED,
@@ -111,7 +111,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
     val establishedConnections: MutableMap<String, TimerEndpoint> = mutableMapOf()
 
     var endpointsFound: Flow<List<TimerEndpoint>> = flow {
-        while (processStateFlow.value.currentState == ProcessStateConstants.AWAITING_PERMISSIONS || processStateFlow.value.currentState == ProcessStateConstants.PERMISSIONS_GRANTED || processStateFlow.value.currentState == ProcessStateConstants.STARTING_DISCOVERY || processStateFlow.value.currentState == ProcessStateConstants.DISCOVERY_STARTED || processStateFlow.value.currentState == ProcessStateConstants.PERMISSIONS_DENIED || processStateFlow.value.currentState == ProcessStateConstants.PARTNER_FOUND) {
+        while (processStateFlow.value.currentState == ProcessStateConstants.AWAITING_PERMISSIONS || processStateFlow.value.currentState == ProcessStateConstants.PERMISSIONS_GRANTED || processStateFlow.value.currentState == ProcessStateConstants.STARTING_DISCOVERY || processStateFlow.value.currentState == ProcessStateConstants.DISCOVERY_STARTED || processStateFlow.value.currentState == ProcessStateConstants.PERMISSIONS_DENIED || processStateFlow.value.currentState == ProcessStateConstants.PARTNER_CHOSEN) {
             emit(discoveredEndpoints.values.toList());
             delay(checkInterval)
         }
@@ -175,7 +175,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                                         TimerEndpoint(endpointId, endpointInfo.endpointName)
                                     discoveredEndpoints[endpointId] = discoveredEndpoint
                                     transitionToNewState(
-                                        ProcessStateConstants.PARTNER_FOUND,
+                                        ProcessStateConstants.PARTNER_CHOSEN,
                                         endpointId
                                     )
                                 }
@@ -249,17 +249,23 @@ class SendToNearbyDeviceViewModel @Inject constructor(
             ProcessStateConstants.DISCOVERY_STARTED -> {
                 // not sure what to do here...
                 when (newState) {
-                    ProcessStateConstants.PARTNER_FOUND -> {
-                        Log.d("SNDVM", "Found partner: $message.")
+                    ProcessStateConstants.PARTNER_CHOSEN -> {
+                        Log.d("SNDVM", "Chose partner: $message.")
                         // stop discovery, bcs
                         connectionsClient.stopDiscovery()
                         // this is where we build an endpoint and initiate connection
                         val endpointId = message // probably should check that!
                         // find endpoint in discoveredEndpoints
-                        // add it to pendingConnections
-                        // then initiate connection
-                        // TODO
-                        _processStateFlow.value = ProcessState(newState, "OK")
+                        val endpoint = discoveredEndpoints.remove(endpointId)
+                        if (endpoint != null) {
+                            // add it to pendingConnections
+                            pendingConnections[endpoint.endpointId] = endpoint
+                            // then initiate connection
+                            // TODO
+                            // if that doesn't work, we go back to discovery
+                            // TODO
+                            _processStateFlow.value = ProcessState(newState, "OK")
+                        }
                     }
 
                     ProcessStateConstants.CANCELLED -> {
@@ -277,7 +283,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                 }
             }
 
-            ProcessStateConstants.PARTNER_FOUND -> {
+            ProcessStateConstants.PARTNER_CHOSEN -> {
                 Log.d("SNDVM", "Found device...")
                 // trigger authentication on both devices
                 // TODO
