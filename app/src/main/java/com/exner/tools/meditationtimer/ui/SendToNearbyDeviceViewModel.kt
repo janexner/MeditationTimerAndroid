@@ -5,6 +5,9 @@ import androidx.lifecycle.ViewModel
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
 import com.exner.tools.meditationtimer.network.TimerEndpoint
 import com.exner.tools.meditationtimer.network.TimerEndpointDiscoveryCallback
+import com.google.android.gms.nearby.connection.ConnectionInfo
+import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback
+import com.google.android.gms.nearby.connection.ConnectionResolution
 import com.google.android.gms.nearby.connection.ConnectionsClient
 import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo
 import com.google.android.gms.nearby.connection.DiscoveryOptions
@@ -117,6 +120,38 @@ class SendToNearbyDeviceViewModel @Inject constructor(
         }
     }
 
+    private val connectionLifecycleCallback = object: ConnectionLifecycleCallback() {
+        override fun onConnectionInitiated(endpointId: String, connectionInfo: ConnectionInfo) {
+            Log.d("SNDVMCLC", "onConnectionInitiated $endpointId: $connectionInfo")
+            val endpoint = discoveredEndpoints.remove(endpointId)
+            pendingConnections[endpointId] = endpoint!! // TODO
+            transitionToNewState(ProcessStateConstants.CONNECTING, endpointId)
+        }
+
+        override fun onConnectionResult(endpointId: String, connectionResolution: ConnectionResolution) {
+            Log.d("SNDVMCLC", "onConnectionResult $endpointId: $connectionResolution")
+            if (!connectionResolution.status.isSuccess) {
+                // failed
+                pendingConnections.remove(endpointId)
+                var message = connectionResolution.status.statusMessage
+                if (null == message) {
+                    message = "Unknown issue"
+                }
+                transitionToNewState(ProcessStateConstants.CONNECTION_DENIED, message = message)
+            } else {
+                // this worked!
+                val endpoint = pendingConnections.remove(endpointId)
+                establishedConnections[endpointId] = endpoint!!
+                transitionToNewState(ProcessStateConstants.CONNECTION_ESTABLISHED, "OK")
+            }
+        }
+
+        override fun onDisconnected(endpointId: String) {
+            TODO("Not yet implemented")
+        }
+
+    }
+
     fun transitionToNewState(
         newState: ProcessStateConstants,
         message: String = "OK"
@@ -174,10 +209,6 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                                     val discoveredEndpoint =
                                         TimerEndpoint(endpointId, endpointInfo.endpointName)
                                     discoveredEndpoints[endpointId] = discoveredEndpoint
-                                    transitionToNewState(
-                                        ProcessStateConstants.PARTNER_CHOSEN,
-                                        endpointId
-                                    )
                                 }
 
                                 override fun onEndpointLost(endpointId: String) {
@@ -256,12 +287,10 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                         // this is where we build an endpoint and initiate connection
                         val endpointId = message // probably should check that!
                         // find endpoint in discoveredEndpoints
-                        val endpoint = discoveredEndpoints.remove(endpointId)
+                        val endpoint = discoveredEndpoints.get(endpointId)
                         if (endpoint != null) {
-                            // add it to pendingConnections
-                            pendingConnections[endpoint.endpointId] = endpoint
-                            // then initiate connection
-                            // TODO
+                            // initiate connection
+                            connectionsClient.requestConnection("Phone", endpoint.endpointId, connectionLifecycleCallback)
                             // if that doesn't work, we go back to discovery
                             // TODO
                             _processStateFlow.value = ProcessState(newState, "OK")
