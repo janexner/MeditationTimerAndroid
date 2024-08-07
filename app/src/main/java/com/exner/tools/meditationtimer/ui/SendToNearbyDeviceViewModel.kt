@@ -79,17 +79,6 @@ data class ProcessState(
     val message: String = ""
 )
 
-// convenience function for all those invalid transitions
-fun invalidTransitionProcessState(
-    currentState: ProcessStateConstants,
-    newState: ProcessStateConstants
-): ProcessState {
-    return ProcessState(
-        ProcessStateConstants.ERROR,
-        "Invalid transition: ${currentState.name} > ${newState.name}"
-    )
-}
-
 @HiltViewModel
 class SendToNearbyDeviceViewModel @Inject constructor(
     repository: MeditationTimerDataRepository,
@@ -118,41 +107,6 @@ class SendToNearbyDeviceViewModel @Inject constructor(
             emit(discoveredEndpoints.values.toList());
             delay(checkInterval)
         }
-    }
-
-    private val connectionLifecycleCallback = object : ConnectionLifecycleCallback() {
-        override fun onConnectionInitiated(endpointId: String, connectionInfo: ConnectionInfo) {
-            Log.d("SNDVMCLC", "onConnectionInitiated $endpointId: $connectionInfo")
-            val endpoint = discoveredEndpoints.remove(endpointId)
-            pendingConnections[endpointId] = endpoint!! // TODO
-            transitionToNewState(ProcessStateConstants.CONNECTING, endpointId)
-        }
-
-        override fun onConnectionResult(
-            endpointId: String,
-            connectionResolution: ConnectionResolution
-        ) {
-            Log.d("SNDVMCLC", "onConnectionResult $endpointId: $connectionResolution")
-            if (!connectionResolution.status.isSuccess) {
-                // failed
-                pendingConnections.remove(endpointId)
-                var message = connectionResolution.status.statusMessage
-                if (null == message) {
-                    message = "Unknown issue"
-                }
-                transitionToNewState(ProcessStateConstants.CONNECTION_DENIED, message = message)
-            } else {
-                // this worked!
-                val endpoint = pendingConnections.remove(endpointId)
-                establishedConnections[endpointId] = endpoint!!
-                transitionToNewState(ProcessStateConstants.CONNECTION_ESTABLISHED, "OK")
-            }
-        }
-
-        override fun onDisconnected(endpointId: String) {
-            TODO("Not yet implemented")
-        }
-
     }
 
     fun transitionToNewState(
@@ -201,17 +155,64 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                 // this is where we build an endpoint and initiate connection
                 val endpointId = message // probably should check that!
                 // find endpoint in discoveredEndpoints
-                val endpoint = discoveredEndpoints.get(endpointId)
+                val endpoint = discoveredEndpoints[endpointId]
+                _processStateFlow.value = ProcessState(ProcessStateConstants.PARTNER_CHOSEN, "Partner chosen: $message...")
                 if (endpoint != null) {
                     // initiate connection
                     connectionsClient.requestConnection(
                         "Phone",
                         endpoint.endpointId,
-                        connectionLifecycleCallback
+                        object : ConnectionLifecycleCallback() {
+                            override fun onConnectionInitiated(
+                                endpointId: String,
+                                connectionInfo: ConnectionInfo
+                            ) {
+                                Log.d(
+                                    "SNDVMCLC",
+                                    "onConnectionInitiated ${connectionInfo.endpointName} / ${connectionInfo.authenticationDigits}"
+                                )
+                                val newEndpoint = discoveredEndpoints.remove(endpointId)
+                                pendingConnections[endpointId] = newEndpoint!! // TODO
+                                _processStateFlow.value = ProcessState(ProcessStateConstants.CONNECTING, connectionInfo.endpointName)
+                            }
+
+                            override fun onConnectionResult(
+                                endpointId: String,
+                                connectionResolution: ConnectionResolution
+                            ) {
+                                Log.d(
+                                    "SNDVMCLC",
+                                    "onConnectionResult $endpointId: $connectionResolution"
+                                )
+                                if (!connectionResolution.status.isSuccess) {
+                                    // failed
+                                    pendingConnections.remove(endpointId)
+                                    var statusMessage = connectionResolution.status.statusMessage
+                                    if (null == statusMessage) {
+                                        statusMessage = "Unknown issue"
+                                    }
+                                    _processStateFlow.value = ProcessState(
+                                        ProcessStateConstants.CONNECTION_DENIED,
+                                        message = statusMessage
+                                    )
+                                } else {
+                                    // this worked!
+                                    val newEndpoint = pendingConnections.remove(endpointId)
+                                    establishedConnections[endpointId] = newEndpoint!!
+                                    _processStateFlow.value = ProcessState(
+                                        ProcessStateConstants.CONNECTION_ESTABLISHED,
+                                        "Connection established: ${newEndpoint.userName}"
+                                    )
+                                }
+                            }
+
+                            override fun onDisconnected(endpointId: String) {
+                                establishedConnections.remove(endpointId)
+                                _processStateFlow.value = ProcessState(ProcessStateConstants.DISCONNECTED, "OK")
+                            }
+
+                        }
                     )
-                    // if that doesn't work, we go back to discovery
-                    // TODO
-                    _processStateFlow.value = ProcessState(newState, "OK")
                 }
             }
 

@@ -22,7 +22,6 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,8 +32,10 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.exner.tools.meditationtimer.network.Permissions
 import com.exner.tools.meditationtimer.network.TimerEndpoint
+import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.ProcessState
 import com.exner.tools.meditationtimer.ui.ProcessStateConstants
 import com.exner.tools.meditationtimer.ui.SendToNearbyDeviceViewModel
@@ -44,8 +45,6 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.nearby.Nearby
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.exner.tools.meditationtimer.ui.BodyText
 
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -118,11 +117,11 @@ fun SendToNearbyDevice(
                     }
 
                     ProcessStateConstants.PARTNER_CHOSEN -> {
-                        ProcessStatePartnerFoundScreen()
+                        ProcessStatePartnerFoundScreen(processState.message)
                     }
 
                     ProcessStateConstants.CONNECTING -> {
-                        ProcessStateConnectingScreen()
+                        ProcessStateConnectingScreen(processState.message)
                     }
 
                     ProcessStateConstants.AUTHENTICATION_OK -> {}
@@ -131,6 +130,7 @@ fun SendToNearbyDevice(
                     ProcessStateConstants.CONNECTION_DENIED -> {}
                     ProcessStateConstants.SENDING -> {}
                     ProcessStateConstants.DISCONNECTED -> {}
+
                     ProcessStateConstants.DONE -> {
                         ProcessStateDoneScreen()
                     }
@@ -140,7 +140,7 @@ fun SendToNearbyDevice(
                     }
 
                     ProcessStateConstants.ERROR -> {
-                        ProcessStateErrorScreen()
+                        ProcessStateErrorScreen(message = processState.message)
                     }
 
                 }
@@ -196,9 +196,11 @@ private fun ProcessStateDiscoveryStartedScreen(discoveredEndpoints: List<TimerEn
             Text(text = "Looking for partners... once found, tap to connect.")
         }
         items(discoveredEndpoints) { endpoint ->
-            Box(modifier = Modifier.padding(PaddingValues(8.dp)).clickable {
-                onItemClick(endpoint.endpointId)
-            }) {
+            Box(modifier = Modifier
+                .padding(PaddingValues(8.dp))
+                .clickable {
+                    onItemClick(endpoint.endpointId)
+                }) {
                 BodyText(text = endpoint.endpointId)
             }
         }
@@ -206,16 +208,16 @@ private fun ProcessStateDiscoveryStartedScreen(discoveredEndpoints: List<TimerEn
 }
 
 @Composable
-private fun ProcessStatePartnerFoundScreen() {
+private fun ProcessStatePartnerFoundScreen(message: String) {
     Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Connecting to partner...")
+        Text(text = "Connecting to partner $message...")
     }
 }
 
 @Composable
-private fun ProcessStateConnectingScreen() {
+private fun ProcessStateConnectingScreen(message: String) {
     Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Connecting to partner...")
+        Text(text = "Connecting to partner $message...")
     }
 }
 
@@ -234,9 +236,11 @@ private fun ProcessStateCancelledScreen() {
 }
 
 @Composable
-private fun ProcessStateErrorScreen() {
+private fun ProcessStateErrorScreen(message: String) {
     Column(modifier = Modifier.fillMaxSize()) {
         Text(text = "Some error occurred. It may help to move away from this screen and try it all again.")
+        Spacer(modifier = Modifier.size(8.dp))
+        Text(text = message)
     }
 }
 
