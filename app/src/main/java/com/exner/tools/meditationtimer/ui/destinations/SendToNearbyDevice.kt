@@ -181,7 +181,7 @@ private fun ProcessStatePermissionsGrantedScreen() {
 @Composable
 private fun ProcessStateStartingDiscovery() {
     Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "All permissions OK, starting discovery...")
+        Text(text = "Starting discovery...")
     }
 }
 
