@@ -2,6 +2,7 @@ package com.exner.tools.meditationtimer.ui
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
 import com.exner.tools.meditationtimer.network.TimerEndpoint
 import com.exner.tools.meditationtimer.network.TimerEndpointDiscoveryCallback
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 enum class ProcessStateConstants {
@@ -81,18 +83,16 @@ data class ProcessState(
 
 @HiltViewModel
 class SendToNearbyDeviceViewModel @Inject constructor(
-    repository: MeditationTimerDataRepository,
+    private val repository: MeditationTimerDataRepository,
 ) : ViewModel() {
 
     private val _processStateFlow = MutableStateFlow(ProcessState())
     val processStateFlow: StateFlow<ProcessState> = _processStateFlow.asStateFlow()
 
+    val processList = repository.observeProcesses
+
     private lateinit var endpointDiscoveryCallback: TimerEndpointDiscoveryCallback
     private lateinit var connectionsClient: ConnectionsClient
-
-    fun provideDiscoveryCallback(endpointDiscoveryCallback: TimerEndpointDiscoveryCallback) {
-        this.endpointDiscoveryCallback = endpointDiscoveryCallback
-    }
 
     fun provideConnectionsClient(connectionsClient: ConnectionsClient) {
         this.connectionsClient = connectionsClient
@@ -217,14 +217,42 @@ class SendToNearbyDeviceViewModel @Inject constructor(
             }
 
             ProcessStateConstants.AWAITING_PERMISSIONS -> TODO()
-            ProcessStateConstants.CONNECTING -> TODO()
+
+            ProcessStateConstants.CONNECTING -> {
+                Log.d("SNDVM", "Connecting... $message")
+            }
+
             ProcessStateConstants.AUTHENTICATION_OK -> TODO()
             ProcessStateConstants.AUTHENTICATION_DENIED -> TODO()
-            ProcessStateConstants.CONNECTION_ESTABLISHED -> TODO()
+
+            ProcessStateConstants.CONNECTION_ESTABLISHED -> {
+                // Nothing to do
+            }
+
             ProcessStateConstants.CONNECTION_DENIED -> TODO()
-            ProcessStateConstants.SENDING -> TODO()
+
+            ProcessStateConstants.SENDING -> {
+                val uuid = message
+                Log.d("SNDVM", "Will try and send $uuid...")
+                viewModelScope.launch {
+                    val process = repository.loadProcessByUuid(uuid)
+                    if (process != null) {
+                        connectionsClient.sendPayload(
+                            endpointId,
+                            process.toPayload()
+                        )
+                        Log.d("SNDVM", "Payload presumably sent.")
+                        _processStateFlow.value = ProcessState(ProcessStateConstants.DONE, "OK")
+                    }
+                }
+            }
+
             ProcessStateConstants.DISCONNECTED -> TODO()
-            ProcessStateConstants.DONE -> TODO()
+
+            ProcessStateConstants.DONE -> {
+                // nothing to do here
+            }
+
             ProcessStateConstants.ERROR -> TODO()
         }
     }

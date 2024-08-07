@@ -3,6 +3,8 @@ package com.exner.tools.meditationtimer.data.persistence
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.android.gms.nearby.connection.Payload
+import kotlin.text.Charsets.UTF_8
 
 @Entity
 data class MeditationTimerProcess (
@@ -20,4 +22,8 @@ data class MeditationTimerProcess (
     @ColumnInfo(name = "category_id") val categoryId: Long?,
 
     @PrimaryKey(autoGenerate = true) val uid: Long = 0
-)
+) {
+    fun toPayload() = Payload.fromBytes(
+        "$name|$info|$uuid|$processTime|$intervalTime|$hasAutoChain|$gotoUuid|$gotoName|$categoryId|$uid".toByteArray(UTF_8)
+    )
+}
