@@ -79,17 +79,6 @@ data class ProcessState(
     val message: String = ""
 )
 
-// convenience function for all those invalid transitions
-fun invalidTransitionProcessState(
-    currentState: ProcessStateConstants,
-    newState: ProcessStateConstants
-): ProcessState {
-    return ProcessState(
-        ProcessStateConstants.ERROR,
-        "Invalid transition: ${currentState.name} > ${newState.name}"
-    )
-}
-
 @HiltViewModel
 class SendToNearbyDeviceViewModel @Inject constructor(
     repository: MeditationTimerDataRepository,
@@ -174,7 +163,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                     }
 
                     ProcessStateConstants.CANCELLED -> {
-                        _processStateFlow.value = ProcessState(newState, "Cancelled")
+                        cancel()
                     }
 
                     else -> {
@@ -241,8 +230,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                     }
 
                     ProcessStateConstants.CANCELLED -> {
-                        connectionsClient.stopDiscovery()
-                        _processStateFlow.value = ProcessState(newState, "Cancelled")
+                        cancel()
                     }
 
                     else -> {
@@ -263,8 +251,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                     }
 
                     ProcessStateConstants.CANCELLED -> {
-                        connectionsClient.stopDiscovery()
-                        _processStateFlow.value = ProcessState(newState, "Cancelled")
+                        cancel()
                     }
 
                     else -> {
@@ -298,9 +285,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                     }
 
                     ProcessStateConstants.CANCELLED -> {
-                        Log.d("SNDVM", "Cancelling discovery...")
-                        connectionsClient.stopDiscovery()
-                        _processStateFlow.value = ProcessState(newState, "Cancelled")
+                        cancel()
                     }
 
                     else -> {
@@ -335,8 +320,23 @@ class SendToNearbyDeviceViewModel @Inject constructor(
         }
     }
 
+    // convenience function for all those invalid transitions
+    private fun invalidTransitionProcessState(
+        currentState: ProcessStateConstants,
+        newState: ProcessStateConstants
+    ): ProcessState {
+        Log.d("SNDVM", "Invalid transition: ${currentState.name} > ${newState.name}")
+        return ProcessState(
+            ProcessStateConstants.ERROR,
+            "Invalid transition: ${currentState.name} > ${newState.name}"
+        )
+    }
+
     fun cancel() {
-        transitionToNewState(ProcessStateConstants.CANCELLED)
+        Log.d("SNDVM", "Cancelling discovery...")
+        connectionsClient.stopAllEndpoints()
+        connectionsClient.stopDiscovery()
+        _processStateFlow.value = ProcessState(ProcessStateConstants.CANCELLED, "Cancelled")
     }
 
 }
