@@ -60,12 +60,7 @@ fun SendToNearbyDevice(
 
     val permissionsNeeded =
         rememberMultiplePermissionsState(
-            permissions = permissions.allNecessaryPermissions,
-            onPermissionsResult = { resultsMap ->
-                resultsMap.forEach{ result ->
-                    Log.d("STND", "${result.key} : ${result.value}")
-                }
-            }
+            permissions = permissions.getAllNecessaryPermissionsAsListOfStrings()
         )
 
     val processState by sendToNearbyDeviceViewModel.processStateFlow.collectAsState()
@@ -82,7 +77,7 @@ fun SendToNearbyDevice(
     if (processState.currentState == ProcessStateConstants.AWAITING_PERMISSIONS && permissionsNeeded.allPermissionsGranted) {
         sendToNearbyDeviceViewModel.transitionToNewState(ProcessStateConstants.PERMISSIONS_GRANTED)
     } else if (processState.currentState == ProcessStateConstants.AWAITING_PERMISSIONS) {
-        Log.d("STND", "Missing permissions: ${permissionsNeeded.permissions}")
+        Log.d("STND", "Needed permissions: ${permissions.getAllNecessaryPermissionsAsListOfStrings()}")
     }
 
     Scaffold(
