@@ -3,7 +3,10 @@ package com.exner.tools.meditationtimer.network
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import androidx.core.content.ContextCompat
+
+private const val MINSDKVERSION = 28
 
 class Permissions(
     val context: Context
@@ -14,30 +17,30 @@ class Permissions(
         val maxSdkVersion: Int? = null
     )
 
-    val allNecessaryPermissions = listOf(
+    private val allNecessaryPermissions = listOf(
         IndividualPermission(
             name = "android.permission.ACCESS_WIFI_STATE",
-            minSdkVersion = 28,
-            maxSdkVersion = 31
+            minSdkVersion = MINSDKVERSION,
+            maxSdkVersion = 35
         ),
         IndividualPermission(
             name = "android.permission.CHANGE_WIFI_STATE",
-            minSdkVersion = 28,
-            maxSdkVersion = 31
+            minSdkVersion = MINSDKVERSION,
+            maxSdkVersion = 35
         ),
         IndividualPermission(
             name = "android.permission.BLUETOOTH",
-            minSdkVersion = 28,
+            minSdkVersion = MINSDKVERSION,
             maxSdkVersion = 30
         ),
         IndividualPermission(
             name = "android.permission.BLUETOOTH_ADMIN",
-            minSdkVersion = 28,
+            minSdkVersion = MINSDKVERSION,
             maxSdkVersion = 30
         ),
         IndividualPermission(
             name = "android.permission.ACCESS_COARSE_LOCATION",
-            minSdkVersion = 28,
+            minSdkVersion = MINSDKVERSION,
             maxSdkVersion = 28
         ),
         IndividualPermission(
@@ -76,6 +79,7 @@ class Permissions(
                 allNecessaryPermissionsAsListOfStrings.add(individualPermission.name)
                 val checkResult =
                     ContextCompat.checkSelfPermission(context, individualPermission.name)
+                Log.d("PERMISSIONS", "Permission ${individualPermission.name} is $checkResult")
                 if (checkResult == PackageManager.PERMISSION_DENIED) {
                     missingPermissions.add(individualPermission)
                 } else if (checkResult == PackageManager.PERMISSION_GRANTED) {
