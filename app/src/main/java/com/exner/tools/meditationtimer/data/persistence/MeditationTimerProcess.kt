@@ -21,15 +21,9 @@ data class MeditationTimerProcess (
 
     @ColumnInfo(name = "category_id") val categoryId: Long?,
 
-    @ColumnInfo(name = "background_uri") val backgroundUri : String?,
-
     @PrimaryKey(autoGenerate = true) val uid: Long = 0
 ) {
-    fun toPayload(): Payload {
-        val processTimeSeconds = processTime * 60
-        val intervalTimeSeconds = intervalTime * 60
-        return Payload.fromBytes(
-            "$name|$info|$uuid|$processTimeSeconds|$intervalTimeSeconds|$hasAutoChain|$gotoUuid|$gotoName|$categoryId|null|$uid".toByteArray(UTF_8)
-        )
-    }
+    fun toPayload() = Payload.fromBytes(
+        "$name|$info|$uuid|$processTime|$intervalTime|$hasAutoChain|$gotoUuid|$gotoName|$categoryId|$uid".toByteArray(UTF_8)
+    )
 }
