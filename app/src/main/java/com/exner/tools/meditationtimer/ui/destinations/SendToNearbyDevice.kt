@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
 import com.exner.tools.meditationtimer.network.Permissions
 import com.exner.tools.meditationtimer.network.TimerEndpoint
 import com.exner.tools.meditationtimer.ui.BodyText
@@ -68,6 +69,10 @@ fun SendToNearbyDevice(
     sendToNearbyDeviceViewModel.provideConnectionsClient(connectionsClient = connectionsClient)
 
     val discoveredEndpoints: List<TimerEndpoint> by sendToNearbyDeviceViewModel.endpointsFound.collectAsStateWithLifecycle(
+        initialValue = emptyList()
+    )
+    
+    val processes: List<MeditationTimerProcess> by sendToNearbyDeviceViewModel.processList.collectAsStateWithLifecycle(
         initialValue = emptyList()
     )
 
@@ -126,7 +131,13 @@ fun SendToNearbyDevice(
 
                     ProcessStateConstants.AUTHENTICATION_OK -> {}
                     ProcessStateConstants.AUTHENTICATION_DENIED -> {}
-                    ProcessStateConstants.CONNECTION_ESTABLISHED -> {}
+
+                    ProcessStateConstants.CONNECTION_ESTABLISHED -> {
+                        ProcessConnectionEstablished(processes) { uuid ->
+                            sendToNearbyDeviceViewModel.transitionToNewState(ProcessStateConstants.SENDING, uuid)
+                        }
+                    }
+
                     ProcessStateConstants.CONNECTION_DENIED -> {}
                     ProcessStateConstants.SENDING -> {}
                     ProcessStateConstants.DISCONNECTED -> {}
@@ -153,6 +164,31 @@ fun SendToNearbyDevice(
             )
         }
     )
+}
+
+@Composable
+fun ProcessConnectionEstablished(
+    processes: List<MeditationTimerProcess>,
+    onItemClick : (String) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier
+            .padding(PaddingValues(8.dp))
+            .fillMaxSize()
+    ) {
+        item {
+            Text(text = "Select a process to send it over")
+        }
+        items(processes) { process ->
+            Box(modifier = Modifier
+                .padding(PaddingValues(8.dp))
+                .clickable {
+                    onItemClick(process.uuid)
+                }) {
+                BodyText(text = process.name)
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
