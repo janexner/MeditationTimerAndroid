@@ -36,6 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
 import com.exner.tools.meditationtimer.network.Permissions
 import com.exner.tools.meditationtimer.network.TimerEndpoint
+import com.exner.tools.meditationtimer.network.TimerPayloadCallback
 import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.ProcessState
 import com.exner.tools.meditationtimer.ui.ProcessStateConstants
@@ -44,6 +45,12 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.nearby.Nearby
+import com.google.android.gms.nearby.connection.ConnectionInfo
+import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback
+import com.google.android.gms.nearby.connection.ConnectionResolution
+import com.google.android.gms.nearby.connection.ConnectionsStatusCodes
+import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo
+import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -67,6 +74,35 @@ fun SendToNearbyDevice(
 
     val connectionsClient = Nearby.getConnectionsClient(context)
     sendToNearbyDeviceViewModel.provideConnectionsClient(connectionsClient = connectionsClient)
+
+    val endpointDiscoveryCallback = object : EndpointDiscoveryCallback() {
+        override fun onEndpointFound(endpointId: String, endpointInfo: DiscoveredEndpointInfo) {
+            Log.d("TEDC", "On Endpoint Found... $endpointId / ${endpointInfo.endpointName}")
+
+            // An endpoint was found. We request a connection to it.
+            val endpoint = TimerEndpoint(endpointId, endpointInfo.endpointName)
+
+            connectionsClient.requestConnection(
+                endpoint.userName,
+                endpoint.endpointId,
+                sendToNearbyDeviceViewModel.timerLifecycleCallback
+            )
+                .addOnSuccessListener { _: Void? ->
+                    Log.d("TEDC", "Connection request succeeded!")
+                }
+                .addOnFailureListener { e: Exception? ->
+                    if (e != null) {
+                        Log.d("TEDC", "Connection failed: ${e.message}")
+                    }
+                }
+
+        }
+
+        override fun onEndpointLost(p0: String) {
+            Log.d("TEDC", "On Endpoint Lost... $p0")
+        }
+    }
+    sendToNearbyDeviceViewModel.provideEndpointDiscoveryCallback(endpointDiscoveryCallback)
 
     val discoveredEndpoints: List<TimerEndpoint> by sendToNearbyDeviceViewModel.endpointsFound.collectAsStateWithLifecycle(
         initialValue = emptyList()
