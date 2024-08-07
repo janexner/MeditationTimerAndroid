@@ -79,6 +79,17 @@ data class ProcessState(
     val message: String = ""
 )
 
+// convenience function for all those invalid transitions
+fun invalidTransitionProcessState(
+    currentState: ProcessStateConstants,
+    newState: ProcessStateConstants
+): ProcessState {
+    return ProcessState(
+        ProcessStateConstants.ERROR,
+        "Invalid transition: ${currentState.name} > ${newState.name}"
+    )
+}
+
 @HiltViewModel
 class SendToNearbyDeviceViewModel @Inject constructor(
     repository: MeditationTimerDataRepository,
@@ -109,7 +120,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
         }
     }
 
-    private val connectionLifecycleCallback = object: ConnectionLifecycleCallback() {
+    private val connectionLifecycleCallback = object : ConnectionLifecycleCallback() {
         override fun onConnectionInitiated(endpointId: String, connectionInfo: ConnectionInfo) {
             Log.d("SNDVMCLC", "onConnectionInitiated $endpointId: $connectionInfo")
             val endpoint = discoveredEndpoints.remove(endpointId)
@@ -117,7 +128,10 @@ class SendToNearbyDeviceViewModel @Inject constructor(
             transitionToNewState(ProcessStateConstants.CONNECTING, endpointId)
         }
 
-        override fun onConnectionResult(endpointId: String, connectionResolution: ConnectionResolution) {
+        override fun onConnectionResult(
+            endpointId: String,
+            connectionResolution: ConnectionResolution
+        ) {
             Log.d("SNDVMCLC", "onConnectionResult $endpointId: $connectionResolution")
             if (!connectionResolution.status.isSuccess) {
                 // failed
@@ -146,197 +160,117 @@ class SendToNearbyDeviceViewModel @Inject constructor(
         message: String = "OK"
     ) {
         // all the logic should be here
-        when (processStateFlow.value.currentState) {
-            ProcessStateConstants.AWAITING_PERMISSIONS -> {
-                // handled in the UI
-                when (newState) {
-                    ProcessStateConstants.PERMISSIONS_GRANTED -> {
-                        _processStateFlow.value = ProcessState(newState, "OK")
-                        transitionToNewState(
-                            newState = ProcessStateConstants.STARTING_DISCOVERY,
-                            message = "Automatically move to discovery..."
-                        )
-                    }
-
-                    ProcessStateConstants.PERMISSIONS_DENIED -> {
-                        _processStateFlow.value = ProcessState(newState, "Denied: $message")
-                    }
-
-                    ProcessStateConstants.CANCELLED -> {
-                        cancel()
-                    }
-
-                    else -> {
-                        _processStateFlow.value = invalidTransitionProcessState(
-                            currentState = processStateFlow.value.currentState,
-                            newState = newState
-                        )
-                    }
-                }
-            }
-
+        // DO NOT CALL RECURSIVELY!
+        when (newState) {
             ProcessStateConstants.PERMISSIONS_GRANTED -> {
-                // handled in the UI
-                when (newState) {
-                    ProcessStateConstants.STARTING_DISCOVERY -> {
-                        _processStateFlow.value = ProcessState(newState, "OK")
-                        // trigger the actual discovery
-                        val discoveryOptions =
-                            DiscoveryOptions.Builder().setStrategy(Strategy.P2P_POINT_TO_POINT)
-                                .build()
-                        connectionsClient.startDiscovery(
-                            endpointId,
-                            object : EndpointDiscoveryCallback() {
-                                override fun onEndpointFound(
-                                    endpointId: String,
-                                    endpointInfo: DiscoveredEndpointInfo
-                                ) {
-                                    Log.d(
-                                        "SNDVM/TEDC",
-                                        "OnEndpointFound... $endpointId / ${endpointInfo.endpointName}"
-                                    )
-                                    val discoveredEndpoint =
-                                        TimerEndpoint(endpointId, endpointInfo.endpointName)
-                                    discoveredEndpoints[endpointId] = discoveredEndpoint
-                                }
-
-                                override fun onEndpointLost(endpointId: String) {
-                                    Log.d("SNDVM/TEDC", "On Endpoint Lost... $endpointId")
-                                    discoveredEndpoints.remove(endpointId)
-                                }
-                            },
-                            discoveryOptions
-                        )
-                            .addOnSuccessListener { _ ->
-                                Log.d("SNDVM", "Success! Discovery started")
-                                transitionToNewState(ProcessStateConstants.DISCOVERY_STARTED)
-                            }
-                            .addOnFailureListener { e: Exception? ->
-                                val errorMessage = "Error discovering" + if (e != null) {
-                                    ": ${e.message}"
-                                } else {
-                                    ""
-                                }
-                                Log.d("SNDVM", errorMessage)
-                                transitionToNewState(
-                                    ProcessStateConstants.ERROR,
-                                    message = errorMessage
-                                )
-                            }
-                    }
-
-                    ProcessStateConstants.DISCOVERY_STARTED -> {
-                        _processStateFlow.value = ProcessState(newState, "Discovering...")
-                    }
-
-                    ProcessStateConstants.CANCELLED -> {
-                        cancel()
-                    }
-
-                    else -> {
-                        _processStateFlow.value = invalidTransitionProcessState(
-                            currentState = processStateFlow.value.currentState,
-                            newState = newState
-                        )
-                    }
-                }
+                _processStateFlow.value = ProcessState(newState, "OK")
+                Log.d("SNDVM", "Permissions OK, automatically starting discovery...")
+                _processStateFlow.value = ProcessState(
+                    ProcessStateConstants.STARTING_DISCOVERY,
+                    message = "Automatically moving to discovery..."
+                )
+                startDiscovery()
             }
 
+            ProcessStateConstants.PERMISSIONS_DENIED -> {
+                _processStateFlow.value = ProcessState(newState, "Denied: $message")
+            }
+
+            ProcessStateConstants.CANCELLED -> {
+                connectionsClient.stopAllEndpoints()
+                connectionsClient.stopDiscovery()
+                _processStateFlow.value = ProcessState(newState, "Cancelled")
+            }
+
+            // not sure I need this anymore
             ProcessStateConstants.STARTING_DISCOVERY -> {
-                // handled in the UI
-                when (newState) {
-                    ProcessStateConstants.DISCOVERY_STARTED -> {
-                        Log.d("SNDVM", "Discovery started...")
-                        _processStateFlow.value = ProcessState(newState, "OK")
-                    }
-
-                    ProcessStateConstants.CANCELLED -> {
-                        cancel()
-                    }
-
-                    else -> {
-                        _processStateFlow.value = invalidTransitionProcessState(
-                            currentState = processStateFlow.value.currentState,
-                            newState = newState
-                        )
-                    }
-                }
+                _processStateFlow.value = ProcessState(newState, "OK")
+                // trigger the actual discovery
+                startDiscovery()
             }
 
-            ProcessStateConstants.PERMISSIONS_DENIED -> TODO()
             ProcessStateConstants.DISCOVERY_STARTED -> {
-                // not sure what to do here...
-                when (newState) {
-                    ProcessStateConstants.PARTNER_CHOSEN -> {
-                        Log.d("SNDVM", "Chose partner: $message.")
-                        // stop discovery, bcs
-                        connectionsClient.stopDiscovery()
-                        // this is where we build an endpoint and initiate connection
-                        val endpointId = message // probably should check that!
-                        // find endpoint in discoveredEndpoints
-                        val endpoint = discoveredEndpoints.get(endpointId)
-                        if (endpoint != null) {
-                            // initiate connection
-                            connectionsClient.requestConnection("Phone", endpoint.endpointId, connectionLifecycleCallback)
-                            // if that doesn't work, we go back to discovery
-                            // TODO
-                            _processStateFlow.value = ProcessState(newState, "OK")
-                        }
-                    }
-
-                    ProcessStateConstants.CANCELLED -> {
-                        cancel()
-                    }
-
-                    else -> {
-                        _processStateFlow.value = invalidTransitionProcessState(
-                            currentState = processStateFlow.value.currentState,
-                            newState = newState
-                        )
-                    }
-                }
+                Log.d("SNDVM", "Discovery started...")
+                _processStateFlow.value = ProcessState(newState, "OK")
             }
 
             ProcessStateConstants.PARTNER_CHOSEN -> {
-                Log.d("SNDVM", "Found device...")
-                // trigger authentication on both devices
-                // TODO
+                Log.d("SNDVM", "Chose partner: $message.")
+                // stop discovery, bcs
+                connectionsClient.stopDiscovery()
+                // this is where we build an endpoint and initiate connection
+                val endpointId = message // probably should check that!
+                // find endpoint in discoveredEndpoints
+                val endpoint = discoveredEndpoints.get(endpointId)
+                if (endpoint != null) {
+                    // initiate connection
+                    connectionsClient.requestConnection(
+                        "Phone",
+                        endpoint.endpointId,
+                        connectionLifecycleCallback
+                    )
+                    // if that doesn't work, we go back to discovery
+                    // TODO
+                    _processStateFlow.value = ProcessState(newState, "OK")
+                }
             }
 
-            ProcessStateConstants.CONNECTING -> {
-                Log.d("SNDVM", "Connecting to device")
-                // TODO
-            }
-
+            ProcessStateConstants.AWAITING_PERMISSIONS -> TODO()
+            ProcessStateConstants.CONNECTING -> TODO()
             ProcessStateConstants.AUTHENTICATION_OK -> TODO()
             ProcessStateConstants.AUTHENTICATION_DENIED -> TODO()
             ProcessStateConstants.CONNECTION_ESTABLISHED -> TODO()
             ProcessStateConstants.CONNECTION_DENIED -> TODO()
             ProcessStateConstants.SENDING -> TODO()
             ProcessStateConstants.DISCONNECTED -> TODO()
-            ProcessStateConstants.DONE, ProcessStateConstants.CANCELLED, ProcessStateConstants.ERROR -> {
-                // don't think there is anything to do here
-            }
+            ProcessStateConstants.DONE -> TODO()
+            ProcessStateConstants.ERROR -> TODO()
         }
     }
 
-    // convenience function for all those invalid transitions
-    private fun invalidTransitionProcessState(
-        currentState: ProcessStateConstants,
-        newState: ProcessStateConstants
-    ): ProcessState {
-        Log.d("SNDVM", "Invalid transition: ${currentState.name} > ${newState.name}")
-        return ProcessState(
-            ProcessStateConstants.ERROR,
-            "Invalid transition: ${currentState.name} > ${newState.name}"
-        )
-    }
+    private fun startDiscovery() {
+        val discoveryOptions =
+            DiscoveryOptions.Builder().setStrategy(Strategy.P2P_POINT_TO_POINT)
+                .build()
+        connectionsClient.startDiscovery(
+            endpointId,
+            object : EndpointDiscoveryCallback() {
+                override fun onEndpointFound(
+                    endpointId: String,
+                    endpointInfo: DiscoveredEndpointInfo
+                ) {
+                    Log.d(
+                        "SNDVM/TEDC",
+                        "OnEndpointFound... $endpointId / ${endpointInfo.endpointName}"
+                    )
+                    val discoveredEndpoint =
+                        TimerEndpoint(endpointId, endpointInfo.endpointName)
+                    discoveredEndpoints[endpointId] = discoveredEndpoint
+                }
 
-    fun cancel() {
-        Log.d("SNDVM", "Cancelling discovery...")
-        connectionsClient.stopAllEndpoints()
-        connectionsClient.stopDiscovery()
-        _processStateFlow.value = ProcessState(ProcessStateConstants.CANCELLED, "Cancelled")
+                override fun onEndpointLost(endpointId: String) {
+                    Log.d("SNDVM/TEDC", "On Endpoint Lost... $endpointId")
+                    discoveredEndpoints.remove(endpointId)
+                }
+            },
+            discoveryOptions
+        )
+            .addOnSuccessListener { _ ->
+                Log.d("SNDVM", "Success! Discovery started")
+                transitionToNewState(ProcessStateConstants.DISCOVERY_STARTED)
+            }
+            .addOnFailureListener { e: Exception? ->
+                val errorMessage = "Error discovering" + if (e != null) {
+                    ": ${e.message}"
+                } else {
+                    ""
+                }
+                Log.d("SNDVM", errorMessage)
+                transitionToNewState(
+                    ProcessStateConstants.ERROR,
+                    message = errorMessage
+                )
+            }
     }
 
 }
