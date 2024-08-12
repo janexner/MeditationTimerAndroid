@@ -382,6 +382,17 @@ fun SendToNearbyBottomBar(
                         elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
                     )
                 }
+                ProcessStateConstants.CONNECTION_ESTABLISHED -> {
+                    ExtendedFloatingActionButton(
+                        text = { Text(text = "Done") },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "Done"
+                            )
+                        },
+                        onClick = { /*TODO*/ })
+                }
                 else -> {
                     ExtendedFloatingActionButton(
                         text = { Text(text = "Cancel") },
