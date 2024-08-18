@@ -13,6 +13,9 @@ import com.google.android.gms.nearby.connection.ConnectionsClient
 import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo
 import com.google.android.gms.nearby.connection.DiscoveryOptions
 import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback
+import com.google.android.gms.nearby.connection.Payload
+import com.google.android.gms.nearby.connection.PayloadCallback
+import com.google.android.gms.nearby.connection.PayloadTransferUpdate
 import com.google.android.gms.nearby.connection.Strategy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -93,6 +96,15 @@ class SendToNearbyDeviceViewModel @Inject constructor(
 
     private lateinit var endpointDiscoveryCallback: EndpointDiscoveryCallback
     private lateinit var connectionsClient: ConnectionsClient
+    val payloadCallback = object : PayloadCallback() {
+        override fun onPayloadReceived(p0: String, p1: Payload) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onPayloadTransferUpdate(p0: String, p1: PayloadTransferUpdate) {
+            TODO("Not yet implemented")
+        }
+    }
     val timerLifecycleCallback = object : ConnectionLifecycleCallback() {
         override fun onConnectionInitiated(
             endpointId: String,
@@ -105,6 +117,8 @@ class SendToNearbyDeviceViewModel @Inject constructor(
             val newEndpoint = discoveredEndpoints.remove(endpointId)
             pendingConnections[endpointId] = newEndpoint!! // TODO
             _processStateFlow.value = ProcessState(ProcessStateConstants.CONNECTING, endpointId)
+            Log.d("SNDVMCLC", "Now accepting the connection...")
+            connectionsClient.acceptConnection(endpointId, payloadCallback)
         }
 
         override fun onConnectionResult(
