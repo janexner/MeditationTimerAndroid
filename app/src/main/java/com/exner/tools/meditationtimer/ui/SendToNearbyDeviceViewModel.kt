@@ -262,7 +262,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                             process.toPayload()
                         )
                         Log.d("SNDVM", "Payload presumably sent.")
-                        _processStateFlow.value = ProcessState(ProcessStateConstants.DONE, "OK")
+                        _processStateFlow.value = ProcessState(ProcessStateConstants.CONNECTION_ESTABLISHED, "OK")
                     }
                 }
             }
