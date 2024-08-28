@@ -97,12 +97,12 @@ class SendToNearbyDeviceViewModel @Inject constructor(
     private lateinit var endpointDiscoveryCallback: EndpointDiscoveryCallback
     private lateinit var connectionsClient: ConnectionsClient
     val payloadCallback = object : PayloadCallback() {
-        override fun onPayloadReceived(p0: String, p1: Payload) {
-            TODO("Not yet implemented")
+        override fun onPayloadReceived(endpointId: String, payload: Payload) {
+            Log.d("SNDVMPTU", "Payload received ${payload.id}")
         }
 
-        override fun onPayloadTransferUpdate(p0: String, p1: PayloadTransferUpdate) {
-            TODO("Not yet implemented")
+        override fun onPayloadTransferUpdate(endpointId: String, update: PayloadTransferUpdate) {
+            Log.d("SNDVMPTU", "Payload Transfer Update: ${update.status}")
         }
     }
     val timerLifecycleCallback = object : ConnectionLifecycleCallback() {
@@ -175,6 +175,12 @@ class SendToNearbyDeviceViewModel @Inject constructor(
             emit(discoveredEndpoints.values.toList());
             delay(checkInterval)
         }
+    }
+
+    override fun onCleared() {
+        connectionsClient.stopDiscovery()
+        connectionsClient.stopAllEndpoints()
+        super.onCleared()
     }
 
     fun transitionToNewState(
@@ -257,23 +263,30 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                 viewModelScope.launch {
                     val process = repository.loadProcessByUuid(uuid)
                     if (process != null) {
-                        connectionsClient.sendPayload(
-                            endpointId,
-                            process.toPayload()
-                        )
-                        Log.d("SNDVM", "Payload presumably sent.")
+                        establishedConnections.forEach{ connection ->
+                            Log.d("SNDVM", "Sending payload to endpoint ${connection.value.endpointId}...")
+                            connectionsClient.sendPayload(
+                                connection.value.endpointId,
+                                process.toPayload()
+                            )
+                            Log.d("SNDVM", "Payload presumably sent.")
+                        }
                         _processStateFlow.value = ProcessState(ProcessStateConstants.CONNECTION_ESTABLISHED, "OK")
                     }
                 }
             }
 
-            ProcessStateConstants.DISCONNECTED -> TODO()
+            ProcessStateConstants.DISCONNECTED -> {
+                Log.d("SNDVM", "Disconnected")
+            }
 
             ProcessStateConstants.DONE -> {
                 // nothing to do here
             }
 
-            ProcessStateConstants.ERROR -> TODO()
+            ProcessStateConstants.ERROR -> {
+                Log.d("SNDVM", "Error!")
+            }
         }
     }
 
