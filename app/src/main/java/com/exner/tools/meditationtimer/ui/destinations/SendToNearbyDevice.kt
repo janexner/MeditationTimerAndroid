@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.BottomAppBar
@@ -195,6 +197,7 @@ fun SendToNearbyDevice(
         },
         bottomBar = {
             SendToNearbyBottomBar(
+                navigator = navigator,
                 processState = processState,
                 transition = sendToNearbyDeviceViewModel::transitionToNewState
             )
@@ -318,6 +321,7 @@ private fun ProcessStateErrorScreen(message: String) {
 
 @Composable
 fun SendToNearbyBottomBar(
+    navigator: DestinationsNavigator,
     processState: ProcessState,
     transition: (ProcessStateConstants, String) -> Unit
 ) {
@@ -391,7 +395,22 @@ fun SendToNearbyBottomBar(
                                 contentDescription = "Done"
                             )
                         },
-                        onClick = { /*TODO*/ })
+                        onClick = {
+                            transition(ProcessStateConstants.DONE, "Done")
+                        })
+                }
+                ProcessStateConstants.DONE, ProcessStateConstants.CANCELLED -> {
+                    ExtendedFloatingActionButton(
+                        text = { Text(text = "Go back") },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
+                        },
+                        onClick = {
+                            navigator.navigateUp()
+                        })
                 }
                 else -> {
                     ExtendedFloatingActionButton(
