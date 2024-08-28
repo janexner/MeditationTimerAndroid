@@ -281,7 +281,10 @@ class SendToNearbyDeviceViewModel @Inject constructor(
             }
 
             ProcessStateConstants.DONE -> {
-                // nothing to do here
+                Log.d("SNDVM", "Done. Disconnecting everything...")
+                connectionsClient.stopAllEndpoints()
+                connectionsClient.stopDiscovery()
+                _processStateFlow.value = ProcessState(newState, "Done")
             }
 
             ProcessStateConstants.ERROR -> {
