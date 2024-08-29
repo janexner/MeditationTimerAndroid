@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
 import com.exner.tools.meditationtimer.network.TimerEndpoint
-import com.exner.tools.meditationtimer.network.TimerPayloadCallback
 import com.google.android.gms.nearby.connection.ConnectionInfo
 import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback
 import com.google.android.gms.nearby.connection.ConnectionResolution
@@ -245,7 +244,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
 
             ProcessStateConstants.CONNECTING -> {
                 Log.d("SNDVM", "Accepting connection... $message")
-                connectionsClient.acceptConnection(message, TimerPayloadCallback())
+                connectionsClient.acceptConnection(message, payloadCallback)
             }
 
             ProcessStateConstants.AUTHENTICATION_OK -> TODO()

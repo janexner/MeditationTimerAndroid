@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -122,12 +123,13 @@ private fun MeditationTimerTopBar(
                 )
                 DropdownMenuItem(
                     enabled = destination != SendToNearbyDeviceDestination,
-                    text = { Text(text = "Send processes to nearby device") },
+                    text = { Text(text = "Share to nearby device") },
                     onClick = {
                         displayMainMenu = false
                         navController.navigate(SendToNearbyDeviceDestination)
                     }
                 )
+                HorizontalDivider()
                 DropdownMenuItem(
                     enabled = destination != AboutDestination,
                     text = { Text(text = "About Meditation Timer") },
