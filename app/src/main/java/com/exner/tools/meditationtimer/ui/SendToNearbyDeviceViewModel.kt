@@ -34,12 +34,12 @@ enum class ProcessStateConstants {
     DISCOVERY_STARTED,
     PARTNER_CHOSEN,
     CONNECTING,
+    AUTHENTICATION_REQUESTED,
     AUTHENTICATION_OK,
     AUTHENTICATION_DENIED,
     CONNECTION_ESTABLISHED,
     CONNECTION_DENIED,
     SENDING,
-    DISCONNECTED,
     DONE,
     CANCELLED,
     ERROR
@@ -95,6 +95,9 @@ class SendToNearbyDeviceViewModel @Inject constructor(
 
     private lateinit var endpointDiscoveryCallback: EndpointDiscoveryCallback
     private lateinit var connectionsClient: ConnectionsClient
+
+    // TODO create object for auth that holds endpointId and connectionInfo
+
     val payloadCallback = object : PayloadCallback() {
         override fun onPayloadReceived(endpointId: String, payload: Payload) {
             Log.d("SNDVMPTU", "Payload received ${payload.id}")
@@ -104,6 +107,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
             Log.d("SNDVMPTU", "Payload Transfer Update: ${update.status}")
         }
     }
+
     val timerLifecycleCallback = object : ConnectionLifecycleCallback() {
         override fun onConnectionInitiated(
             endpointId: String,
@@ -113,11 +117,15 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                 "SNDVMCLC",
                 "onConnectionInitiated ${connectionInfo.endpointName} / ${connectionInfo.authenticationDigits}"
             )
-            val newEndpoint = discoveredEndpoints.remove(endpointId)
-            pendingConnections[endpointId] = newEndpoint!! // TODO
-            _processStateFlow.value = ProcessState(ProcessStateConstants.CONNECTING, endpointId)
-            Log.d("SNDVMCLC", "Now accepting the connection...")
-            connectionsClient.acceptConnection(endpointId, payloadCallback)
+            // authenticate
+            // TODO set object that holds endpointId and connectionInfo, then set state
+
+            // this will be moved TODO
+//            val newEndpoint = discoveredEndpoints.remove(endpointId)
+//            pendingConnections[endpointId] = newEndpoint!! // TODO
+//            _processStateFlow.value = ProcessState(ProcessStateConstants.CONNECTING, endpointId)
+//            Log.d("SNDVMCLC", "Now accepting the connection...")
+//            connectionsClient.acceptConnection(endpointId, payloadCallback)
         }
 
         override fun onConnectionResult(
@@ -152,7 +160,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
 
         override fun onDisconnected(endpointId: String) {
             establishedConnections.remove(endpointId)
-            _processStateFlow.value = ProcessState(ProcessStateConstants.DISCONNECTED, "OK")
+            _processStateFlow.value = ProcessState(ProcessStateConstants.DONE, "Disconnected")
         }
 
 
@@ -189,6 +197,11 @@ class SendToNearbyDeviceViewModel @Inject constructor(
         // all the logic should be here
         // DO NOT CALL RECURSIVELY!
         when (newState) {
+            ProcessStateConstants.AUTHENTICATION_REQUESTED -> {
+                _processStateFlow.value = ProcessState(newState, "Auth requested")
+                Log.d("SNDVM", "Authentication requested...")
+            }
+
             ProcessStateConstants.PERMISSIONS_GRANTED -> {
                 _processStateFlow.value = ProcessState(newState, "OK")
                 Log.d("SNDVM", "Permissions OK, automatically starting discovery...")
@@ -204,6 +217,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
             }
 
             ProcessStateConstants.CANCELLED -> {
+                Log.d("SNDVM", "Cancelled. Disconnecting everything...")
                 connectionsClient.stopAllEndpoints()
                 connectionsClient.stopDiscovery()
                 _processStateFlow.value = ProcessState(newState, "Cancelled")
@@ -273,10 +287,6 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                         _processStateFlow.value = ProcessState(ProcessStateConstants.CONNECTION_ESTABLISHED, "OK")
                     }
                 }
-            }
-
-            ProcessStateConstants.DISCONNECTED -> {
-                Log.d("SNDVM", "Disconnected")
             }
 
             ProcessStateConstants.DONE -> {
