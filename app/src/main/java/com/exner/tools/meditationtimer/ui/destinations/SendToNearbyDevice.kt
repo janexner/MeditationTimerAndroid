@@ -1,5 +1,8 @@
 package com.exner.tools.meditationtimer.ui.destinations
 
+import android.R
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -94,8 +97,8 @@ fun SendToNearbyDevice(
 
         }
 
-        override fun onEndpointLost(p0: String) {
-            Log.d("TEDC", "On Endpoint Lost... $p0")
+        override fun onEndpointLost(endpointId: String) {
+            Log.d("TEDC", "On Endpoint Lost... $endpointId")
         }
     }
     sendToNearbyDeviceViewModel.provideEndpointDiscoveryCallback(endpointDiscoveryCallback)
@@ -108,12 +111,16 @@ fun SendToNearbyDevice(
         initialValue = emptyList()
     )
 
+
+    fun popUpAuthenticalionDialog() : Boolean {
+        return false
+    }
+
     // some sanity checking for state
-    Log.d("STND", "All permissions granted: ${permissionsNeeded.allPermissionsGranted}")
     if (processState.currentState == ProcessStateConstants.AWAITING_PERMISSIONS && permissionsNeeded.allPermissionsGranted) {
         sendToNearbyDeviceViewModel.transitionToNewState(ProcessStateConstants.PERMISSIONS_GRANTED)
     } else if (processState.currentState == ProcessStateConstants.AWAITING_PERMISSIONS) {
-        Log.d("STND", "Needed permissions: ${permissions.getAllNecessaryPermissionsAsListOfStrings()}")
+        Log.d("STND", "Missing permissions: ${permissions.getAllNecessaryPermissionsAsListOfStrings()}")
     }
 
     Scaffold(
@@ -125,10 +132,6 @@ fun SendToNearbyDevice(
                     .padding(8.dp)
                     .fillMaxSize()
             ) {
-                Spacer(modifier = Modifier.size(16.dp))
-                Text(text = "Now at ${processState.currentState.name}")
-                Spacer(modifier = Modifier.size(16.dp))
-
                 // UI, depending on state
                 when (processState.currentState) {
                     ProcessStateConstants.AWAITING_PERMISSIONS -> {
@@ -161,6 +164,7 @@ fun SendToNearbyDevice(
                         ProcessStateConnectingScreen(processState.message)
                     }
 
+                    ProcessStateConstants.AUTHENTICATION_REQUESTED -> {}
                     ProcessStateConstants.AUTHENTICATION_OK -> {}
                     ProcessStateConstants.AUTHENTICATION_DENIED -> {}
 
@@ -172,7 +176,6 @@ fun SendToNearbyDevice(
 
                     ProcessStateConstants.CONNECTION_DENIED -> {}
                     ProcessStateConstants.SENDING -> {}
-                    ProcessStateConstants.DISCONNECTED -> {}
 
                     ProcessStateConstants.DONE -> {
                         ProcessStateDoneScreen()
@@ -209,6 +212,9 @@ fun ProcessConnectionEstablished(
             .padding(PaddingValues(8.dp))
             .fillMaxSize()
     ) {
+        item {
+            Text(text = "Connected to ")
+        }
         item {
             Text(text = "Select a process to send it over")
         }
@@ -280,6 +286,24 @@ private fun ProcessStateDiscoveryStartedScreen(discoveredEndpoints: List<TimerEn
 private fun ProcessStatePartnerFoundScreen(message: String) {
     Column(modifier = Modifier.fillMaxSize()) {
         Text(text = "Connecting to partner $message...")
+//        if (showAuthenticationAlert) {
+//            AlertDialog.Builder(context)
+//                .setTitle("Accept connection to " + info.getEndpointName())
+//                .setMessage("Confirm the code matches on both devices: " + info.getAuthenticationDigits())
+//                .setPositiveButton(
+//                    "Accept"
+//                ) { dialog: DialogInterface?, which: Int ->  // The user confirmed, so we can accept the connection.
+//                    Nearby.getConnectionsClient(context)
+//                        .acceptConnection(endpointId, payloadCallback)
+//                }
+//                .setNegativeButton(
+//                    R.string.cancel
+//                ) { dialog: DialogInterface?, which: Int ->  // The user canceled, so we should reject the connection.
+//                    Nearby.getConnectionsClient(context).rejectConnection(endpointId)
+//                }
+//                .setIcon(R.drawable.ic_dialog_alert)
+//                .show()
+//        }
     }
 }
 
