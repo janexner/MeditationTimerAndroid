@@ -75,12 +75,17 @@ enum class ProcessStateConstants {
  */
 
 const val endpointId: String = "com.exner.tools.activitytimerfortv"
-const val userName: String = "Anonymous"
+const val userName: String = "Timer"
 const val checkInterval: Long = 500 // this should be milliseconds
 
 data class ProcessState(
     val currentState: ProcessStateConstants = ProcessStateConstants.AWAITING_PERMISSIONS,
     val message: String = ""
+)
+
+data class EndpointConnectionInformation(
+    val endpointId: String = "",
+    val connectionInfo: ConnectionInfo = ConnectionInfo("", "", false)
 )
 
 @HiltViewModel
@@ -92,6 +97,9 @@ class SendToNearbyDeviceViewModel @Inject constructor(
     val processStateFlow: StateFlow<ProcessState> = _processStateFlow.asStateFlow()
 
     val processList = repository.observeProcesses
+
+    private val _connectionInfo = MutableStateFlow(EndpointConnectionInformation())
+    val connectionInfo: StateFlow<EndpointConnectionInformation> = _connectionInfo
 
     private lateinit var endpointDiscoveryCallback: EndpointDiscoveryCallback
     private lateinit var connectionsClient: ConnectionsClient
@@ -118,14 +126,14 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                 "onConnectionInitiated ${connectionInfo.endpointName} / ${connectionInfo.authenticationDigits}"
             )
             // authenticate
-            // TODO set object that holds endpointId and connectionInfo, then set state
-
-            // this will be moved TODO
-//            val newEndpoint = discoveredEndpoints.remove(endpointId)
-//            pendingConnections[endpointId] = newEndpoint!! // TODO
-//            _processStateFlow.value = ProcessState(ProcessStateConstants.CONNECTING, endpointId)
-//            Log.d("SNDVMCLC", "Now accepting the connection...")
-//            connectionsClient.acceptConnection(endpointId, payloadCallback)
+            _connectionInfo.value = EndpointConnectionInformation(
+                endpointId = endpointId,
+                connectionInfo = connectionInfo
+            )
+            // now move to auth requested
+            _processStateFlow.value = ProcessState(ProcessStateConstants.AUTHENTICATION_REQUESTED,
+                connectionInfo.endpointName
+            )
         }
 
         override fun onConnectionResult(
@@ -261,8 +269,17 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                 connectionsClient.acceptConnection(message, payloadCallback)
             }
 
-            ProcessStateConstants.AUTHENTICATION_OK -> TODO()
-            ProcessStateConstants.AUTHENTICATION_DENIED -> TODO()
+            ProcessStateConstants.AUTHENTICATION_OK -> {
+                val newEndpoint = discoveredEndpoints.remove(connectionInfo.value.endpointId)
+                pendingConnections[connectionInfo.value.endpointId] = newEndpoint!! // TODO
+                _processStateFlow.value = ProcessState(ProcessStateConstants.CONNECTING, connectionInfo.value.endpointId)
+                Log.d("SNDVM", "Now accepting the connection...")
+                connectionsClient.acceptConnection(connectionInfo.value.endpointId, payloadCallback)
+            }
+            ProcessStateConstants.AUTHENTICATION_DENIED -> {
+                Log.d("SNDVM", "Connection denied!")
+                _processStateFlow.value = ProcessState(ProcessStateConstants.DISCOVERY_STARTED, "Connection denied")
+            }
 
             ProcessStateConstants.CONNECTION_ESTABLISHED -> {
                 // Nothing to do
