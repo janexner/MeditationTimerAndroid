@@ -1,8 +1,5 @@
 package com.exner.tools.meditationtimer.ui.destinations
 
-import android.R
-import android.app.AlertDialog
-import android.content.DialogInterface
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,6 +16,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Button
@@ -28,9 +27,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +43,7 @@ import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
 import com.exner.tools.meditationtimer.network.Permissions
 import com.exner.tools.meditationtimer.network.TimerEndpoint
 import com.exner.tools.meditationtimer.ui.BodyText
+import com.exner.tools.meditationtimer.ui.EndpointConnectionInformation
 import com.exner.tools.meditationtimer.ui.ProcessState
 import com.exner.tools.meditationtimer.ui.ProcessStateConstants
 import com.exner.tools.meditationtimer.ui.SendToNearbyDeviceViewModel
@@ -111,10 +114,8 @@ fun SendToNearbyDevice(
         initialValue = emptyList()
     )
 
-
-    fun popUpAuthenticalionDialog() : Boolean {
-        return false
-    }
+    val openAuthenticationDialog = remember { mutableStateOf(false) }
+    val connectionInfo by sendToNearbyDeviceViewModel.connectionInfo.collectAsState()
 
     // some sanity checking for state
     if (processState.currentState == ProcessStateConstants.AWAITING_PERMISSIONS && permissionsNeeded.allPermissionsGranted) {
@@ -164,7 +165,21 @@ fun SendToNearbyDevice(
                         ProcessStateConnectingScreen(processState.message)
                     }
 
-                    ProcessStateConstants.AUTHENTICATION_REQUESTED -> {}
+                    ProcessStateConstants.AUTHENTICATION_REQUESTED -> {
+                        openAuthenticationDialog.value = true
+                        ProcessStateAuthenticationRequestedScreen(
+                            openAuthenticationDialog = openAuthenticationDialog.value,
+                            info = connectionInfo,
+                            confirmCallback = {
+                                openAuthenticationDialog.value = false
+                                sendToNearbyDeviceViewModel.transitionToNewState(ProcessStateConstants.AUTHENTICATION_OK, "Accepted")
+                            },
+                            dismissCallback = {
+                                openAuthenticationDialog.value = false
+                                sendToNearbyDeviceViewModel.transitionToNewState(ProcessStateConstants.AUTHENTICATION_DENIED, "Denied")
+                            }
+                        )
+                    }
                     ProcessStateConstants.AUTHENTICATION_OK -> {}
                     ProcessStateConstants.AUTHENTICATION_DENIED -> {}
 
@@ -200,6 +215,29 @@ fun SendToNearbyDevice(
             )
         }
     )
+}
+
+@Composable
+fun ProcessStateAuthenticationRequestedScreen(
+    openAuthenticationDialog: Boolean,
+    info: EndpointConnectionInformation,
+    confirmCallback: () -> Unit,
+    dismissCallback: () -> Unit
+) {
+    if (openAuthenticationDialog) {
+        AlertDialog(
+            title = { Text(text = "Accept connection to " + info.connectionInfo.endpointName) },
+            text = { Text(text = "Confirm the code matches on both devices: " + info.connectionInfo.authenticationDigits) },
+            icon = { Icon(imageVector = Icons.Default.Warning, contentDescription = "Alert") },
+            onDismissRequest = { dismissCallback() },
+            confirmButton = { TextButton(onClick = { confirmCallback() }) {
+                Text(text = "Accept")
+            } },
+            dismissButton = { TextButton(onClick = { dismissCallback() }) {
+                Text(text = "Decline")
+            } }
+        )
+    }
 }
 
 @Composable
