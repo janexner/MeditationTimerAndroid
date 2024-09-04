@@ -74,7 +74,7 @@ enum class ProcessStateConstants {
  *
  */
 
-const val endpointId: String = "com.exner.tools.activitytimerfortv"
+const val endpointId: String = "com.exner.tools.timers"
 const val userName: String = "Timer"
 const val checkInterval: Long = 500 // this should be milliseconds
 
@@ -255,7 +255,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                 if (endpoint != null) {
                     // initiate connection
                     connectionsClient.requestConnection(
-                        "Phone",
+                        userName,
                         endpoint.endpointId,
                         timerLifecycleCallback
                     )
