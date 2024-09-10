@@ -44,10 +44,11 @@ import com.exner.tools.meditationtimer.ui.SettingsViewModel
 import com.exner.tools.meditationtimer.ui.TextAndSwitch
 import com.exner.tools.meditationtimer.ui.TextFieldForTimes
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination
+@Destination<RootGraph>
 @Composable
 fun ProcessEdit(
     processUuid: String?,
