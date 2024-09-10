@@ -48,12 +48,13 @@ import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCa
 import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.CategoryListViewModel
 import com.exner.tools.meditationtimer.ui.HeaderText
-import com.exner.tools.meditationtimer.ui.destinations.destinations.CategoryBulkDeleteDestination
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.CategoryBulkDeleteDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination
+@Destination<RootGraph>
 @Composable
 fun CategoryList(
     categoryListViewModel: CategoryListViewModel = hiltViewModel(),

@@ -37,9 +37,10 @@ import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.CategoryListViewModel
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination
+@Destination<RootGraph>
 @Composable
 fun CategoryBulkDelete(
     categoryListViewModel: CategoryListViewModel = hiltViewModel(),
