@@ -31,8 +31,9 @@ import androidx.core.content.ContextCompat.startActivity
 import com.exner.tools.meditationtimer.BuildConfig
 import com.exner.tools.meditationtimer.ui.theme.MeditationTimerTheme
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
 
-@Destination
+@Destination<RootGraph>
 @Composable
 fun About() {
 

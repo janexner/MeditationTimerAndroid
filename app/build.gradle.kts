@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.exner.tools.meditationtimer"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.exner.tools.meditationtimer"
@@ -39,7 +39,7 @@ android {
         compose = true
         buildConfig = true
     }
-    buildToolsVersion = "34.0.0"
+    buildToolsVersion = "35.0.0"
 
     applicationVariants.all {
         val variant = this

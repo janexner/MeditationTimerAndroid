@@ -19,8 +19,9 @@ import com.exner.tools.meditationtimer.ui.TextAndTriStateToggle
 import com.exner.tools.meditationtimer.ui.theme.MeditationTimerTheme
 import com.exner.tools.meditationtimer.ui.theme.Theme
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
 
-@Destination
+@Destination<RootGraph>
 @Composable
 fun Settings(
     settingsViewModel: SettingsViewModel = hiltViewModel()
