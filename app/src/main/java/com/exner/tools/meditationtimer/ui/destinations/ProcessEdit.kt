@@ -22,6 +22,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -137,7 +138,7 @@ fun ProcessEdit(
                         TextField(
                             // The `menuAnchor` modifier must be passed to the text field for correctness.
                             modifier = Modifier
-                                .menuAnchor()
+                                .menuAnchor(type = MenuAnchorType.PrimaryEditable, enabled = true)
                                 .fillMaxWidth()
                                 .padding(8.dp),
                             readOnly = true,
@@ -214,7 +215,7 @@ fun ProcessEdit(
                             TextField(
                                 // The `menuAnchor` modifier must be passed to the text field for correctness.
                                 modifier = Modifier
-                                    .menuAnchor()
+                                    .menuAnchor(type = MenuAnchorType.PrimaryEditable, enabled = true)
                                     .fillMaxWidth()
                                     .padding(8.dp),
                                 readOnly = true,
