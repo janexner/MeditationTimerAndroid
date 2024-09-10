@@ -54,11 +54,12 @@ import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo
 import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 
 @OptIn(ExperimentalPermissionsApi::class)
-@Destination
+@Destination<RootGraph>
 @Composable
 fun SendToNearbyDevice(
     sendToNearbyDeviceViewModel: SendToNearbyDeviceViewModel = hiltViewModel(),

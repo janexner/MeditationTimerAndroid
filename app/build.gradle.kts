@@ -41,11 +41,6 @@ android {
     }
     buildToolsVersion = "35.0.0"
 
-    dependenciesInfo {
-        includeInApk = false
-        includeInBundle = false
-    }
-
     applicationVariants.all {
         val variant = this
         variant.outputs
