@@ -24,6 +24,6 @@ data class MeditationTimerProcess (
     @PrimaryKey(autoGenerate = true) val uid: Long = 0
 ) {
     fun toPayload() = Payload.fromBytes(
-        "$name|$info|$uuid|$processTime|$intervalTime|$hasAutoChain|$gotoUuid|$gotoName|$categoryId|$uid".toByteArray(UTF_8)
+        "$name|$info|$uuid|$processTime|$intervalTime|$hasAutoChain|$gotoUuid|$gotoName|$categoryId|null|$uid".toByteArray(UTF_8)
     )
 }
