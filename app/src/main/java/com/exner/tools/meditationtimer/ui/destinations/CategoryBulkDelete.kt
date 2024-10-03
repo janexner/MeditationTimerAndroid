@@ -142,7 +142,7 @@ fun CategoryBulkDelete(
                     ExtendedFloatingActionButton(
                         text = { Text(text = "Delete") },
                         icon = {
-                            Icon(Icons.Filled.Delete, "Delete selected categories")
+                            Icon(Icons.Default.Delete, "Delete selected categories")
                         },
                         onClick = {
                             openAlertDialog.value = true

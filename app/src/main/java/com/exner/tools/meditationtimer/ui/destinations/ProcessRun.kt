@@ -158,7 +158,7 @@ fun FotoTimerRunBottomBar(navigator: DestinationsNavigator, cancelAction: () -> 
                 text = { Text(text = "Stop") },
                 icon = {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
                         contentDescription = "Stop"
                     )
                 },
