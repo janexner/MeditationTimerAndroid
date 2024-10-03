@@ -11,6 +11,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -87,7 +88,7 @@ private fun MeditationTimerTopBar(
                 else -> {
                     IconButton(onClick = { destinationsNavigator.navigateUp() }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = "Back"
                         )
                     }
@@ -101,7 +102,7 @@ private fun MeditationTimerTopBar(
                 }
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Menu,
+                    imageVector = Icons.Default.Menu,
                     contentDescription = "Menu"
                 )
             }
@@ -111,7 +112,7 @@ private fun MeditationTimerTopBar(
             ) {
                 DropdownMenuItem(
                     enabled = destination != CategoryListDestination,
-                    text = { Text(text = "Manage categories") },
+                    text = { Text(text = "Manage categories", style = MaterialTheme.typography.bodyLarge) },
                     onClick = {
                         displayMainMenu = false
                         destinationsNavigator.navigate(CategoryListDestination())
@@ -119,7 +120,7 @@ private fun MeditationTimerTopBar(
                 )
                 DropdownMenuItem(
                     enabled = destination != SettingsDestination,
-                    text = { Text(text = "Settings") },
+                    text = { Text(text = "Settings", style = MaterialTheme.typography.bodyLarge) },
                     onClick = {
                         displayMainMenu = false
                         destinationsNavigator.navigate(SettingsDestination())
@@ -127,7 +128,7 @@ private fun MeditationTimerTopBar(
                 )
                 DropdownMenuItem(
                     enabled = destination != SendToNearbyDeviceDestination,
-                    text = { Text(text = "Share to nearby device") },
+                    text = { Text(text = "Share to nearby device", style = MaterialTheme.typography.bodyLarge) },
                     onClick = {
                         displayMainMenu = false
                         destinationsNavigator.navigate(SendToNearbyDeviceDestination)
@@ -136,7 +137,7 @@ private fun MeditationTimerTopBar(
                 HorizontalDivider()
                 DropdownMenuItem(
                     enabled = destination != AboutDestination,
-                    text = { Text(text = "About Meditation Timer") },
+                    text = { Text(text = "About Meditation Timer", style = MaterialTheme.typography.bodyLarge) },
                     onClick = {
                         displayMainMenu = false
                         destinationsNavigator.navigate(AboutDestination())

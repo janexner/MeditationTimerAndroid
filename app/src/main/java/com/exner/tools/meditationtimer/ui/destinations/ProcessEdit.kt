@@ -259,7 +259,7 @@ fun ProcessEdit(
                         text = { Text(text = "Save") },
                         icon = {
                             Icon(
-                                imageVector = Icons.Filled.Done,
+                                imageVector = Icons.Default.Done,
                                 contentDescription = "Save the process"
                             )
                         },

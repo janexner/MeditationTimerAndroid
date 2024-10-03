@@ -96,7 +96,7 @@ fun FotoTimerDeleteBottomBar(
                 text = { Text(text = "Delete") },
                 icon = {
                     Icon(
-                        imageVector = Icons.Filled.Delete,
+                        imageVector = Icons.Default.Delete,
                         contentDescription = "Delete the process"
                     )
                 },
