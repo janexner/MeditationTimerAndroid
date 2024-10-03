@@ -138,7 +138,7 @@ fun MeditationTimerDetailsBottomBar(
                 )
             }) {
                 Icon(
-                    imageVector = Icons.Filled.Edit,
+                    imageVector = Icons.Default.Edit,
                     contentDescription = "Edit"
                 )
             }
@@ -149,7 +149,7 @@ fun MeditationTimerDetailsBottomBar(
                 )
             }) {
                 Icon(
-                    imageVector = Icons.Filled.Delete,
+                    imageVector = Icons.Default.Delete,
                     contentDescription = "Delete"
                 )
             }
@@ -160,7 +160,7 @@ fun MeditationTimerDetailsBottomBar(
                 text = { Text(text = "Start") },
                 icon = {
                     Icon(
-                        imageVector = Icons.Filled.PlayArrow,
+                        imageVector = Icons.Default.PlayArrow,
                         contentDescription = "Start"
                     )
                 },

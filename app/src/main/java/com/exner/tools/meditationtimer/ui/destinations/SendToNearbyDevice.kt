@@ -43,6 +43,7 @@ import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
 import com.exner.tools.meditationtimer.network.Permissions
 import com.exner.tools.meditationtimer.network.TimerEndpoint
 import com.exner.tools.meditationtimer.ui.BodyText
+import com.exner.tools.meditationtimer.ui.DefaultSpacer
 import com.exner.tools.meditationtimer.ui.EndpointConnectionInformation
 import com.exner.tools.meditationtimer.ui.ProcessState
 import com.exner.tools.meditationtimer.ui.ProcessStateConstants
@@ -274,7 +275,7 @@ fun ProcessConnectionEstablished(
 private fun ProcessStateAwaitingPermissionsScreen(permissionsNeeded: MultiplePermissionsState) {
     Column(modifier = Modifier.fillMaxSize()) {
         Text(text = "If you would like to send processes to your TV, this app needs permission for Bluetooth, WiFi, and the discovery of nearby devices, which may also need location permissions.")
-        Spacer(modifier = Modifier.size(16.dp))
+        DefaultSpacer()
         Button(
             onClick = {
                 permissionsNeeded.launchMultiplePermissionRequest()
@@ -295,7 +296,9 @@ private fun ProcessStatePermissionsGrantedScreen() {
 @Composable
 private fun ProcessStateStartingDiscovery() {
     Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Starting discovery...")
+        Text(text = "Looking for a TV now...")
+        DefaultSpacer()
+        Text(text = "Make sure the Activity Timer app is running on your TV!")
     }
 }
 
@@ -307,7 +310,7 @@ private fun ProcessStateDiscoveryStartedScreen(discoveredEndpoints: List<TimerEn
             .fillMaxSize()
     ) {
         item {
-            Text(text = "Looking for partners... once found, tap to connect.")
+            Text(text = "Looking for a TV... once found, tap to connect.")
         }
         items(discoveredEndpoints) { endpoint ->
             Box(modifier = Modifier
@@ -325,24 +328,6 @@ private fun ProcessStateDiscoveryStartedScreen(discoveredEndpoints: List<TimerEn
 private fun ProcessStatePartnerFoundScreen(message: String) {
     Column(modifier = Modifier.fillMaxSize()) {
         Text(text = "Connecting to partner $message...")
-//        if (showAuthenticationAlert) {
-//            AlertDialog.Builder(context)
-//                .setTitle("Accept connection to " + info.getEndpointName())
-//                .setMessage("Confirm the code matches on both devices: " + info.getAuthenticationDigits())
-//                .setPositiveButton(
-//                    "Accept"
-//                ) { dialog: DialogInterface?, which: Int ->  // The user confirmed, so we can accept the connection.
-//                    Nearby.getConnectionsClient(context)
-//                        .acceptConnection(endpointId, payloadCallback)
-//                }
-//                .setNegativeButton(
-//                    R.string.cancel
-//                ) { dialog: DialogInterface?, which: Int ->  // The user canceled, so we should reject the connection.
-//                    Nearby.getConnectionsClient(context).rejectConnection(endpointId)
-//                }
-//                .setIcon(R.drawable.ic_dialog_alert)
-//                .show()
-//        }
     }
 }
 
@@ -371,7 +356,7 @@ private fun ProcessStateCancelledScreen() {
 private fun ProcessStateErrorScreen(message: String) {
     Column(modifier = Modifier.fillMaxSize()) {
         Text(text = "Some error occurred. It may help to move away from this screen and try it all again.")
-        Spacer(modifier = Modifier.size(8.dp))
+        DefaultSpacer()
         Text(text = message)
     }
 }
@@ -416,7 +401,7 @@ fun SendToNearbyBottomBar(
                         text = { Text(text = "Discover Devices") },
                         icon = {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                imageVector = Icons.AutoMirrored.Default.ArrowForward,
                                 contentDescription = "Discover Devices"
                             )
                         },
@@ -461,7 +446,7 @@ fun SendToNearbyBottomBar(
                         text = { Text(text = "Go back") },
                         icon = {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                imageVector = Icons.AutoMirrored.Default.ArrowBack,
                                 contentDescription = "Back"
                             )
                         },

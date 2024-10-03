@@ -178,7 +178,7 @@ fun ProcessList(
                     ExtendedFloatingActionButton(
                         text = { Text(text = "Add") },
                         icon = {
-                            Icon(Icons.Filled.Add, "Add a process")
+                            Icon(Icons.Default.Add, "Add a process")
                         },
                         onClick = {
                             navigator.navigate(

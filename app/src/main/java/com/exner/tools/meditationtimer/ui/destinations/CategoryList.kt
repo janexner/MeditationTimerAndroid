@@ -180,7 +180,7 @@ fun CategoryList(
                         )
                     }) {
                         Icon(
-                            imageVector = Icons.Filled.Delete,
+                            imageVector = Icons.Default.Delete,
                             contentDescription = "Delete Categories"
                         )
                     }
@@ -189,7 +189,7 @@ fun CategoryList(
                     ExtendedFloatingActionButton(
                         text = { Text(text = "Add") },
                         icon = {
-                            Icon(Icons.Filled.Add, "Add a category")
+                            Icon(Icons.Default.Add, "Add a category")
                         },
                         onClick = {
                             openDialogCategory.value = null
