@@ -274,7 +274,7 @@ fun ProcessConnectionEstablished(
 @Composable
 private fun ProcessStateAwaitingPermissionsScreen(permissionsNeeded: MultiplePermissionsState) {
     Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "If you would like to send processes to your TV, this app needs permission for Bluetooth, WiFi, and the discovery of nearby devices, which may also need location permissions.")
+        Text(text = "If you would like to send processes to your TV running Activity Timer, this app needs permission for Bluetooth, WiFi, and the discovery of nearby devices, which may also need location permissions.")
         DefaultSpacer()
         Button(
             onClick = {
@@ -310,7 +310,7 @@ private fun ProcessStateDiscoveryStartedScreen(discoveredEndpoints: List<TimerEn
             .fillMaxSize()
     ) {
         item {
-            Text(text = "Looking for a TV... once found, tap to connect.")
+            Text(text = "Looking for a TV running Activity Timer... once found, tap to connect.")
         }
         items(discoveredEndpoints) { endpoint ->
             Box(modifier = Modifier
@@ -318,7 +318,7 @@ private fun ProcessStateDiscoveryStartedScreen(discoveredEndpoints: List<TimerEn
                 .clickable {
                     onItemClick(endpoint.endpointId)
                 }) {
-                BodyText(text = endpoint.endpointId)
+                BodyText(text = "Activity Timer for TV ID: ${endpoint.endpointId}")
             }
         }
     }
@@ -439,7 +439,10 @@ fun SendToNearbyBottomBar(
                         },
                         onClick = {
                             transition(ProcessStateConstants.DONE, "Done")
-                        })
+                        },
+                        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
+                    )
                 }
                 ProcessStateConstants.DONE, ProcessStateConstants.CANCELLED -> {
                     ExtendedFloatingActionButton(
@@ -452,7 +455,10 @@ fun SendToNearbyBottomBar(
                         },
                         onClick = {
                             navigator.navigateUp()
-                        })
+                        },
+                        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
+                    )
                 }
                 else -> {
                     ExtendedFloatingActionButton(
