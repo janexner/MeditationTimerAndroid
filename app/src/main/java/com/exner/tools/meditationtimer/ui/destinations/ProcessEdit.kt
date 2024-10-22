@@ -64,6 +64,7 @@ fun ProcessEdit(
     val intervalTime by processEditViewModel.intervalTime.observeAsState()
     val hasAutoChain by processEditViewModel.hasAutoChain.observeAsState()
     val gotoName by processEditViewModel.gotoName.observeAsState()
+    val backgroundUri by processEditViewModel.backgroundUri.observeAsState()
     // some odd ones out
     val processes: List<MeditationTimerProcess> by processEditViewModel.observeProcessesForCurrentCategory.collectAsStateWithLifecycle(
         initialValue = emptyList()
@@ -76,6 +77,8 @@ fun ProcessEdit(
     )
 
     val chainToSameCategoryOnly by settingsViewModel.chainToSameCategoryOnly.collectAsStateWithLifecycle()
+
+    val enableExportToActivityTimer by settingsViewModel.enableExportToActivityTimer.collectAsStateWithLifecycle()
 
     processEditViewModel.getProcess(processUuid, chainToSameCategoryOnly)
 
@@ -94,9 +97,11 @@ fun ProcessEdit(
                     .verticalScroll(rememberScrollState())
             ) {
                 // top - fields
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
                     TextField(
                         value = name ?: "Name",
                         onValueChange = {
@@ -215,7 +220,10 @@ fun ProcessEdit(
                             TextField(
                                 // The `menuAnchor` modifier must be passed to the text field for correctness.
                                 modifier = Modifier
-                                    .menuAnchor(type = MenuAnchorType.PrimaryEditable, enabled = true)
+                                    .menuAnchor(
+                                        type = MenuAnchorType.PrimaryEditable,
+                                        enabled = true
+                                    )
                                     .fillMaxWidth()
                                     .padding(8.dp),
                                 readOnly = true,
@@ -246,6 +254,28 @@ fun ProcessEdit(
                                 }
                             }
                         }
+                    }
+                }
+                AnimatedVisibility(visible = enableExportToActivityTimer) {
+                    HeaderText("Background Image URL")
+                    Text(text = "Will only be used by ActivityTimer for TV.")
+                    Text(text = "Setting it here makes sense if you then export the process to ActivityTimer, because it is much easier to copy and paste a URL on your phone.")
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        TextField(
+                            value = backgroundUri ?: "",
+                            onValueChange = {
+                                processEditViewModel.updateBackgroundUri(it)
+                                modified = true
+                            },
+                            label = { Text(text = "URL") },
+                            placeholder = { Text(text = "URL of an image") },
+                            singleLine = false,
+                            modifier = Modifier.weight(0.75f)
+                        )
                     }
                 }
             }
