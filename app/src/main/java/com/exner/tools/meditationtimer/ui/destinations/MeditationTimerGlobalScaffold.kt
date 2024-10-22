@@ -16,6 +16,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +39,7 @@ import com.ramcosta.composedestinations.utils.currentDestinationAsState
 import com.ramcosta.composedestinations.utils.rememberDestinationsNavigator
 
 @Composable
-fun MeditationTimerGlobalScaffold() {
+fun MeditationTimerGlobalScaffold(enableExportToActivityTimer: State<Boolean>) {
     val engine = rememberNavHostEngine()
     val navController = engine.rememberNavController()
     val destinationsNavigator = navController.rememberDestinationsNavigator()
@@ -46,7 +47,7 @@ fun MeditationTimerGlobalScaffold() {
 
     Scaffold(
         topBar = {
-            MeditationTimerTopBar(destination, destinationsNavigator)
+            MeditationTimerTopBar(destination, destinationsNavigator, enableExportToActivityTimer)
         },
         content = { innerPadding ->
             val newPadding = PaddingValues.Absolute(
@@ -70,6 +71,7 @@ fun MeditationTimerGlobalScaffold() {
 private fun MeditationTimerTopBar(
     destination: DestinationSpec?,
     destinationsNavigator: DestinationsNavigator,
+    enableExportToActivityTimer: State<Boolean>,
 ) {
     var displayMainMenu by remember { mutableStateOf(false) }
     
@@ -126,14 +128,21 @@ private fun MeditationTimerTopBar(
                         destinationsNavigator.navigate(SettingsDestination())
                     }
                 )
-                DropdownMenuItem(
-                    enabled = destination != SendToNearbyDeviceDestination,
-                    text = { Text(text = "Share to nearby device", style = MaterialTheme.typography.bodyLarge) },
-                    onClick = {
-                        displayMainMenu = false
-                        destinationsNavigator.navigate(SendToNearbyDeviceDestination)
-                    }
-                )
+                if (enableExportToActivityTimer.value) {
+                    DropdownMenuItem(
+                        enabled = destination != SendToNearbyDeviceDestination,
+                        text = {
+                            Text(
+                                text = "Share to nearby device",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        },
+                        onClick = {
+                            displayMainMenu = false
+                            destinationsNavigator.navigate(SendToNearbyDeviceDestination)
+                        }
+                    )
+                }
                 HorizontalDivider()
                 DropdownMenuItem(
                     enabled = destination != AboutDestination,

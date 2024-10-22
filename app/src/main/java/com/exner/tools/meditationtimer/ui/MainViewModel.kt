@@ -20,4 +20,10 @@ class MainViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
         initialValue = Theme.Auto
     )
+
+    val enableExportToActivityTimer: StateFlow<Boolean> = userPreferencesManager.enableExportToActivityTimer().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
+        initialValue = false
+    )
 }

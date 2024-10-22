@@ -3,6 +3,7 @@ package com.exner.tools.meditationtimer.data.di
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataDAO
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
@@ -40,7 +41,14 @@ object AppComponent {
             context.applicationContext,
             MeditationTimerRoomDatabase::class.java,
             "meditation_timer_process_database"
-        ).fallbackToDestructiveMigration().addCallback(ProcessDatabaseCallback(provider)).build()
+        ).fallbackToDestructiveMigration().addMigrations(MIGRATION_11_12)
+            .addCallback(ProcessDatabaseCallback(provider)).build()
+
+    private val MIGRATION_11_12 = object : Migration(11, 12) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE MeditationTimerProcess ADD COLUMN background_uri TEXT DEFAULT 'https://fototimer.net/assets/activitytimer/bg-none.png';")
+        }
+    }
 
     class ProcessDatabaseCallback(
         private val provider: Provider<MeditationTimerDataDAO>
@@ -69,6 +77,7 @@ object AppComponent {
                     hasAutoChain = true,
                     gotoUuid = secondUuid,
                     gotoName = "Basic 1 - Mindful Breathing",
+                    backgroundUri = "https://fototimer.net/assets/activitytimer/bg-default.png",
                     uid = 0L,
                 )
             provider.get().insert(meditationTimerProcess)
@@ -83,6 +92,7 @@ object AppComponent {
                     hasAutoChain = false,
                     gotoUuid = null,
                     gotoName = null,
+                    backgroundUri = "https://fototimer.net/assets/activitytimer/bg-default.png",
                     uid = 0L,
                 )
             provider.get().insert(meditationTimerProcess)
