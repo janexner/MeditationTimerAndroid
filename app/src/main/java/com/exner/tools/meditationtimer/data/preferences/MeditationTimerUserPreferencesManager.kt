@@ -110,6 +110,20 @@ class MeditationTimerUserPreferencesManager @Inject constructor(
         }
     }
 
+    fun enableExportToActivityTimer(): Flow<Boolean> {
+        return userDataStorePreferences.data.catch {
+            emit(emptyPreferences())
+        }.map { preferences ->
+            preferences[KEY_ENABLE_EXPORT_TO_ACTIVITY_TIMER] ?: false
+        }
+    }
+
+    suspend fun setEnableExportToActivityTimer(newEnableExportToActivityTimer: Boolean) {
+        userDataStorePreferences.edit { preferences ->
+            preferences[KEY_ENABLE_EXPORT_TO_ACTIVITY_TIMER] = newEnableExportToActivityTimer
+        }
+    }
+
     private companion object {
 
         val KEY_NIGHT_MODE = booleanPreferencesKey(name = "preference_night_mode")
@@ -123,5 +137,6 @@ class MeditationTimerUserPreferencesManager @Inject constructor(
         val KEY_VIBRATE_ENABLED = booleanPreferencesKey(name = "vibrate_enabled")
         val KEY_THEME = stringPreferencesKey(name = "preference_theme")
         val KEY_SIMPLE_DISPLAY = booleanPreferencesKey(name = "simple_display")
+        val KEY_ENABLE_EXPORT_TO_ACTIVITY_TIMER = booleanPreferencesKey(name = "enable_export_to_activity_timer")
     }
 }

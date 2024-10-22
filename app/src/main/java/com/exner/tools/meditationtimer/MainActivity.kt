@@ -47,6 +47,8 @@ class MainActivity : ComponentActivity() {
             // - force night mode setting may be on
             val userTheme = viewModel.userSelectedTheme.collectAsState()
 
+            val enableExportToActivityTimer = viewModel.enableExportToActivityTimer.collectAsState()
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 if (userTheme.value == Theme.Dark || (userTheme.value == Theme.Auto && isSystemInDarkTheme())) {
                     window.navigationBarColor = Color(0xFF000000).toArgb()
@@ -66,7 +68,7 @@ class MainActivity : ComponentActivity() {
             MeditationTimerTheme(
                 darkTheme = userTheme.value == Theme.Dark || (userTheme.value == Theme.Auto && isSystemInDarkTheme())
             ) {
-                MeditationTimerGlobalScaffold()
+                MeditationTimerGlobalScaffold(enableExportToActivityTimer)
             }
         }
 

@@ -33,6 +33,7 @@ fun Settings(
     val noSounds by settingsViewModel.noSounds.collectAsStateWithLifecycle()
     val vibrateEnabled by settingsViewModel.vibrateEnabled.collectAsStateWithLifecycle()
     val showSimpleDisplay by settingsViewModel.showSimpleDisplay.collectAsStateWithLifecycle()
+    val enableExportToActivityTimer by settingsViewModel.enableExportToActivityTimer.collectAsStateWithLifecycle()
 
     // unlock screen rotation
     LockScreenOrientation(orientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR)
@@ -78,6 +79,12 @@ fun Settings(
             checked = chainToSameCategoryOnly
         ) {
             settingsViewModel.updateChainToSameCategoryOnly(it)
+        }
+        TextAndSwitch(
+            text = "Enable export to ActivityTimer for TV",
+            checked = enableExportToActivityTimer
+        ) {
+            settingsViewModel.updateEnableExportToActivityTimer(it)
         }
     }
 
