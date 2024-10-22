@@ -257,25 +257,29 @@ fun ProcessEdit(
                     }
                 }
                 AnimatedVisibility(visible = enableExportToActivityTimer) {
-                    HeaderText("Background Image URL")
-                    Text(text = "Will only be used by ActivityTimer for TV.")
-                    Text(text = "Setting it here makes sense if you then export the process to ActivityTimer, because it is much easier to copy and paste a URL on your phone.")
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        TextField(
-                            value = backgroundUri ?: "",
-                            onValueChange = {
-                                processEditViewModel.updateBackgroundUri(it)
-                                modified = true
-                            },
-                            label = { Text(text = "URL") },
-                            placeholder = { Text(text = "URL of an image") },
-                            singleLine = false,
-                            modifier = Modifier.weight(0.75f)
-                        )
+                        HeaderText("Background Image URL")
+                        Text(text = "Will only be used by ActivityTimer for TV.")
+                        Text(text = "Setting it here makes sense if you then export the process to ActivityTimer, because it is much easier to copy and paste a URL on your phone.")
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                        ) {
+                            TextField(
+                                value = backgroundUri ?: "",
+                                onValueChange = {
+                                    processEditViewModel.updateBackgroundUri(it)
+                                    modified = true
+                                },
+                                label = { Text(text = "URL") },
+                                placeholder = { Text(text = "URL of an image") },
+                                singleLine = false,
+                                modifier = Modifier.weight(0.75f)
+                            )
+                        }
                     }
                 }
             }
