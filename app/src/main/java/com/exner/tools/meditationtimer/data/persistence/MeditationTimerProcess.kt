@@ -21,6 +21,8 @@ data class MeditationTimerProcess (
 
     @ColumnInfo(name = "category_id") val categoryId: Long?,
 
+    @ColumnInfo(name = "background_uri") val backgroundUri : String?,
+
     @PrimaryKey(autoGenerate = true) val uid: Long = 0
 ) {
     fun toPayload(): Payload {

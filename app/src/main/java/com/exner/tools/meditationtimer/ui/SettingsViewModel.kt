@@ -2,6 +2,7 @@ package com.exner.tools.meditationtimer.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.exner.tools.meditationtimer.data.preferences.MeditationTimerUserPreferencesManager
 import com.exner.tools.meditationtimer.ui.theme.Theme
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,6 +47,11 @@ class SettingsViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(),
         true
     )
+    val enableExportToActivityTimer: StateFlow<Boolean> = userPreferencesManager.enableExportToActivityTimer().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(),
+        false
+    )
 
     fun updateUserSelectedTheme(newTheme: Theme) {
         viewModelScope.launch {
@@ -80,6 +86,12 @@ class SettingsViewModel @Inject constructor(
     fun updateShowSimpleDisplay(newSimpleDisplay: Boolean) {
         viewModelScope.launch {
             userPreferencesManager.setShowSimpleDisplay(newSimpleDisplay)
+        }
+    }
+
+    fun updateEnableExportToActivityTimer(newEnableExportToActivityTimer: Boolean) {
+        viewModelScope.launch {
+            userPreferencesManager.setEnableExportToActivityTimer(newEnableExportToActivityTimer)
         }
     }
 }

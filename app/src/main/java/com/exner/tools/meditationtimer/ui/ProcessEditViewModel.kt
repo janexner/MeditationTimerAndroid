@@ -41,6 +41,9 @@ class ProcessEditViewModel @Inject constructor(
     private val _gotoName: MutableLiveData<String?> = MutableLiveData(null)
     val gotoName: LiveData<String?> = _gotoName
 
+    private val _backgroundUri: MutableLiveData<String> = MutableLiveData("https://fototimer.net/assets/activitytimer/bg-default.png")
+    val backgroundUri: LiveData<String> = _backgroundUri
+
     private val _uuid: MutableLiveData<String?> = MutableLiveData(null)
 
     private val observeProcessesRaw = repository.observeProcesses
@@ -105,6 +108,7 @@ class ProcessEditViewModel @Inject constructor(
                     _gotoUuid.value = process.gotoUuid
                     _gotoName.value = process.gotoName
                     updateCategoryId(process.categoryId ?: -1L, filterProcessesForCurrentCategory)
+                    _backgroundUri.value = process.backgroundUri ?: "https://fototimer.net/assets/activitytimer/bg-default.png"
                     _uuid.value = process.uuid
                 }
             }
@@ -123,6 +127,7 @@ class ProcessEditViewModel @Inject constructor(
                 gotoUuid = _gotoUuid.value,
                 gotoName = _gotoName.value,
                 categoryId = currentCategory.value.uid,
+                backgroundUri = backgroundUri.value,
                 uuid = if (_uuid.value != null) _uuid.value!! else UUID.randomUUID().toString()
             )
             if (!repository.doesProcessWithUuidExist(uuid = process.uuid)) {
@@ -160,6 +165,10 @@ class ProcessEditViewModel @Inject constructor(
     fun updateGotoUuidAndName(gotoUuid: String?, name: String?) {
         _gotoUuid.value = gotoUuid
         _gotoName.value = name
+    }
+
+    fun updateBackgroundUri(backgroundUri: String) {
+        _backgroundUri.value = backgroundUri
     }
 
     fun createNewCategory(newCategoryName: String) {
