@@ -262,7 +262,7 @@ fun ProcessEdit(
                     ) {
                         HeaderText("Background Image URL")
                         Text(text = "Will only be used by ActivityTimer for TV.")
-                        Text(text = "Setting it here makes sense if you then export the process to ActivityTimer, because it is much easier to copy and paste a URL on your phone.")
+                        Text(text = "Setting it here makes sense if you then export the process to ActivityTimer, because it is much easier to type, or to copy and paste a URL on your phone.")
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
