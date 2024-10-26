@@ -29,7 +29,6 @@ import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessListD
 import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessRunDestination
 import com.exner.tools.meditationtimer.ui.destinations.destinations.SettingsDestination
 import com.ramcosta.composedestinations.DestinationsNavHost
-import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.rememberNavHostEngine
 
 @Composable
