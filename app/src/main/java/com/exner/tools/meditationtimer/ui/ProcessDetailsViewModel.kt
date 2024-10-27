@@ -47,6 +47,9 @@ class ProcessDetailsViewModel @Inject constructor(
     val currentCategory: StateFlow<MeditationTimerProcessCategory>
         get() = _currentCategory
 
+    private val _backgroundUri: MutableLiveData<String> = MutableLiveData("https://fototimer.net/assets/activitytimer/bg-default.png")
+    val backgroundUri: LiveData<String> = _backgroundUri
+
     private fun updateCategoryId(id: Long) {
         if (id == -1L) {
             _currentCategory.value = MeditationTimerProcessCategory("None", -1L)

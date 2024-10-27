@@ -134,6 +134,9 @@ dependencies {
     // retrofit
     implementation(libs.squareup.retrofit)
     implementation(libs.squareup.retrofit.converter.gson)
+
+    // Async image loading
+    implementation(libs.coil.compose)
 }
 
 hilt {

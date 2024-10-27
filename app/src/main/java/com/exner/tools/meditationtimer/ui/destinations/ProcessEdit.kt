@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCategory
 import com.exner.tools.meditationtimer.ui.HeaderText
@@ -278,6 +279,13 @@ fun ProcessEdit(
                                 placeholder = { Text(text = "URL of an image") },
                                 singleLine = false,
                                 modifier = Modifier.weight(0.75f)
+                            )
+                        }
+                        if (null != backgroundUri && "" != backgroundUri) {
+                            AsyncImage(
+                                model = backgroundUri,
+                                contentDescription = "Background image",
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                     }
