@@ -7,15 +7,19 @@ import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCategory
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
-import javax.inject.Inject
 
-@HiltViewModel
-class ProcessEditViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = ProcessEditViewModel.ProcessEditViewModelFactory::class)
+class ProcessEditViewModel @AssistedInject constructor(
+    @Assisted val uuid: String?,
+    @Assisted val filterProcessesForCurrentCategory: Boolean,
     private val repository: MeditationTimerDataRepository,
 ) : ViewModel() {
 
@@ -44,8 +48,6 @@ class ProcessEditViewModel @Inject constructor(
     private val _backgroundUri: MutableLiveData<String> = MutableLiveData("https://fototimer.net/assets/activitytimer/bg-default.png")
     val backgroundUri: LiveData<String> = _backgroundUri
 
-    private val _uuid: MutableLiveData<String?> = MutableLiveData(null)
-
     private val observeProcessesRaw = repository.observeProcesses
 
     private val _observeProcessesForCurrentCategory =
@@ -66,6 +68,21 @@ class ProcessEditViewModel @Inject constructor(
                     item.categoryId == currentCategory.value.uid || currentCategory.value.uid == -1L
                 }
                 _observeProcessesForCurrentCategory.value = filteredItemsList
+            }
+            if (uuid != null) {
+                val process = repository.loadProcessByUuid(uuid)
+                if (process != null) {
+                    _uid.value = process.uid
+                    _name.value = process.name
+                    _info.value = process.info
+                    _processTime.value = process.processTime
+                    _intervalTime.value = process.intervalTime
+                    _hasAutoChain.value = process.hasAutoChain
+                    _gotoUuid.value = process.gotoUuid
+                    _gotoName.value = process.gotoName
+                    updateCategoryId(process.categoryId ?: -1L, filterProcessesForCurrentCategory)
+                    _backgroundUri.value = process.backgroundUri ?: "https://fototimer.net/assets/activitytimer/bg-default.png"
+                }
             }
         }
     }
@@ -93,28 +110,6 @@ class ProcessEditViewModel @Inject constructor(
         }
     }
 
-    fun getProcess(processUuid: String?, filterProcessesForCurrentCategory: Boolean) {
-        if (processUuid != null) {
-            _uuid.value = processUuid
-            viewModelScope.launch {
-                val process = repository.loadProcessByUuid(processUuid)
-                if (process != null) {
-                    _uid.value = process.uid
-                    _name.value = process.name
-                    _info.value = process.info
-                    _processTime.value = process.processTime
-                    _intervalTime.value = process.intervalTime
-                    _hasAutoChain.value = process.hasAutoChain
-                    _gotoUuid.value = process.gotoUuid
-                    _gotoName.value = process.gotoName
-                    updateCategoryId(process.categoryId ?: -1L, filterProcessesForCurrentCategory)
-                    _backgroundUri.value = process.backgroundUri ?: "https://fototimer.net/assets/activitytimer/bg-default.png"
-                    _uuid.value = process.uuid
-                }
-            }
-        }
-    }
-
     fun commitProcess() {
         viewModelScope.launch {
             val process = MeditationTimerProcess(
@@ -128,7 +123,7 @@ class ProcessEditViewModel @Inject constructor(
                 gotoName = _gotoName.value,
                 categoryId = currentCategory.value.uid,
                 backgroundUri = backgroundUri.value,
-                uuid = if (_uuid.value != null) _uuid.value!! else UUID.randomUUID().toString()
+                uuid = uuid ?: UUID.randomUUID().toString()
             )
             if (!repository.doesProcessWithUuidExist(uuid = process.uuid)) {
                 repository.insert(
@@ -171,10 +166,8 @@ class ProcessEditViewModel @Inject constructor(
         _backgroundUri.value = backgroundUri
     }
 
-    fun createNewCategory(newCategoryName: String) {
-        viewModelScope.launch {
-            val newCategory = MeditationTimerProcessCategory(newCategoryName, 0)
-            repository.insertCategory(newCategory)
-        }
+    @AssistedFactory
+    interface ProcessEditViewModelFactory {
+        fun create(uuid: String?, filterProcessesForCurrentCategory: Boolean): ProcessEditViewModel
     }
 }

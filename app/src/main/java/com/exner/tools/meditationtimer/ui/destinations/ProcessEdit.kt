@@ -54,10 +54,14 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun ProcessEdit(
     processUuid: String?,
-    processEditViewModel: ProcessEditViewModel = hiltViewModel(),
     settingsViewModel: SettingsViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
 ) {
+    val chainToSameCategoryOnly by settingsViewModel.chainToSameCategoryOnly.collectAsStateWithLifecycle()
+
+    val processEditViewModel = hiltViewModel<ProcessEditViewModel, ProcessEditViewModel.ProcessEditViewModelFactory> { factory ->
+        factory.create(processUuid, chainToSameCategoryOnly)
+    }
 
     val name by processEditViewModel.name.observeAsState()
     val info by processEditViewModel.info.observeAsState()
@@ -77,11 +81,7 @@ fun ProcessEdit(
         initialValue = emptyList()
     )
 
-    val chainToSameCategoryOnly by settingsViewModel.chainToSameCategoryOnly.collectAsStateWithLifecycle()
-
     val enableExportToActivityTimer by settingsViewModel.enableExportToActivityTimer.collectAsStateWithLifecycle()
-
-    processEditViewModel.getProcess(processUuid, chainToSameCategoryOnly)
 
     var modified by remember { mutableStateOf(false) }
 
