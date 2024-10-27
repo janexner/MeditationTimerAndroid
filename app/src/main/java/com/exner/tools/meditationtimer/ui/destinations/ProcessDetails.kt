@@ -1,8 +1,10 @@
 package com.exner.tools.meditationtimer.ui.destinations
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -28,11 +30,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.exner.tools.meditationtimer.R
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCategory
 import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.ProcessDetailsViewModel
+import com.exner.tools.meditationtimer.ui.SettingsViewModel
 import com.exner.tools.meditationtimer.ui.SmallBodyText
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
@@ -46,6 +50,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun ProcessDetails(
     processUuid: String,
     processDetailsViewModel: ProcessDetailsViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
 ) {
 
@@ -56,9 +61,12 @@ fun ProcessDetails(
     val hasAutoChain by processDetailsViewModel.hasAutoChain.observeAsState()
     val gotoId by processDetailsViewModel.gotoUuid.observeAsState()
     val gotoName by processDetailsViewModel.gotoName.observeAsState()
+    val backgroundUri by processDetailsViewModel.backgroundUri.observeAsState()
     val currentCategory: MeditationTimerProcessCategory by processDetailsViewModel.currentCategory.collectAsStateWithLifecycle(
         initialValue = MeditationTimerProcessCategory("None", -1L)
     )
+
+    val enableExportToActivityTimer by settingsViewModel.enableExportToActivityTimer.collectAsStateWithLifecycle()
 
     processDetailsViewModel.getProcess(processUuid = processUuid)
 
@@ -116,6 +124,32 @@ fun ProcessDetails(
                 }
                 // middle - spacer
                 Spacer(modifier = Modifier)
+                HorizontalDivider(modifier = Modifier.padding(8.dp))
+                AnimatedVisibility(visible = enableExportToActivityTimer) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        HeaderText(
+                            text = "Background Image URL",
+                            modifier = modifier1
+                        )
+                        Text(
+                            text = "Will only be used by ActivityTimer for TV.",
+                            modifier = modifier1.padding(8.dp, 0.dp)
+                        )
+                        Text(
+                            text = backgroundUri ?: "",
+                            modifier = modifier1.padding(8.dp, 0.dp)
+                        )
+                        if (null != backgroundUri && "" != backgroundUri) {
+                            AsyncImage(
+                                model = backgroundUri,
+                                contentDescription = "Background image",
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
             }
         },
         bottomBar = {
