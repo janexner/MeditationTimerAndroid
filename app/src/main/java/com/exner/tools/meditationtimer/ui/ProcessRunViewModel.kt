@@ -18,20 +18,24 @@ import com.exner.tools.meditationtimer.steps.ProcessStartAction
 import com.exner.tools.meditationtimer.steps.ProcessStepAction
 import com.exner.tools.meditationtimer.steps.STEP_LENGTH_IN_MILLISECONDS
 import com.exner.tools.meditationtimer.steps.getProcessStepListForOneProcess
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ProcessRunViewModel @Inject constructor(
+@OptIn(DelicateCoroutinesApi::class)
+@HiltViewModel(assistedFactory = ProcessRunViewModel.ProcessRunViewModelFactory::class)
+class ProcessRunViewModel @AssistedInject constructor(
+    @Assisted val uuid: String,
+    @Assisted val doneEventHandler: () -> Unit = {},
     private val repository: MeditationTimerDataRepository,
     private val userPreferencesRepository: MeditationTimerUserPreferencesManager
 ) : ViewModel() {
@@ -58,12 +62,7 @@ class ProcessRunViewModel @Inject constructor(
 
     private var isRunning: Boolean = false
 
-    private var doneEventHandler: () -> Unit = {}
-
-    @OptIn(DelicateCoroutinesApi::class)
-    fun initialiseRun(
-        processUuid: String,
-    ) {
+    init {
         val result = mutableListOf<List<ProcessStepAction>>()
 
         _showStages.value = false // bcs default for simple screen is yes
@@ -75,9 +74,8 @@ class ProcessRunViewModel @Inject constructor(
             viewModelScope.launch {
                 // loop detection
                 val processIdList = mutableListOf<String>()
-                var currentID: String? = processUuid
+                var currentID: String? = uuid
                 var noLoopDetectedSoFar = true
-                var firstRound = true
 
                 while (currentID != null && noLoopDetectedSoFar) {
                     val process = repository.loadProcessByUuid(currentID)
@@ -94,7 +92,6 @@ class ProcessRunViewModel @Inject constructor(
                         // do we want to simplify the display?
                         _showStages.value = !(userPreferencesRepository.showSimpleDisplay().firstOrNull() ?: true) || (process.processTime != process.intervalTime)
                         // prepare for the next iteration
-                        firstRound = false
                         if (process.gotoUuid != null && process.gotoUuid != "" && repository.doesProcessWithUuidExist(
                                 process.gotoUuid
                             )
@@ -123,7 +120,7 @@ class ProcessRunViewModel @Inject constructor(
                                         latestActionList[latestActionList.lastIndex]
                                     if (lastAction is ProcessGotoAction) { // it should be!
                                         // remove the action list, it is not mutable
-                                        result.removeLast() // remove the action list, bcs we need a new one
+                                        result.removeAt(result.lastIndex) // remove the action list, bcs we need a new one
                                         val newActionsList = mutableListOf<ProcessStepAction>()
                                         latestActionList.forEach { processStepAction ->
                                             if (processStepAction !is ProcessGotoAction) {
@@ -201,8 +198,9 @@ class ProcessRunViewModel @Inject constructor(
         }
     }
 
-    fun setDoneEventHandler(handler: () -> Unit) {
-        doneEventHandler = handler
+    @AssistedFactory
+    interface ProcessRunViewModelFactory {
+        fun create(uuid: String, doneEventHandler: () -> Unit): ProcessRunViewModel
     }
 
     fun cancel() {

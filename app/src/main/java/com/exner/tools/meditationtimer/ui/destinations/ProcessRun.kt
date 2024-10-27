@@ -40,9 +40,11 @@ import kotlin.time.Duration.Companion.seconds
 @Composable
 fun ProcessRun(
     processUuid: String,
-    processRunViewModel: ProcessRunViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
 ) {
+    val processRunViewModel = hiltViewModel<ProcessRunViewModel, ProcessRunViewModel.ProcessRunViewModelFactory> { factory ->
+        factory.create(processUuid) { navigator.navigateUp() }
+    }
 
     val displayAction by processRunViewModel.displayAction.observeAsState()
     val numberOfSteps by processRunViewModel.numberOfSteps.observeAsState()
@@ -50,14 +52,6 @@ fun ProcessRun(
     val hasLoop by processRunViewModel.hasLoop.observeAsState()
     val hasHours by processRunViewModel.hasHours.observeAsState()
     val showStages by processRunViewModel.showStages.observeAsState()
-
-    processRunViewModel.initialiseRun(
-        processUuid = processUuid
-    )
-
-    processRunViewModel.setDoneEventHandler {
-        navigator.navigateUp()
-    }
 
     // Always!
     KeepScreenOn()
