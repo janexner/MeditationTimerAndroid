@@ -63,12 +63,6 @@ class ProcessEditViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            observeProcessesRaw.collect { itemsList ->
-                val filteredItemsList: List<MeditationTimerProcess> = itemsList.filter { item ->
-                    item.categoryId == currentCategory.value.uid || currentCategory.value.uid == -1L
-                }
-                _observeProcessesForCurrentCategory.value = filteredItemsList
-            }
             if (uuid != null) {
                 val process = repository.loadProcessByUuid(uuid)
                 if (process != null) {
@@ -83,6 +77,12 @@ class ProcessEditViewModel @AssistedInject constructor(
                     updateCategoryId(process.categoryId ?: -1L, filterProcessesForCurrentCategory)
                     _backgroundUri.value = process.backgroundUri ?: "https://fototimer.net/assets/activitytimer/bg-default.png"
                 }
+            }
+            observeProcessesRaw.collect { itemsList ->
+                val filteredItemsList: List<MeditationTimerProcess> = itemsList.filter { item ->
+                    item.categoryId == currentCategory.value.uid || currentCategory.value.uid == -1L
+                }
+                _observeProcessesForCurrentCategory.value = filteredItemsList
             }
         }
     }
