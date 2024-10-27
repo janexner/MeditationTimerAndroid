@@ -49,10 +49,12 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun ProcessDetails(
     processUuid: String,
-    processDetailsViewModel: ProcessDetailsViewModel = hiltViewModel(),
     settingsViewModel: SettingsViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
 ) {
+    val processDetailsViewModel = hiltViewModel<ProcessDetailsViewModel, ProcessDetailsViewModel.ProcessDetailsViewModelFactory> { factory ->
+        factory.create(processUuid)
+    }
 
     val name by processDetailsViewModel.name.observeAsState()
     val info by processDetailsViewModel.info.observeAsState()
@@ -67,8 +69,6 @@ fun ProcessDetails(
     )
 
     val enableExportToActivityTimer by settingsViewModel.enableExportToActivityTimer.collectAsStateWithLifecycle()
-
-    processDetailsViewModel.getProcess(processUuid = processUuid)
 
     Scaffold(
         content = { innerPadding ->
