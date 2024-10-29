@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
     entities = [MeditationTimerProcess::class, MeditationTimerProcessCategory::class],
     views = [MeditationTimerCategoryIdNameCount::class],
     version = 11,
-    exportSchema = false
+    exportSchema = true
 )
 abstract class MeditationTimerRoomDatabase : RoomDatabase() {
     abstract fun processDAO(): MeditationTimerDataDAO
