@@ -41,7 +41,7 @@ object AppComponent {
             context.applicationContext,
             MeditationTimerRoomDatabase::class.java,
             "meditation_timer_process_database"
-        ).fallbackToDestructiveMigration().addMigrations(MIGRATION_11_12)
+        ).addMigrations(MIGRATION_11_12).fallbackToDestructiveMigration()
             .addCallback(ProcessDatabaseCallback(provider)).build()
 
     private val MIGRATION_11_12 = object : Migration(11, 12) {
