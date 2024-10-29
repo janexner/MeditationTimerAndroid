@@ -112,6 +112,7 @@ dependencies {
     // hilt
     implementation(libs.hilt.android)
     implementation(libs.play.services.nearby)
+    testImplementation(libs.junit.jupiter)
     ksp(libs.dagger.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
@@ -119,6 +120,7 @@ dependencies {
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
+    testImplementation(libs.room.testing)
 
     // others
     implementation(libs.google.material)
