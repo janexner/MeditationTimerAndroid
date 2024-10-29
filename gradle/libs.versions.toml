@@ -19,6 +19,8 @@ lifecycleViewmodel = "2.8.6"
 material = "1.12.0"
 navigation = "2.8.3"
 room = "2.6.1"
+rules = "1.6.1"
+runner = "1.6.2"
 runtimeSaveable = "1.7.4"
 sqlite = "2.4.0"
 squareupRetrofit = "2.11.0"
@@ -28,7 +30,7 @@ material3 = "1.3.0"
 playServicesNearby = "19.3.0"
 accompanistPermissions = "0.36.0"
 coil-compose = "2.7.0"
-junitJupiter = "5.8.1"
+junitKtx = "1.2.1"
 
 [libraries]
 androidx-activity = { module = "androidx.activity:activity", version.ref = "androidxActivity" }
@@ -54,6 +56,8 @@ androidx-material-icons-core = { module = "androidx.compose.material:material-ic
 androidx-navigation-common = { module = "androidx.navigation:navigation-common", version.ref = "navigation" }
 androidx-navigation-runtime = { module = "androidx.navigation:navigation-runtime", version.ref = "navigation" }
 androidx-room-common = { module = "androidx.room:room-common", version.ref = "room" }
+androidx-rules = { module = "androidx.test:rules", version.ref = "rules" }
+androidx-runner = { module = "androidx.test:runner", version.ref = "runner" }
 androidx-runtime = { module = "androidx.compose.runtime:runtime" }
 androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 androidx-runtime-saveable = { module = "androidx.compose.runtime:runtime-saveable", version.ref = "runtimeSaveable" }
@@ -86,7 +90,7 @@ squareup-retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "c
 play-services-nearby = { group = "com.google.android.gms", name = "play-services-nearby", version.ref = "playServicesNearby" }
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermissions" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil-compose" }
-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

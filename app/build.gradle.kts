@@ -14,8 +14,8 @@ android {
         applicationId = "com.exner.tools.meditationtimer"
         minSdk = 29
         targetSdk = 35
-        versionCode = 6
-        versionName = "1.0.6"
+        versionCode = 7
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -112,7 +112,6 @@ dependencies {
     // hilt
     implementation(libs.hilt.android)
     implementation(libs.play.services.nearby)
-    testImplementation(libs.junit.jupiter)
     ksp(libs.dagger.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
@@ -120,7 +119,10 @@ dependencies {
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
-    testImplementation(libs.room.testing)
+    androidTestImplementation(libs.room.testing)
+    androidTestImplementation(libs.androidx.junit.ktx)
+    androidTestImplementation(libs.androidx.runner)
+    androidTestImplementation(libs.androidx.rules)
 
     // others
     implementation(libs.google.material)
