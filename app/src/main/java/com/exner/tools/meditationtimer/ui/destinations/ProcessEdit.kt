@@ -222,7 +222,7 @@ fun ProcessEdit(
                                 // The `menuAnchor` modifier must be passed to the text field for correctness.
                                 modifier = Modifier
                                     .menuAnchor(
-                                        type = MenuAnchorType.PrimaryEditable,
+                                        type = MenuAnchorType.PrimaryNotEditable,
                                         enabled = true
                                     )
                                     .fillMaxWidth()
