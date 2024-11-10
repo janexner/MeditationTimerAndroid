@@ -228,8 +228,8 @@ fun ProcessStateAuthenticationRequestedScreen(
 ) {
     if (openAuthenticationDialog) {
         AlertDialog(
-            title = { Text(text = "Accept connection to " + info.connectionInfo.endpointName) },
-            text = { Text(text = "Confirm the code matches on both devices: " + info.connectionInfo.authenticationDigits) },
+            title = { Text(text = "Accept connection to " + info.endpointName) },
+            text = { Text(text = "Confirm the code matches on both devices: " + info.authenticationDigits) },
             icon = { Icon(imageVector = Icons.Default.Warning, contentDescription = "Alert") },
             onDismissRequest = { dismissCallback() },
             confirmButton = { TextButton(onClick = { confirmCallback() }) {

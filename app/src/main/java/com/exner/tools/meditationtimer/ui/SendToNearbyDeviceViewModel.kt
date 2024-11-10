@@ -85,7 +85,8 @@ data class ProcessState(
 
 data class EndpointConnectionInformation(
     val endpointId: String = "",
-    val connectionInfo: ConnectionInfo = ConnectionInfo("", "", false)
+    val endpointName: String = "",
+    val authenticationDigits: String = ""
 )
 
 @HiltViewModel
@@ -128,7 +129,8 @@ class SendToNearbyDeviceViewModel @Inject constructor(
             // authenticate
             _connectionInfo.value = EndpointConnectionInformation(
                 endpointId = endpointId,
-                connectionInfo = connectionInfo
+                endpointName = connectionInfo.endpointName,
+                authenticationDigits = connectionInfo.authenticationDigits
             )
             // now move to auth requested
             _processStateFlow.value = ProcessState(ProcessStateConstants.AUTHENTICATION_REQUESTED,
