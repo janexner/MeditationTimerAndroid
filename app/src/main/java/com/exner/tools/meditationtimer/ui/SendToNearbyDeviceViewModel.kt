@@ -75,7 +75,7 @@ enum class ProcessStateConstants {
  */
 
 const val endpointId: String = "com.exner.tools.ActivityTimer"
-const val userName: String = "anonymous"
+const val userName: String = "Meditation Timer"
 const val checkInterval: Long = 500 // this should be milliseconds
 
 data class ProcessState(
@@ -107,7 +107,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
 
     // TODO create object for auth that holds endpointId and connectionInfo
 
-    val payloadCallback = object : PayloadCallback() {
+    private val payloadCallback = object : PayloadCallback() {
         override fun onPayloadReceived(endpointId: String, payload: Payload) {
             Log.d("SNDVMPTU", "Payload received ${payload.id}")
         }
@@ -189,7 +189,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
 
     var endpointsFound: Flow<List<TimerEndpoint>> = flow {
         while (processStateFlow.value.currentState == ProcessStateConstants.AWAITING_PERMISSIONS || processStateFlow.value.currentState == ProcessStateConstants.PERMISSIONS_GRANTED || processStateFlow.value.currentState == ProcessStateConstants.STARTING_DISCOVERY || processStateFlow.value.currentState == ProcessStateConstants.DISCOVERY_STARTED || processStateFlow.value.currentState == ProcessStateConstants.PERMISSIONS_DENIED || processStateFlow.value.currentState == ProcessStateConstants.PARTNER_CHOSEN) {
-            emit(discoveredEndpoints.values.toList());
+            emit(discoveredEndpoints.values.toList())
             delay(checkInterval)
         }
     }
@@ -290,10 +290,9 @@ class SendToNearbyDeviceViewModel @Inject constructor(
             ProcessStateConstants.CONNECTION_DENIED -> TODO()
 
             ProcessStateConstants.SENDING -> {
-                val uuid = message
-                Log.d("SNDVM", "Will try and send $uuid...")
+                Log.d("SNDVM", "Will try and send $message...")
                 viewModelScope.launch {
-                    val process = repository.loadProcessByUuid(uuid)
+                    val process = repository.loadProcessByUuid(message)
                     if (process != null) {
                         establishedConnections.forEach{ connection ->
                             Log.d("SNDVM", "Sending payload to endpoint ${connection.value.endpointId}...")

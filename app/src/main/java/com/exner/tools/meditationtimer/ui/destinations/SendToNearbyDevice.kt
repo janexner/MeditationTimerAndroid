@@ -5,10 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -34,7 +32,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -128,7 +125,6 @@ fun SendToNearbyDevice(
 
     Scaffold(
         content = { innerPadding ->
-            val configuration = LocalConfiguration.current
             Column(
                 modifier = Modifier
                     .padding(innerPadding)
@@ -142,7 +138,9 @@ fun SendToNearbyDevice(
                     }
 
                     ProcessStateConstants.PERMISSIONS_GRANTED -> {
-                        ProcessStatePermissionsGrantedScreen()
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Text(text = "All permissions OK.")
+                        }
                     }
 
                     ProcessStateConstants.PERMISSIONS_DENIED -> {
@@ -150,21 +148,32 @@ fun SendToNearbyDevice(
                     }
 
                     ProcessStateConstants.STARTING_DISCOVERY -> {
-                        ProcessStateStartingDiscovery()
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Text(text = "Looking for a TV now...")
+                            DefaultSpacer()
+                            Text(text = "Make sure the Activity Timer app is running on your TV!")
+                        }
                     }
 
                     ProcessStateConstants.DISCOVERY_STARTED -> {
                         ProcessStateDiscoveryStartedScreen(discoveredEndpoints) { endpointId ->
-                            sendToNearbyDeviceViewModel.transitionToNewState(ProcessStateConstants.PARTNER_CHOSEN, endpointId)
+                            sendToNearbyDeviceViewModel.transitionToNewState(
+                                ProcessStateConstants.PARTNER_CHOSEN,
+                                endpointId
+                            )
                         }
                     }
 
                     ProcessStateConstants.PARTNER_CHOSEN -> {
-                        ProcessStatePartnerFoundScreen(processState.message)
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Text(text = "Connecting to partner ${processState.message}...")
+                        }
                     }
 
                     ProcessStateConstants.CONNECTING -> {
-                        ProcessStateConnectingScreen(processState.message)
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Text(text = "Connecting to partner ${processState.message}...")
+                        }
                     }
 
                     ProcessStateConstants.AUTHENTICATION_REQUESTED -> {
@@ -174,20 +183,30 @@ fun SendToNearbyDevice(
                             info = connectionInfo,
                             confirmCallback = {
                                 openAuthenticationDialog.value = false
-                                sendToNearbyDeviceViewModel.transitionToNewState(ProcessStateConstants.AUTHENTICATION_OK, "Accepted")
+                                sendToNearbyDeviceViewModel.transitionToNewState(
+                                    ProcessStateConstants.AUTHENTICATION_OK,
+                                    "Accepted"
+                                )
                             },
                             dismissCallback = {
                                 openAuthenticationDialog.value = false
-                                sendToNearbyDeviceViewModel.transitionToNewState(ProcessStateConstants.AUTHENTICATION_DENIED, "Denied")
+                                sendToNearbyDeviceViewModel.transitionToNewState(
+                                    ProcessStateConstants.AUTHENTICATION_DENIED,
+                                    "Denied"
+                                )
                             }
                         )
                     }
+
                     ProcessStateConstants.AUTHENTICATION_OK -> {}
                     ProcessStateConstants.AUTHENTICATION_DENIED -> {}
 
                     ProcessStateConstants.CONNECTION_ESTABLISHED -> {
                         ProcessConnectionEstablished(processes) { uuid ->
-                            sendToNearbyDeviceViewModel.transitionToNewState(ProcessStateConstants.SENDING, uuid)
+                            sendToNearbyDeviceViewModel.transitionToNewState(
+                                ProcessStateConstants.SENDING,
+                                uuid
+                            )
                         }
                     }
 
@@ -195,15 +214,23 @@ fun SendToNearbyDevice(
                     ProcessStateConstants.SENDING -> {}
 
                     ProcessStateConstants.DONE -> {
-                        ProcessStateDoneScreen()
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Text(text = "All done.")
+                        }
                     }
 
                     ProcessStateConstants.CANCELLED -> {
-                        ProcessStateCancelledScreen()
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Text(text = "Cancelled.")
+                        }
                     }
 
                     ProcessStateConstants.ERROR -> {
-                        ProcessStateErrorScreen(message = processState.message)
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Text(text = "Some error occurred. It may help to move away from this screen and try it all again.")
+                            DefaultSpacer()
+                            Text(text = processState.message)
+                        }
                     }
 
                 }
@@ -287,23 +314,10 @@ private fun ProcessStateAwaitingPermissionsScreen(permissionsNeeded: MultiplePer
 }
 
 @Composable
-private fun ProcessStatePermissionsGrantedScreen() {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "All permissions OK.")
-    }
-}
-
-@Composable
-private fun ProcessStateStartingDiscovery() {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Looking for a TV now...")
-        DefaultSpacer()
-        Text(text = "Make sure the Activity Timer app is running on your TV!")
-    }
-}
-
-@Composable
-private fun ProcessStateDiscoveryStartedScreen(discoveredEndpoints: List<TimerEndpoint>, onItemClick : (String) -> Unit) {
+private fun ProcessStateDiscoveryStartedScreen(
+    discoveredEndpoints: List<TimerEndpoint>,
+    onItemClick : (String) -> Unit
+) {
     LazyColumn(
         modifier = Modifier
             .padding(PaddingValues(8.dp))
@@ -321,43 +335,6 @@ private fun ProcessStateDiscoveryStartedScreen(discoveredEndpoints: List<TimerEn
                 BodyText(text = "Activity Timer for TV ID: ${endpoint.endpointId}")
             }
         }
-    }
-}
-
-@Composable
-private fun ProcessStatePartnerFoundScreen(message: String) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Connecting to partner $message...")
-    }
-}
-
-@Composable
-private fun ProcessStateConnectingScreen(message: String) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Connecting to partner $message...")
-    }
-}
-
-@Composable
-private fun ProcessStateDoneScreen() {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "All done.")
-    }
-}
-
-@Composable
-private fun ProcessStateCancelledScreen() {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Cancelled.")
-    }
-}
-
-@Composable
-private fun ProcessStateErrorScreen(message: String) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "Some error occurred. It may help to move away from this screen and try it all again.")
-        DefaultSpacer()
-        Text(text = message)
     }
 }
 
