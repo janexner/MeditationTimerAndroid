@@ -1,5 +1,5 @@
 [versions]
-androidGradlePlugin = "8.7.2"
+androidGradlePlugin = "8.7.3"
 androidxActivity = "1.9.3"
 androidxComposeBom = "2024.11.00"
 androidxHiltNavigationCompose = "1.2.0"
