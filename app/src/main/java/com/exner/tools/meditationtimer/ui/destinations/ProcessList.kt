@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.BottomAppBar
@@ -145,8 +146,7 @@ fun ProcessList(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(innerPadding)
                 ) {
-                    items(count = filteredProcesses.size) { meditationTimerProcess ->
-                        val mtProcess = filteredProcesses[meditationTimerProcess]
+                    items(items = filteredProcesses, key = {it.uuid}) { mtProcess ->
                         Surface(
                             modifier = Modifier
                                 .clickable {

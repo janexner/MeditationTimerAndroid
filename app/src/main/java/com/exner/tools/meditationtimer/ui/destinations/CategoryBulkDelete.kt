@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
@@ -77,8 +78,7 @@ fun CategoryBulkDelete(
                         .imePadding()
 
                 ) {
-                    items(count = categories.size) { meditationTimerCategory ->
-                        val category = categories[meditationTimerCategory]
+                    items(items = categories, key = {it.uid}) { category ->
                         var supText = "Unused"
                         val usage = categoryUsage.firstOrNull {
                             it.uid == category.uid
