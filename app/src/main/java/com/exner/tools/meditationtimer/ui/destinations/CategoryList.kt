@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -90,8 +91,7 @@ fun CategoryList(
                         .padding(innerPadding)
                         .imePadding()
                 ) {
-                    items(count = categories.size) { index ->
-                        val category = categories[index]
+                    items(items = categories, key = {it.uid}) { category ->
                         Surface(
                             modifier = Modifier
                                 .clickable {

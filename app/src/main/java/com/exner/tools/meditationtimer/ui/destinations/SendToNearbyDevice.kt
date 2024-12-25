@@ -285,7 +285,7 @@ fun ProcessConnectionEstablished(
         item {
             Text(text = "Select a process to send it over")
         }
-        items(processes) { process ->
+        items(items = processes, key = {it.uuid}) { process ->
             Box(modifier = Modifier
                 .padding(PaddingValues(8.dp))
                 .clickable {
@@ -326,7 +326,7 @@ private fun ProcessStateDiscoveryStartedScreen(
         item {
             Text(text = "Looking for a TV running Activity Timer... once found, tap to connect.")
         }
-        items(discoveredEndpoints) { endpoint ->
+        items(items = discoveredEndpoints, key = {it.endpointId}) { endpoint ->
             Box(modifier = Modifier
                 .padding(PaddingValues(8.dp))
                 .clickable {
