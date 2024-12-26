@@ -240,7 +240,8 @@ fun SendToNearbyDevice(
             SendToNearbyBottomBar(
                 navigator = navigator,
                 processState = processState,
-                transition = sendToNearbyDeviceViewModel::transitionToNewState
+                transition = sendToNearbyDeviceViewModel::transitionToNewState,
+                permissionsNeeded = permissionsNeeded
             )
         }
     )
@@ -338,11 +339,13 @@ private fun ProcessStateDiscoveryStartedScreen(
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SendToNearbyBottomBar(
     navigator: DestinationsNavigator,
     processState: ProcessState,
-    transition: (ProcessStateConstants, String) -> Unit
+    transition: (ProcessStateConstants, String) -> Unit,
+    permissionsNeeded: MultiplePermissionsState
 ) {
     BottomAppBar(
         actions = {
@@ -367,7 +370,7 @@ fun SendToNearbyBottomBar(
                             )
                         },
                         onClick = {
-                            // how do we do this?
+                            permissionsNeeded.launchMultiplePermissionRequest()
                         },
                         containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
                         elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
