@@ -27,9 +27,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 enum class ProcessStateConstants {
-    AWAITING_PERMISSIONS, // IDLE
-    PERMISSIONS_GRANTED,
-    PERMISSIONS_DENIED,
+    IDLE, // IDLE
     STARTING_DISCOVERY,
     DISCOVERY_STARTED,
     PARTNER_CHOSEN,
@@ -48,13 +46,7 @@ enum class ProcessStateConstants {
 /****
  * Here's the flow:
  *
- * AWAITING PERMISSIONS ("IDLE")
- * - show brief explanation why permissions are needed, and a button "Get permissions"
- * - check whether permissions are all given.
- *   - If so -> PERMISSIONS_GRANTED
- *   - Otherwise -> PERMISSIONS_DENIED (same as AWAITING_PERMISSIONS?)
- *
- * PERMISSIONS_GRANTED
+ * IDLE
  * - show "Start discovery" button
  * - the button has two callbacks
  *   - success -> DISCOVERY_STARTED
@@ -79,7 +71,7 @@ const val userName: String = "Meditation Timer"
 const val checkInterval: Long = 500 // this should be milliseconds
 
 data class ProcessState(
-    val currentState: ProcessStateConstants = ProcessStateConstants.AWAITING_PERMISSIONS,
+    val currentState: ProcessStateConstants = ProcessStateConstants.IDLE,
     val message: String = ""
 )
 
@@ -188,7 +180,7 @@ class SendToNearbyDeviceViewModel @Inject constructor(
     val establishedConnections: MutableMap<String, TimerEndpoint> = mutableMapOf()
 
     var endpointsFound: Flow<List<TimerEndpoint>> = flow {
-        while (processStateFlow.value.currentState == ProcessStateConstants.AWAITING_PERMISSIONS || processStateFlow.value.currentState == ProcessStateConstants.PERMISSIONS_GRANTED || processStateFlow.value.currentState == ProcessStateConstants.STARTING_DISCOVERY || processStateFlow.value.currentState == ProcessStateConstants.DISCOVERY_STARTED || processStateFlow.value.currentState == ProcessStateConstants.PERMISSIONS_DENIED || processStateFlow.value.currentState == ProcessStateConstants.PARTNER_CHOSEN) {
+        while (processStateFlow.value.currentState == ProcessStateConstants.IDLE || processStateFlow.value.currentState == ProcessStateConstants.STARTING_DISCOVERY || processStateFlow.value.currentState == ProcessStateConstants.DISCOVERY_STARTED || processStateFlow.value.currentState == ProcessStateConstants.PARTNER_CHOSEN) {
             emit(discoveredEndpoints.values.toList())
             delay(checkInterval)
         }
@@ -212,18 +204,14 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                 Log.d("SNDVM", "Authentication requested...")
             }
 
-            ProcessStateConstants.PERMISSIONS_GRANTED -> {
+            ProcessStateConstants.IDLE -> {
                 _processStateFlow.value = ProcessState(newState, "OK")
-                Log.d("SNDVM", "Permissions OK, automatically starting discovery...")
+                Log.d("SNDVM", "Permissions OK.")
                 _processStateFlow.value = ProcessState(
                     ProcessStateConstants.STARTING_DISCOVERY,
-                    message = "Automatically moving to discovery..."
+                    message = "Permissions OK"
                 )
                 startDiscovery()
-            }
-
-            ProcessStateConstants.PERMISSIONS_DENIED -> {
-                _processStateFlow.value = ProcessState(newState, "Denied: $message")
             }
 
             ProcessStateConstants.CANCELLED -> {
@@ -263,8 +251,6 @@ class SendToNearbyDeviceViewModel @Inject constructor(
                     )
                 }
             }
-
-            ProcessStateConstants.AWAITING_PERMISSIONS -> TODO()
 
             ProcessStateConstants.CONNECTING -> {
                 Log.d("SNDVM", "Accepting connection... $message")

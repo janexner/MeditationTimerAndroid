@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -37,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
-import com.exner.tools.meditationtimer.network.Permissions
 import com.exner.tools.meditationtimer.network.TimerEndpoint
 import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.DefaultSpacer
@@ -45,9 +43,8 @@ import com.exner.tools.meditationtimer.ui.EndpointConnectionInformation
 import com.exner.tools.meditationtimer.ui.ProcessState
 import com.exner.tools.meditationtimer.ui.ProcessStateConstants
 import com.exner.tools.meditationtimer.ui.SendToNearbyDeviceViewModel
+import com.exner.tools.meditationtimer.ui.destinations.wrappers.AskForPermissionsWrapper
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.MultiplePermissionsState
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo
 import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback
@@ -57,19 +54,15 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 
 @OptIn(ExperimentalPermissionsApi::class)
-@Destination<RootGraph>
+@Destination<RootGraph>(
+    wrappers = [AskForPermissionsWrapper::class]
+)
 @Composable
 fun SendToNearbyDevice(
     sendToNearbyDeviceViewModel: SendToNearbyDeviceViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
 ) {
     val context = LocalContext.current
-    val permissions = Permissions(context = context)
-
-    val permissionsNeeded =
-        rememberMultiplePermissionsState(
-            permissions = permissions.getAllNecessaryPermissionsAsListOfStrings()
-        )
 
     val processState by sendToNearbyDeviceViewModel.processStateFlow.collectAsState()
 
@@ -116,13 +109,6 @@ fun SendToNearbyDevice(
     val openAuthenticationDialog = remember { mutableStateOf(false) }
     val connectionInfo by sendToNearbyDeviceViewModel.connectionInfo.collectAsState()
 
-    // some sanity checking for state
-    if (processState.currentState == ProcessStateConstants.AWAITING_PERMISSIONS && permissionsNeeded.allPermissionsGranted) {
-        sendToNearbyDeviceViewModel.transitionToNewState(ProcessStateConstants.PERMISSIONS_GRANTED)
-    } else if (processState.currentState == ProcessStateConstants.AWAITING_PERMISSIONS) {
-        Log.d("STND", "Missing permissions: ${permissions.getAllNecessaryPermissionsAsListOfStrings()}")
-    }
-
     Scaffold(
         content = { innerPadding ->
             Column(
@@ -133,18 +119,10 @@ fun SendToNearbyDevice(
             ) {
                 // UI, depending on state
                 when (processState.currentState) {
-                    ProcessStateConstants.AWAITING_PERMISSIONS -> {
-                        ProcessStateAwaitingPermissionsScreen(permissionsNeeded)
-                    }
-
-                    ProcessStateConstants.PERMISSIONS_GRANTED -> {
+                    ProcessStateConstants.IDLE -> {
                         Column(modifier = Modifier.fillMaxSize()) {
                             Text(text = "All permissions OK.")
                         }
-                    }
-
-                    ProcessStateConstants.PERMISSIONS_DENIED -> {
-                        ProcessStateAwaitingPermissionsScreen(permissionsNeeded)
                     }
 
                     ProcessStateConstants.STARTING_DISCOVERY -> {
@@ -241,7 +219,6 @@ fun SendToNearbyDevice(
                 navigator = navigator,
                 processState = processState,
                 transition = sendToNearbyDeviceViewModel::transitionToNewState,
-                permissionsNeeded = permissionsNeeded
             )
         }
     )
@@ -298,22 +275,6 @@ fun ProcessConnectionEstablished(
     }
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
-@Composable
-private fun ProcessStateAwaitingPermissionsScreen(permissionsNeeded: MultiplePermissionsState) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Text(text = "If you would like to send processes to your TV running Activity Timer, this app needs permission for Bluetooth, WiFi, and the discovery of nearby devices, which may also need location permissions.")
-        DefaultSpacer()
-        Button(
-            onClick = {
-                permissionsNeeded.launchMultiplePermissionRequest()
-            }
-        ) {
-            Text(text = "Request permissions")
-        }
-    }
-}
-
 @Composable
 private fun ProcessStateDiscoveryStartedScreen(
     discoveredEndpoints: List<TimerEndpoint>,
@@ -345,7 +306,6 @@ fun SendToNearbyBottomBar(
     navigator: DestinationsNavigator,
     processState: ProcessState,
     transition: (ProcessStateConstants, String) -> Unit,
-    permissionsNeeded: MultiplePermissionsState
 ) {
     BottomAppBar(
         actions = {
@@ -360,23 +320,7 @@ fun SendToNearbyBottomBar(
         },
         floatingActionButton = {
             when (processState.currentState) {
-                ProcessStateConstants.AWAITING_PERMISSIONS -> {
-                    ExtendedFloatingActionButton(
-                        text = { Text(text = "Request Permissions") },
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = "Request permissions"
-                            )
-                        },
-                        onClick = {
-                            permissionsNeeded.launchMultiplePermissionRequest()
-                        },
-                        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
-                    )
-                }
-                ProcessStateConstants.PERMISSIONS_GRANTED -> {
+                ProcessStateConstants.IDLE -> {
                     ExtendedFloatingActionButton(
                         text = { Text(text = "Discover Devices") },
                         icon = {
