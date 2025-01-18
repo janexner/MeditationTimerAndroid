@@ -53,7 +53,6 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Destination<RootGraph>(
     wrappers = [AskForPermissionsWrapper::class]
 )
