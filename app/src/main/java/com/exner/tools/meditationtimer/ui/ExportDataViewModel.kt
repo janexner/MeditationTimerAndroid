@@ -26,7 +26,10 @@ class ExportDataViewModel @Inject constructor(
     val allCategories = repository.observeCategories
 
     @OptIn(ExperimentalStdlibApi::class)
-    fun commitExport(context: Context) {
+    fun commitExport(
+        context: Context,
+        successCallback: () -> Unit
+    ) {
         viewModelScope.launch {
             val moshi = Moshi.Builder()
                 .addLast(KotlinJsonAdapterFactory())
@@ -53,6 +56,7 @@ class ExportDataViewModel @Inject constructor(
                     stream?.write(json.encodeToByteArray())
                 }
             }
+            successCallback()
         }
     }
 }

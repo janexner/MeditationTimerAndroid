@@ -1,5 +1,6 @@
 package com.exner.tools.meditationtimer.ui.destinations
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -104,7 +105,13 @@ fun ExportData(
                             )
                         },
                         onClick = {
-                            exportDataViewModel.commitExport(context)
+                            exportDataViewModel.commitExport(context) {
+                                Toast.makeText(
+                                    context,
+                                    "Data exported successfully",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
                         },
                         containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
                         elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
