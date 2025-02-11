@@ -129,14 +129,20 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.datastore.preferences)
     runtimeOnly(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.material3.windowsizeclass.android)
 
     // compose destinations
     implementation(libs.compose.destinations.core)
     ksp(libs.compose.destinations.ksp)
 
-    // retrofit
-    implementation(libs.squareup.retrofit)
-    implementation(libs.squareup.retrofit.converter.gson)
+    // moshi
+    implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
+    ksp(libs.moshi.codegen)
+
+    // filekit
+    implementation(libs.filekit.core)
+    implementation(libs.filekit.compose)
 }
 
 hilt {

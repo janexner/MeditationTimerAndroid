@@ -4,8 +4,10 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -32,10 +34,11 @@ import com.exner.tools.meditationtimer.ui.MediumTimerAndIntervalText
 import com.exner.tools.meditationtimer.ui.NotesText
 import com.exner.tools.meditationtimer.ui.ProcessRunViewModel
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlin.time.Duration.Companion.seconds
 
-@Destination
+@Destination<RootGraph>
 @Composable
 fun ProcessRun(
     processUuid: String,
@@ -62,10 +65,12 @@ fun ProcessRun(
     KeepScreenOn()
 
     Scaffold(
+        modifier = Modifier.imePadding(),
         content = { innerPadding ->
             val configuration = LocalConfiguration.current
             Column(
                 modifier = Modifier
+                    .consumeWindowInsets(innerPadding)
                     .padding(innerPadding)
                     .padding(8.dp)
                     .fillMaxWidth()

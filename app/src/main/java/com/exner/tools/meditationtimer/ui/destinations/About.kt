@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -24,15 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
 import com.exner.tools.meditationtimer.BuildConfig
-import com.exner.tools.meditationtimer.ui.theme.MeditationTimerTheme
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
 
-@Destination
+@Destination<RootGraph>
 @Composable
 fun About() {
 
@@ -92,22 +90,24 @@ private fun AboutVersionAndButton(localContext: Context) {
         )
         Spacer(modifier = Modifier.width(8.dp))
         Button(
+            modifier = Modifier.fillMaxWidth(),
             onClick = {
                 val webpage: Uri =
                     Uri.parse("https://jan-exner.de/software/android/meditationtimer/")
                 val intent = Intent(Intent.ACTION_VIEW, webpage)
-                startActivity(localContext, intent, null)
+                localContext.startActivity(intent)
             },
         ) {
             Text(text = "Visit the Meditation Timer web site")
         }
         Spacer(modifier = Modifier.width(8.dp))
         Button(
+            modifier = Modifier.fillMaxWidth(),
             onClick = {
                 val webpage: Uri =
                     Uri.parse("https://jan-exner.de/software/android/fototimer/manual/")
                 val intent = Intent(Intent.ACTION_VIEW, webpage)
-                startActivity(localContext, intent, null)
+                localContext.startActivity(intent)
             },
         ) {
             Text(text = "Peruse the Foto Timer manual")
@@ -150,24 +150,5 @@ fun AboutText() {
             text = "It runs on Android phones and tablets running Android 10 or later. I aim to support the latest 3 versions of Android.",
             modifier = Modifier.padding(8.dp)
         )
-    }
-}
-
-@Preview(
-    showSystemUi = true,
-    device = Devices.PHONE
-)
-@Preview(
-    showSystemUi = true,
-    device = Devices.NEXUS_5
-)
-@Preview(
-    showSystemUi = true,
-    device = Devices.TABLET
-)
-@Composable
-fun FTAPreview() {
-    MeditationTimerTheme {
-        About()
     }
 }

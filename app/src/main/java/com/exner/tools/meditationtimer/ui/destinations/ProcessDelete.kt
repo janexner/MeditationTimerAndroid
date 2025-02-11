@@ -2,8 +2,10 @@ package com.exner.tools.meditationtimer.ui.destinations
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -25,11 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.ProcessDeleteViewModel
-import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessListDestination
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.ProcessListDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination
+@Destination<RootGraph>
 @Composable
 fun ProcessDelete(
     processUuid: String,
@@ -44,10 +47,12 @@ fun ProcessDelete(
     processDeleteViewModel.checkProcess(processUuid)
 
     Scaffold(
+        modifier = Modifier.imePadding(),
         content = { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .consumeWindowInsets(innerPadding)
                     .padding(innerPadding)
                     .padding(8.dp)
                     .verticalScroll(rememberScrollState())

@@ -28,6 +28,11 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
     }
 
     @WorkerThread
+    suspend fun loadProcessById(uid: Long): MeditationTimerProcess? {
+        return meditationTimerProcessDAO.getMeditationTimerProcess(uid)
+    }
+
+    @WorkerThread
     suspend fun getUuidsOfDependentProcesses(fotoTimerProcess: MeditationTimerProcess): List<String> {
         return meditationTimerProcessDAO.getUuidsOfDependantProcesses(fotoTimerProcess.uuid)
     }
@@ -38,8 +43,28 @@ class MeditationTimerDataRepository @Inject constructor(private val meditationTi
     }
 
     @WorkerThread
+    suspend fun getAllProcesses(): List<MeditationTimerProcess> {
+        return meditationTimerProcessDAO.getAllProcesses()
+    }
+
+    @WorkerThread
+    suspend fun deleteAllProcesses() {
+        meditationTimerProcessDAO.deleteAllProcesses()
+    }
+
+    @WorkerThread
     suspend fun getCategoryById(id: Long): MeditationTimerProcessCategory? {
         return meditationTimerProcessDAO.getCategoryById(id)
+    }
+
+    @WorkerThread
+    suspend fun getAllCategories(): List<MeditationTimerProcessCategory> {
+        return meditationTimerProcessDAO.getAllCategories()
+    }
+
+    @WorkerThread
+    suspend fun deleteAllCategories() {
+        meditationTimerProcessDAO.deleteAllCategories()
     }
 
     @WorkerThread

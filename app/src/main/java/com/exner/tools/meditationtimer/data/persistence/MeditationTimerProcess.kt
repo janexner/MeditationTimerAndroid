@@ -3,8 +3,10 @@ package com.exner.tools.meditationtimer.data.persistence
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.squareup.moshi.JsonClass
 
 @Entity
+@JsonClass(generateAdapter = true)
 data class MeditationTimerProcess (
     @ColumnInfo(name = "name") val name : String,
     @ColumnInfo(name = "info") val info : String,

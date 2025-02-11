@@ -37,9 +37,10 @@ import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.CategoryListViewModel
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination
+@Destination<RootGraph>
 @Composable
 fun CategoryBulkDelete(
     categoryListViewModel: CategoryListViewModel = hiltViewModel(),
@@ -60,10 +61,14 @@ fun CategoryBulkDelete(
     val openAlertDialog = remember { mutableStateOf(false) }
 
     Scaffold(
+        modifier = Modifier.imePadding(),
         content = { innerPadding ->
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
+                    .consumeWindowInsets(innerPadding)
+                    .padding(innerPadding)
+                    .padding(8.dp)
             ) {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 250.dp),

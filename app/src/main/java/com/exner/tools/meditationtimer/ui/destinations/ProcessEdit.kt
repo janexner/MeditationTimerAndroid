@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -44,10 +45,11 @@ import com.exner.tools.meditationtimer.ui.SettingsViewModel
 import com.exner.tools.meditationtimer.ui.TextAndSwitch
 import com.exner.tools.meditationtimer.ui.TextFieldForTimes
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination
+@Destination<RootGraph>
 @Composable
 fun ProcessEdit(
     processUuid: String?,
@@ -80,15 +82,15 @@ fun ProcessEdit(
     var modified by remember { mutableStateOf(false) }
 
     Scaffold(
+        modifier = Modifier.imePadding(),
         content = { innerPadding ->
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .consumeWindowInsets(innerPadding)
-                    .padding(8.dp)
-                    .wrapContentHeight()
                     .padding(innerPadding)
-                    .imePadding()
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .wrapContentHeight()
                     .verticalScroll(rememberScrollState())
             ) {
                 // top - fields

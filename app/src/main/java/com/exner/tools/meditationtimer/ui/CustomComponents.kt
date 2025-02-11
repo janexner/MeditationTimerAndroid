@@ -8,8 +8,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -88,6 +90,11 @@ fun SmallBodyText(text: String, modifier: Modifier = Modifier) {
         style = MaterialTheme.typography.bodySmall,
         modifier = modifier,
     )
+}
+
+@Composable
+fun DefaultSpacer() {
+    Spacer(modifier = Modifier.size(16.dp))
 }
 
 @Composable
@@ -202,7 +209,11 @@ fun TextAndTriStateToggle(
 }
 
 @Composable
-fun durationToAnnotatedString(duration: Duration, withHours: Boolean, postText: String? = null): AnnotatedString {
+fun durationToAnnotatedString(
+    duration: Duration,
+    withHours: Boolean,
+    postText: String? = null
+): AnnotatedString {
     // convert seconds to "00:00" style string
     val output = duration.toComponents { hours, minutes, seconds, _ ->
         String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds)
@@ -392,7 +403,11 @@ fun BTTTest() {
     MeditationTimerTheme {
         Column {
             BigTimerText(duration = 10.seconds, false)
-            MediumTimerAndIntervalText(duration = 75.seconds, withHours = false, intervalText = "1 of 3")
+            MediumTimerAndIntervalText(
+                duration = 75.seconds,
+                withHours = false,
+                intervalText = "1 of 3"
+            )
         }
     }
 }
@@ -403,7 +418,11 @@ fun BTTNormalTest() {
     MeditationTimerTheme {
         Column {
             BigTimerText(duration = 10.seconds, false)
-            MediumTimerAndIntervalText(duration = 75.seconds, withHours = false, intervalText = "1 of 3")
+            MediumTimerAndIntervalText(
+                duration = 75.seconds,
+                withHours = false,
+                intervalText = "1 of 3"
+            )
         }
     }
 }

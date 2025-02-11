@@ -38,11 +38,23 @@ interface MeditationTimerDataDAO {
     @Query("SELECT count(uid) FROM meditationtimerprocess")
     suspend fun getNumberOfProcesses(): Int
 
+    @Query("SELECT * FROM meditationtimerprocess ORDER BY name ASC")
+    suspend fun getAllProcesses(): List<MeditationTimerProcess>
+
+    @Query("DELETE FROM meditationtimerprocess;")
+    suspend fun deleteAllProcesses()
+
     @Query("SELECT * FROM meditationtimerprocesscategory WHERE uid=:id")
     suspend fun getCategoryById(id: Long): MeditationTimerProcessCategory?
 
     @Query("DELETE FROM meditationtimerprocesscategory WHERE uid IN (:listOfIds)")
     suspend fun deleteCategoriesByIdsFromList(listOfIds: List<Long>)
+
+    @Query("SELECT * FROM meditationtimerprocesscategory ORDER BY name ASC")
+    suspend fun getAllCategories(): List<MeditationTimerProcessCategory>
+
+    @Query("DELETE FROM meditationtimerprocesscategory")
+    suspend fun deleteAllCategories()
 
     @Insert
     suspend fun insert(fotoTimerProcess: MeditationTimerProcess)

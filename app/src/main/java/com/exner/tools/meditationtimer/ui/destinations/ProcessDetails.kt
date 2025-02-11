@@ -2,7 +2,9 @@ package com.exner.tools.meditationtimer.ui.destinations
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -34,13 +36,14 @@ import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.ProcessDetailsViewModel
 import com.exner.tools.meditationtimer.ui.SmallBodyText
-import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessDeleteDestination
-import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessEditDestination
-import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessRunDestination
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.ProcessDeleteDestination
+import com.ramcosta.composedestinations.generated.destinations.ProcessEditDestination
+import com.ramcosta.composedestinations.generated.destinations.ProcessRunDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination
+@Destination<RootGraph>
 @Composable
 fun ProcessDetails(
     processUuid: String,
@@ -62,11 +65,14 @@ fun ProcessDetails(
     processDetailsViewModel.getProcess(processUuid = processUuid)
 
     Scaffold(
+        modifier = Modifier.imePadding(),
         content = { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .consumeWindowInsets(innerPadding)
                     .padding(innerPadding)
+                    .padding(8.dp)
                     .verticalScroll(rememberScrollState())
             ) {
                 // top - process information

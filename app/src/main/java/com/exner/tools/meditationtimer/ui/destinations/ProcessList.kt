@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -42,16 +44,15 @@ import com.exner.tools.meditationtimer.ui.BodyText
 import com.exner.tools.meditationtimer.ui.CategoryListDefinitions
 import com.exner.tools.meditationtimer.ui.HeaderText
 import com.exner.tools.meditationtimer.ui.ProcessListViewModel
-import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessDetailsDestination
-import com.exner.tools.meditationtimer.ui.destinations.destinations.ProcessEditDestination
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.ProcessDetailsDestination
+import com.ramcosta.composedestinations.generated.destinations.ProcessEditDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RootNavGraph(start = true)
-@Destination
+@Destination<RootGraph>(start = true)
 @Composable
 fun ProcessList(
     processListViewModel: ProcessListViewModel = hiltViewModel(),
@@ -62,7 +63,10 @@ fun ProcessList(
         initialValue = emptyList()
     )
     val currentCategory: MeditationTimerProcessCategory by processListViewModel.currentCategory.collectAsStateWithLifecycle(
-        initialValue = MeditationTimerProcessCategory("All", CategoryListDefinitions.CATEGORY_UID_ALL)
+        initialValue = MeditationTimerProcessCategory(
+            "All",
+            CategoryListDefinitions.CATEGORY_UID_ALL
+        )
     )
     val categories: List<MeditationTimerProcessCategory> by processListViewModel.observeCategoriesRaw.collectAsStateWithLifecycle(
         initialValue = emptyList()
@@ -71,9 +75,14 @@ fun ProcessList(
     var modified by remember { mutableStateOf(false) }
 
     Scaffold(
+        modifier = Modifier.imePadding(),
         content = { innerPadding ->
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .consumeWindowInsets(innerPadding)
+                    .padding(innerPadding)
+                    .padding(8.dp)
             ) {
                 var categoryExpanded by remember {
                     mutableStateOf(false)
@@ -129,17 +138,18 @@ fun ProcessList(
                     }
                 }
 
-                val filteredProcesses = if (currentCategory.uid == CategoryListDefinitions.CATEGORY_UID_ALL) {
-                    processes
-                } else if (currentCategory.uid == CategoryListDefinitions.CATEGORY_UID_NONE) {
-                    processes.filter { process ->
-                        CategoryListDefinitions.CATEGORY_UID_NONE == process.categoryId || 0L == process.categoryId || null == process.categoryId
+                val filteredProcesses =
+                    if (currentCategory.uid == CategoryListDefinitions.CATEGORY_UID_ALL) {
+                        processes
+                    } else if (currentCategory.uid == CategoryListDefinitions.CATEGORY_UID_NONE) {
+                        processes.filter { process ->
+                            CategoryListDefinitions.CATEGORY_UID_NONE == process.categoryId || 0L == process.categoryId || null == process.categoryId
+                        }
+                    } else {
+                        processes.filter { process ->
+                            currentCategory.uid == process.categoryId
+                        }
                     }
-                } else {
-                    processes.filter { process ->
-                        currentCategory.uid == process.categoryId
-                    }
-                }
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 250.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
