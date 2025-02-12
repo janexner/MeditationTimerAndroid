@@ -7,8 +7,7 @@ import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
-import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
-import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCategory
+import com.exner.tools.meditationtimer.data.persistence.tools.RootData
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
@@ -34,15 +33,11 @@ class ExportDataViewModel @Inject constructor(
             val moshi = Moshi.Builder()
                 .addLast(KotlinJsonAdapterFactory())
                 .build()
-            val jsonAdapterProcesses: JsonAdapter<List<MeditationTimerProcess>> =
-                moshi.adapter<List<MeditationTimerProcess>>()
             val processes = repository.getAllProcesses()
-            val jsonProcesses: String = jsonAdapterProcesses.toJson(processes)
-            val jsonAdapterCategories: JsonAdapter<List<MeditationTimerProcessCategory>> =
-                moshi.adapter<List<MeditationTimerProcessCategory>>()
             val categories = repository.getAllCategories()
-            val jsonCategories: String = jsonAdapterCategories.toJson(categories)
-            val json = "[{\"categories\": $jsonCategories},{\"processes\": $jsonProcesses]"
+            val data = RootData(processes, categories)
+            val jsonAdapter: JsonAdapter<RootData> = moshi.adapter<RootData>()
+            val json = jsonAdapter.toJson(data)
             // now save
             val contentValues = ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, "meditation-timer-export")

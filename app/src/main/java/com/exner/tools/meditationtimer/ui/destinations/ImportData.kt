@@ -1,5 +1,6 @@
 package com.exner.tools.meditationtimer.ui.destinations
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,6 +42,7 @@ import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
 
+@OptIn(ExperimentalFoundationApi::class)
 @Destination<RootGraph>
 @Composable
 fun ImportData(
@@ -56,14 +58,19 @@ fun ImportData(
     val fileForImport by importDataViewModel.file.collectAsStateWithLifecycle()
 
     val listOfProcessesInFile by importDataViewModel.listOfProcessesInFile.collectAsStateWithLifecycle()
+    val listOfCategoriesInFile by importDataViewModel.listOfCategoriesInFile.collectAsStateWithLifecycle()
 
     val listOfOldProcesses by importDataViewModel.listOfOldProcesses.collectAsStateWithLifecycle()
     val listOfNewProcesses by importDataViewModel.listOfNewProcesses.collectAsStateWithLifecycle()
     val listOfClashingProcesses by importDataViewModel.listOfClashingProcesses.collectAsStateWithLifecycle()
 
-    val hasOverlap = importDataViewModel.hasOverlap
+    val listOfOldCategories by importDataViewModel.listOfOldCategories.collectAsStateWithLifecycle()
+    val listOfNewCategories by importDataViewModel.listOfNewCategories.collectAsStateWithLifecycle()
+    val listOfClashingCategories by importDataViewModel.listOfClashingCategories.collectAsStateWithLifecycle()
+
     val override by importDataViewModel.override.collectAsStateWithLifecycle()
     val highestUidInProcessDB by importDataViewModel.highestUidInProcessDB.collectAsStateWithLifecycle()
+    val highestUidInCategoryDB by importDataViewModel.highestUidInCategoryDB.collectAsStateWithLifecycle()
 
     val errorMessage by importDataViewModel.errorMessage.collectAsStateWithLifecycle()
 
@@ -133,32 +140,61 @@ fun ImportData(
                             Text(text = "Select different file")
                         }
                         DefaultSpacer()
-                        Text(text = "File contains ${listOfProcessesInFile.size} processes.")
+                        Text(text = "File contains ${listOfProcessesInFile.size} processes and ${listOfCategoriesInFile.size} categories.")
                         DefaultSpacer()
                         if (override) {
-                            Text(text = "Existing processes will be deleted, and ${listOfProcessesInFile.size} will be imported.")
+                            Text(text = "Existing processes & categories will be deleted, and ${listOfProcessesInFile.size}/${listOfCategoriesInFile.size} will be imported.")
                             DefaultSpacer()
                             LazyColumn(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(0.5f)
                             ) {
+                                stickyHeader {
+                                    Text(
+                                        text = "Processes",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
                                 items(items = listOfProcessesInFile) { process ->
                                     Text(text = "${process.uid} - ${process.name}")
                                 }
+                                stickyHeader {
+                                    Text(
+                                        text = "Categories",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
+                                items(items = listOfCategoriesInFile) { category ->
+                                    Text(text = "${category.uid} - ${category.name}")
+                                }
                             }
-
                         } else {
-                            if (listOfOldProcesses.isNotEmpty()) {
-                                Text(text = "Processes that already exist in the database: ${listOfOldProcesses.size}")
+                            if (listOfOldProcesses.isNotEmpty() || listOfOldCategories.isNotEmpty()) {
+                                Text(text = "Processes/categories that already exist in the database: ${listOfOldProcesses.size}/${listOfOldCategories.size}")
                                 DefaultSpacer()
                                 LazyColumn(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .weight(0.5f)
                                 ) {
+                                    stickyHeader {
+                                        Text(
+                                            text = "Processes",
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                    }
                                     items(items = listOfOldProcesses) { process ->
                                         Text(text = "${process.uid} - ${process.name}")
+                                    }
+                                    stickyHeader {
+                                        Text(
+                                            text = "Categories",
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                    }
+                                    items(items = listOfOldCategories) { category ->
+                                        Text(text = "${category.uid} - ${category.name}")
                                     }
                                 }
                             }
@@ -170,8 +206,23 @@ fun ImportData(
                                         .fillMaxWidth()
                                         .weight(0.5f)
                                 ) {
+                                    stickyHeader {
+                                        Text(
+                                            text = "Processes",
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                    }
                                     items(items = listOfClashingProcesses) { process ->
                                         Text(text = "${process.uid} - ${process.name}")
+                                    }
+                                    stickyHeader {
+                                        Text(
+                                            text = "Categories",
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                    }
+                                    items(items = listOfClashingCategories) { category ->
+                                        Text(text = "${category.uid} - ${category.name}")
                                     }
                                 }
                             }
@@ -183,8 +234,23 @@ fun ImportData(
                                         .fillMaxWidth()
                                         .weight(0.5f)
                                 ) {
+                                    stickyHeader {
+                                        Text(
+                                            text = "Processes",
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                    }
                                     items(items = listOfNewProcesses) { process ->
                                         Text(text = "${process.uid} - ${process.name}")
+                                    }
+                                    stickyHeader {
+                                        Text(
+                                            text = "Categories",
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                    }
+                                    items(items = listOfNewCategories) { category ->
+                                        Text(text = "${category.uid} - ${category.name}")
                                     }
                                 }
                             } else {
@@ -195,7 +261,7 @@ fun ImportData(
                                 )
                             }
                             DefaultSpacer()
-                            if (hasOverlap) {
+                            if (listOfClashingProcesses.isNotEmpty() || listOfClashingCategories.isNotEmpty()) {
                                 Text(
                                     text = "Uids overlap! This will cause an error on import!",
                                     color = MaterialTheme.colorScheme.error
@@ -205,11 +271,13 @@ fun ImportData(
                                 DefaultSpacer()
                                 Text(text = "You can also edit the JSON file and start over. When doing so, change the 'uid' fields for each process, and check whether any 'gotoId' fields have to be adjusted, too.")
                                 DefaultSpacer()
-                                Text(text = "The highest Uid in the database is $highestUidInProcessDB.")
+                                Text(text = "The highest Uids in the database are:")
+                                DefaultSpacer()
+                                Text(text = "Process $highestUidInProcessDB & category $highestUidInCategoryDB.")
                             }
                         }
                         TextAndSwitch(
-                            text = "Delete existing processes before import?",
+                            text = "Delete existing processes & categories before import?",
                             checked = override
                         ) {
                             importDataViewModel.setOverride(it)
@@ -236,7 +304,7 @@ fun ImportData(
                 },
                 floatingActionButton = {
                     if (importState.state == ImportStateConstants.FILE_ANALYSED
-                        && (!hasOverlap || override)
+                        && ((listOfClashingProcesses.isEmpty() && listOfClashingCategories.isEmpty()) || override)
                         && (listOfNewProcesses.isNotEmpty() || (override && listOfProcessesInFile.isNotEmpty()))
                     ) {
                         ExtendedFloatingActionButton(

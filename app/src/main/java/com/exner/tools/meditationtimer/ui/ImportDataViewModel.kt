@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerDataRepository
 import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcess
+import com.exner.tools.meditationtimer.data.persistence.MeditationTimerProcessCategory
+import com.exner.tools.meditationtimer.data.persistence.tools.RootData
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
@@ -63,13 +65,38 @@ class ImportDataViewModel @Inject constructor(
             emptyList()
         )
     val listOfClashingProcesses: StateFlow<List<MeditationTimerProcess>> = _listOfClashingProcesses
-    val hasOverlap: Boolean = listOfClashingProcesses.value.isNotEmpty()
+
+    private val _listOfCategoriesInFile: MutableStateFlow<List<MeditationTimerProcessCategory>> =
+        MutableStateFlow(
+            emptyList()
+        )
+    val listOfCategoriesInFile: StateFlow<List<MeditationTimerProcessCategory>> =
+        _listOfCategoriesInFile
+
+    private val _listOfOldCategories: MutableStateFlow<List<MeditationTimerProcessCategory>> =
+        MutableStateFlow(
+            emptyList()
+        )
+    val listOfOldCategories: StateFlow<List<MeditationTimerProcessCategory>> = _listOfOldCategories
+    private val _listOfNewCategories: MutableStateFlow<List<MeditationTimerProcessCategory>> =
+        MutableStateFlow(
+            emptyList()
+        )
+    val listOfNewCategories: StateFlow<List<MeditationTimerProcessCategory>> = _listOfNewCategories
+    private val _listOfClashingCategories: MutableStateFlow<List<MeditationTimerProcessCategory>> =
+        MutableStateFlow(
+            emptyList()
+        )
+    val listOfClashingCategories: StateFlow<List<MeditationTimerProcessCategory>> =
+        _listOfClashingCategories
 
     private val _errorMessage: MutableStateFlow<String> = MutableStateFlow("")
     val errorMessage: StateFlow<String> = _errorMessage
 
     private val _highestUidInProcessDB: MutableStateFlow<Long> = MutableStateFlow(-1)
     val highestUidInProcessDB: StateFlow<Long> = _highestUidInProcessDB
+    private val _highestUidInCategoryDB: MutableStateFlow<Long> = MutableStateFlow(-1)
+    val highestUidInCategoryDB: StateFlow<Long> = _highestUidInCategoryDB
 
     fun setOverride(override: Boolean) {
         _override.value = override
@@ -78,14 +105,25 @@ class ImportDataViewModel @Inject constructor(
     fun commitImport(
         successCallback: () -> Unit
     ) {
-        if (listOfNewProcesses.value.isNotEmpty()) {
+        if (listOfNewProcesses.value.isNotEmpty() && listOfNewCategories.value.isNotEmpty()) {
             viewModelScope.launch {
                 if (override.value) {
+                    repository.deleteAllCategories()
+                    if (listOfCategoriesInFile.value.isNotEmpty()) {
+                        listOfCategoriesInFile.value.forEach { category ->
+                            repository.insertCategory(category)
+                        }
+                    }
                     repository.deleteAllProcesses()
-                    listOfProcessesInFile.value.forEach { process ->
-                        repository.insert(process)
+                    if (listOfProcessesInFile.value.isNotEmpty()) {
+                        listOfProcessesInFile.value.forEach { process ->
+                            repository.insert(process)
+                        }
                     }
                 } else {
+                    listOfNewCategories.value.forEach { category ->
+                        repository.insertCategory(category)
+                    }
                     listOfNewProcesses.value.forEach { process ->
                         repository.insert(process)
                     }
@@ -107,17 +145,18 @@ class ImportDataViewModel @Inject constructor(
     @OptIn(ExperimentalStdlibApi::class)
     private fun analyseFile(file: PlatformFile) {
         viewModelScope.launch {
-            val moshi = Moshi.Builder()
-                .addLast(KotlinJsonAdapterFactory())
-                .build()
-            val jsonAdapter: JsonAdapter<List<MeditationTimerProcess>> =
-                moshi.adapter<List<MeditationTimerProcess>>()
             try {
                 val fileContent = file.readBytes().toString(Charsets.UTF_8)
                 Log.d("ImportDataVM", "File content: '$fileContent'")
-                val newProcesses: List<MeditationTimerProcess>? = jsonAdapter.fromJson(fileContent)
-                // compare with existing
-                if (newProcesses != null) {
+                val moshi = Moshi.Builder()
+                    .addLast(KotlinJsonAdapterFactory())
+                    .build()
+                val jsonAdapter: JsonAdapter<RootData> = moshi.adapter<RootData>()
+                val data: RootData? = jsonAdapter.fromJson(fileContent)
+                if (data != null) {
+                    // processes
+                    val newProcesses: List<MeditationTimerProcess> = data.processes
+                    // compare with existing
                     _listOfProcessesInFile.value = newProcesses
                     val oldProcesses = repository.getAllProcesses()
                     val oldUids: MutableList<Long> = mutableListOf()
@@ -147,6 +186,40 @@ class ImportDataViewModel @Inject constructor(
                             val temp = listOfNewProcesses.value.toMutableList()
                             temp.add(newProcess)
                             _listOfNewProcesses.value = temp
+                        }
+                    }
+                    // categories
+                    val newCategories: List<MeditationTimerProcessCategory> = data.categories
+                    // compare with existing
+                    _listOfCategoriesInFile.value = newCategories
+                    val oldCategories = repository.getAllCategories()
+                    val oldCategoryUids: MutableList<Long> = mutableListOf()
+                    oldCategories.forEach { oldCategory ->
+                        oldCategoryUids.add(oldCategory.uid)
+                        if (oldCategory.uid > highestUidInCategoryDB.value) {
+                            _highestUidInCategoryDB.value = oldCategory.uid
+                        }
+                    }
+                    _listOfOldCategories.value = emptyList()
+                    _listOfClashingCategories.value = emptyList()
+                    _listOfNewCategories.value = emptyList()
+                    newCategories.forEach { newCategory ->
+                        if (oldUids.contains(newCategory.uid)) {
+                            // is it the same?
+                            if (newCategory == repository.getCategoryById(newCategory.uid)) {
+                                // it is the same. No need to import
+                                val temp = listOfOldCategories.value.toMutableList()
+                                temp.add(newCategory)
+                                _listOfOldCategories.value = temp
+                            } else {
+                                val temp = listOfClashingCategories.value.toMutableList()
+                                temp.add(newCategory)
+                                _listOfClashingCategories.value = temp
+                            }
+                        } else {
+                            val temp = listOfNewCategories.value.toMutableList()
+                            temp.add(newCategory)
+                            _listOfNewCategories.value = temp
                         }
                     }
                 }
