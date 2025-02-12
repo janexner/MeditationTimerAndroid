@@ -33,9 +33,7 @@ class ExportDataViewModel @Inject constructor(
             val moshi = Moshi.Builder()
                 .addLast(KotlinJsonAdapterFactory())
                 .build()
-            val processes = repository.getAllProcesses()
-            val categories = repository.getAllCategories()
-            val data = RootData(processes, categories)
+            val data = bundleData()
             val jsonAdapter: JsonAdapter<RootData> = moshi.adapter<RootData>()
             val json = jsonAdapter.toJson(data)
             // now save
@@ -53,5 +51,12 @@ class ExportDataViewModel @Inject constructor(
             }
             successCallback()
         }
+    }
+
+    private suspend fun bundleData(): RootData {
+        val processes = repository.getAllProcesses()
+        val categories = repository.getAllCategories()
+        val data = RootData(processes, categories)
+        return data
     }
 }
