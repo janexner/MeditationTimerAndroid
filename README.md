@@ -1,3 +1,5 @@
+i have moved this repository to https://codeberg.org/jexner/MeditationTimerAndroid.git
+
 # Meditation Timer
 
 [Meditation Timer for Android](https://www.jan-exner.de/software/android/meditationtimer) is a free, open source app that can count and beep. It helps with repeating tasks, such as meditation.
